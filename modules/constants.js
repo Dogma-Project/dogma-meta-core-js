@@ -1,0 +1,18 @@
+const constants = {
+	OK:										1,
+	CANNOTGETCERT:							1001,
+	INVALIDCERT:							1002,
+	ADDCERTERROR:							1003,
+	CREATEDBERROR:							1004,
+	GETCONFIGERROR:							1005,
+	CONFIGSAVEERROR:						1006,
+	CANNOTGETDM:							1007,
+	CANNOTPUSHDM:							1008,
+	CANNOTGETFRIENDS:						1009,
+	CANNOTCREATEMK:							1010,
+	CANNOTCREATENK:							1011,
+	CANNOTGETSERVICES:						1012,
+};
+
+
+module.exports = constants;

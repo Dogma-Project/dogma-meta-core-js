@@ -4,7 +4,6 @@
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
   "main": "index.js",
   "homepage": "https://dogma.rgott.com/",
-  "private": true,
   "bugs": {
 	"email" : "dogma@rgott.com"
   },

@@ -9,7 +9,7 @@ TODO: Describe the installation process
 ## Usage
 
 ```javascript
-const {on, api} = require("dogma-core");
+const {ee, api} = require("dogma-core");
 ```
 
 ## History

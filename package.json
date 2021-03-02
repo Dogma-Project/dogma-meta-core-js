@@ -5,6 +5,7 @@
   "main": "index.js",
   "homepage": "https://dogma.rgott.com",
   "bugs": {
+	"url": "https://gitlab.com/dogma-project/dogma-core/-/issues",
 	"email" : "dogma@rgott.com"
   },
   "scripts": {
@@ -27,5 +28,9 @@
     "os": "^0.1.1",
     "sqlite3": "^5.0.2",
     "uuid": "^3.4.0"
+  }, 
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/dogma-project/dogma-core.git"
   }
 }

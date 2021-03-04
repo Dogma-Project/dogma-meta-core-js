@@ -11,7 +11,7 @@ var store = {
 	name: "Dogma Username", // edit
 	nodeName: "Dogma Nodename", // edit
 	config: {},
-	protocol: 4,
+	protocol: 5,
 	ca: [],
 	users: [],
 	node: {
@@ -27,7 +27,8 @@ var store = {
 	}
 };
 
-function getKeys() { 
+const getKeys = () => { 
+	
 	if (!store.master.key) {
 		try {
 			store.master.key = fs.readFileSync(keysDir + "/key.pem");
@@ -50,7 +51,6 @@ function getKeys() {
 			console.error("NODE KEYS NOT FOUND");
 			services.nodeKey = 0;
 		}
-		
 	}
 	
 }
@@ -99,13 +99,15 @@ const readNodesTable = () => {
 	});
 }
 
-const checkHomeDir =() => {
+const checkHomeDir = () => {
 	return new Promise((resolve, reject) => {
 		try {
-			if (!fs.existsSync(global.datadir)) fs.mkdirSync(global.datadir);
+			if (!fs.existsSync(global.datadir)) fs.mkdirSync(global.datadir, {
+				recursive: true
+			});
 			resolve();
-		} catch (error) {
-			reject(error);
+		} catch (err) {
+			reject(err);
 		}
 
 	});

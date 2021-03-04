@@ -1,14 +1,16 @@
 'use strict';
-const store = require("./store");
+const { store } = require("./store");
 const client = require("./client");
 const {subscribe} = require("./state");
 const localDiscovery = require("./localDiscovery");
 const EventEmitter = require("./eventEmitter");
+const { users, nodes, connections } = require("./nedb");
 
 var peers = {};
 var interval1,interval2;
 
 function searchFriends() {
+	console.log("STORE", store);
 	store.users.forEach(user => dhtLookup(user.hash));
 }
 
@@ -53,12 +55,39 @@ function tryPeer(peer, infoHash, from) { // check non-listed peers
 		if (!inFriends) return console.log("pubkey", pubkey, "not in the friends list");
 	}
 	const address = peer.host + ":" + peer.port;
+	getConnectionsCount(address).then((count) => {
+		if (count === 0) client.connect(peer);
+	}).catch((err) => {
+		console.error(err);
+	});
+}
+
+/**
+ * 
+ * @param {String} address host:port
+ */
+const getConnectionsCount = (address) => {
 	console.log("TRY PEER", address);
-	global.temp.get("SELECT COUNT(*) as c FROM temp WHERE address = ?", [address]).then(result => { 
-		if (!result.c) client.connect(peer);
-	}).catch(error => {
-		console.error("CRITICAL", error);
-	})	
+	return new Promise((resolve, reject) => {
+		connections.find({ address }, (err, result) => {
+			if (err) return reject(err);
+			resolve(result.length);
+		});
+	})
+}
+
+const getOwnNodes = () => { 
+	return new Promise((resolve, reject) => {
+		users.find({ type: 0}, (err, result) => {
+			if (err) return reject(err);
+			// can be only one own user
+			const uhash = result[0].hash;
+			nodes.find({ user_hash: uhash }, (err, result) => {
+				if (err) return reject(err);
+				resolve(result);
+			})
+		})
+	});
 }
 
 localDiscovery.subscribe("dogma-router", (service) => {
@@ -88,3 +117,5 @@ subscribe(["dht", "config-dhtLookup", "users"], (action) => { // edit
 
 module.exports.tryPeer = tryPeer;
 module.exports.peers = peers;
+module.exports.getOwnNodes = getOwnNodes;
+module.exports.getcc = getConnectionsCount;

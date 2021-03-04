@@ -1,130 +1,63 @@
-const homedir = require('os').homedir();
-const sqlite3 = require('sqlite3').verbose();
-const store = require("../store");
-const {emit} = require("../state");
-const model = require("../model");
+const { emit } = require("../state");
+const { config, users, nodes } = require("../nedb");
 
-var database;
+const createConfigTable = (defaults) => {
+	return new Promise((resolve, reject) => { 
+		const newArr = Object.keys(defaults).map((key) => {
+			return {
+				param: key,
+				value: defaults[key]
+			};
+		});
+		config.insert(newArr, (err, result) => {
+			if (err) return reject(err);
+			emit("config-db", 2);
+			resolve(result);
+		});
+	});
+}
 
 /**
  * 
- * @param {Object} defaults router, bootstrap, dhtLookup, dhtAnnounce, external, autoDefine, ip4
+ * @param {Object} store must contain master.hash, name, master.cert
  */
-function createConfigTable(defaults) { // edit ????? !!!!
-	console.log("creating config table");
-	return new Promise((resolve, reject) => {
-		database.run(`CREATE TABLE "config" (
-			param TEXT UNIQUE,
-			value BLOB,
-			CONSTRAINT config_PK PRIMARY KEY (param)
-		)`, async (err) => { 
-			if (err) {
-				return reject("CRITICAL:: failed to create config table: " + err.message);
-			} 
-			try {
-				const newObject = Object.keys(defaults).map((key) => {
-					return [key, defaults[key]];
-				});
-				var stmt = database.prepare("INSERT INTO config(param,value) VALUES (?,?)");
-				for (var i = 0; i < newObject.length; i++) {
-					stmt.run(newObject[i]);
-				}
-				stmt.finalize();
-				resolve(true);
-			} catch (err2) {
-				reject(err2);
-			}
-		});
-	});
-}
-
-function createParamsTable() { 
-	console.log("creating params table");
-	return new Promise((resolve, reject) => {
-		database.run(`CREATE TABLE "params" (
-			param TEXT UNIQUE,
-			value TEXT,
-			CONSTRAINT params_PK PRIMARY KEY (param)
-		)`, (err) => { 
-			if (err) {
-				return reject("CRITICAL:: failed to create params table: " + err.message);
-			} 
-			database.run(`INSERT INTO params(param,value) VALUES ('router', ${store.protocol})`, (err) => {
-				if (err) {
-					return reject("CRITICAL:: failed to insert defaults into a params table: " + err.message);
-				} 
-				resolve(true);
-			});
-		});
-	});
-}
-
-function createUsersTable() { 
-	return new Promise((resolve, reject) => {
-		database.run(`CREATE TABLE users (
-			hash TEXT NOT NULL UNIQUE,
-			name TEXT DEFAULT 'Dogma User',
-			cert TEXT NOT NULL,
-			"type" INTEGER DEFAULT -1 NOT NULL,
-			CONSTRAINT users_PK PRIMARY KEY (hash)
-		)`, (err) => { 
-			if (err) {
-				return reject("CRITICAL:: failed to create users table: " + err.message);
-			} 
-			const params = [
-				store.master.hash,
-				store.name,
-				store.master.cert.toString("utf-8"),
-				"0" // own cert
-			];
-			database.run(`INSERT INTO users(hash,name,cert,"type") VALUES (?,?,?,?)`, params, (err) => {
-				if (err) {
-					return reject("CRITICAL:: failed to insert defaults into a users table: " + err.message);
-				} 
-				resolve(true);
-			});
+const createUsersTable = (store) => {
+	return new Promise((resolve, reject) => { 
+		const doc = {
+			hash: store.master.hash,
+			name: store.name,
+			cert: store.master.cert.toString("utf-8"),
+			type: 0 
+		}
+		users.insert(doc, (err, result) => {
+			if (err) return reject(err);
+			emit("users-db", 2);
+			resolve(result);
 		});
 	});
 }
 
 /**
  * 
+ * @param {Object} store must contain master.hash, nodeName, node.hash
  * @param {Object} defaults ip4, router, bootstrap, stun, turn
  */
-function createNodesTable(defaults) { 
-	return new Promise((resolve, reject) => {
-		database.run(`CREATE TABLE nodes (
-			name TEXT DEFAULT 'Dogma Node',
-			hash TEXT NOT NULL,
-			user_hash TEXT NOT NULL,
-			ip4 TEXT DEFAULT '',
-			router_port INTEGER DEFAULT '0',
-			bootstrap_port INTEGER DEFAULT '0',
-			stun_port INTEGER DEFAULT '0',
-			turn_port INTEGER DEFAULT '0',
-			CONSTRAINT nodes_PK PRIMARY KEY (hash,user_hash),
-			CONSTRAINT nodes_FK FOREIGN KEY (user_hash) REFERENCES users(hash) ON DELETE CASCADE
-		)`, (err) => { 
-			if (err) {
-				return reject("CRITICAL:: failed to create nodes table: " + err.message);
-			} 
-			// add external
-			const params = [
-				store.nodeName,
-				store.node.hash,
-				store.master.hash,
-				defaults.ip4,
-				defaults.router,
-				defaults.bootstrap,
-				defaults.stun,
-				defaults.turn
-			];
-			database.run(`INSERT INTO nodes(name,hash,user_hash,ip4,router_port,bootstrap_port,stun_port,turn_port) VALUES (?,?,?,?,?,?,?,?)`, params, (err) => {
-				if (err) {
-					return reject("CRITICAL:: failed to insert defaults into a nodes table: " + err.message);
-				} 
-				resolve(true);
-			});
+const createNodesTable = (store, defaults) => {
+	return new Promise((resolve, reject) => { 
+		const doc = {
+			name: store.nodeName,
+			hash: store.node.hash,
+			user_hash: store.master.hash,
+			ip4: defaults.ip4,
+			router_port: defaults.router,
+			bootstrap_port: defaults.bootstrap,
+			stun_port: defaults.stun,
+			turn_port: defaults.turn
+		};
+		nodes.insert(doc, (err, result) => {
+			if (err) return reject(err);
+			emit("nodes-db", 2);
+			resolve(result);
 		});
 	});
 }
@@ -132,31 +65,24 @@ function createNodesTable(defaults) {
 /**
  * 
  * @param {Object} defaults router, bootstrap, dhtLookup, dhtAnnounce, external, autoDefine, ip4, stun, turn
+ * @param {Object} store FOR TESTS! master.hash, master.cert, name, nodeName, node.hash
  */
-module.exports = (defaults) => { 
-	return new Promise((resolve, reject) => {
+module.exports.createDataBase = (defaults, store) => { 
+	return new Promise(async (resolve, reject) => {
 		try {
-			const path = homedir + "/.dogma-node/data.db"; // edit
-			database = new sqlite3.Database(path, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, async (err) => {
-				if (err) { 
-					reject("CRITICAL:: failed to create node.db: " + err.message);
-				} else { 
-					console.log("created empty db", path);
-					try {
-						await createParamsTable();
-						await createUsersTable();
-						await createNodesTable(defaults);
-						await createConfigTable(defaults);
-						emit("db-ready", true);
-						console.log("created db tables");
-					} catch (err) {
-						return reject("DB INIT ERROR:: " + err);
-					}
-					resolve(true);
-				}
-			});
+			if (!store) {
+				const { store } = require("../store");
+			}
+			await createUsersTable(store);
+			await createNodesTable(store, defaults);
+			await createConfigTable(defaults);
+			resolve(1)
 		} catch (err) {
 			reject(err);
 		}
 	});
 }
+
+module.exports.cconfig = createConfigTable;
+module.exports.cusers = createUsersTable;
+module.exports.cnodes = createNodesTable;

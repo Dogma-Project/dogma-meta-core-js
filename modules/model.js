@@ -35,10 +35,6 @@ class Model {
 		});
 	}
 
-	selectOwnNodes() {
-		return db.all("SELECT n.* FROM nodes n JOIN users u ON u.hash = n.user_hash WHERE u.`type` == 0");
-	}
-
 }
 
 var model = new Model;

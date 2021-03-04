@@ -1,8 +1,9 @@
 'use strict';
 const uuidv4 = require('uuid').v4;
-const store = require("./store");
+const { store } = require("./store");
 const directMessage = require("./directMessage");
 const multiplex = require('multiplex');
+const { connections } = require("./nedb");
 
 var connection = {
     peers: {},
@@ -16,15 +17,18 @@ var connection = {
 			global.log.info("SELF CONNECTED", address);
             // socket.destroy(); // temp
         }
-		const params = [connectionId, key, address];
-        global.temp.query("INSERT INTO temp(connection_id,device_id,address) VALUES(?,?,?)", params).then(() => { 
-            // console.log("SUCCESS", "INSERT INTO TEMP", params);
-		}).catch(async (_err) => { // check if planned duplicate
+		const params = {
+			connection_id: connectionId, 
+			device_id: key, 
+			address
+		};
+
+		const errorHandler = (err) => { // edit !!! // add duplicates resolving
 			return; // test
 			console.log("DESTROY SOCKET", address, connectionId);
 			return socket.destroy(); // проверить работу системы
             if (!socket._tlsOptions.isServer) { // edit
-                await global.temp.query("UPDATE temp SET address = ? WHERE device_id = ?", [address, key]).then(() => {
+                await _temp._query("UPDATE temp SET address = ? WHERE device_id = ?", [address, key]).then(() => {
                     // console.log("successfully updated connection", [address, key]);
                 }).catch(error => {
                     console.error("can't update connection");
@@ -32,7 +36,12 @@ var connection = {
 			} 
 			console.log("DESTROY SOCKET", address, connectionId);
 			socket.destroy(); // check // edit // !!!
-        });
+		}
+
+		connections.insert(params, (err, _result) => {
+			if (err) return errorHandler(err);
+		});
+
     },
 
     onConnect: (socket, address) => { 
@@ -81,23 +90,29 @@ var connection = {
         connection.accept(socket);
     },
 
-    onClose: async (socket) => { 
-        try {
-            // console.log("CONNECTION CLOSED", socket.dogma.id, socket.dogma.hash);
-            const params = [
-                socket.dogma.id,
-                store.node.hash
-            ];
-			await global.temp.query("DELETE FROM temp WHERE connection_id = ? AND device_id != ?", params).then(() => { 
-                // check
-				console.log("successfully deleted connection", socket.dogma.id);
-			}).catch(error => {
-				console.error("can't delete connection", error);
-			});
-        } catch (e) {
-            console.log("CONNECTION CLOSED WITH UNK ATTRIBUTE");
-        }
+    onClose: (socket) => { 
+		// const params = [
+		//     socket.dogma.id,
+		//     store.node.hash // wtf????
+		// ];
+		connections.remove(query, { }, (err, _count) => {
+			if (err) return console.error("can't delete connection", err);
+			console.log("successfully deleted connection", socket.dogma.id);
+		});
     }, 
+
+	/**
+	 * 
+	 * @param {String} device_id
+	 */
+	getConnIdByDeviceId: (device_id) => {
+		return new Promise((resolve, reject) => {
+			connections.find({ device_id }, (err, result) => {
+				if (err) return reject(err);
+				resolve(result);
+			})
+		});
+	},
 
 	/**
 	 * 
@@ -113,9 +128,10 @@ var connection = {
 		}
 		try {
 			console.log("SEND TO NODE", message);
-			const result = await global.temp.get("SELECT connection_id AS cid FROM temp WHERE device_id = ?", [deviceId]);
-			if (!result || !result.cid) return response(message.id, 0);
-			const socket = connection.peers[result.cid];
+			const result = await this.getConnIdByDeviceId(deviceId);
+			if (!result || !result.length) return response(message.id, 0);
+			const cid = result[0].connection_id;
+			const socket = connection.peers[cid];
 			directMessage.commit(deviceId, message.text, 0); 
 			console.log("WRITE TO STREAM", message.text);
 			socket.multiplex.messages.write(message.text);

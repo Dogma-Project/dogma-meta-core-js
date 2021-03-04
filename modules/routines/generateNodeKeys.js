@@ -1,9 +1,10 @@
 'use strict';
 const {pki,md,random,util} = require("node-forge");
-const homedir = require('os').homedir();
 const fs = require("fs"); // edit
 const {publicKeyFingerprint, getPublicCertHash} = require("../crypt");
 const {emit} = require("../state");
+
+const keysDir = global.datadir + "/keys";
 
 /**
  * 
@@ -58,14 +59,14 @@ module.exports = (store, params) => {
 		store.node.cert	= Buffer.from(pki.certificateToPem(cert));
 		store.node.hash	= getPublicCertHash(store.node.cert, true);
 		console.log("HASH", store.node.hash);
-		fs.writeFile(homedir + "/.dogma-node/node-key.pem", store.node.key, (err) => {
+		fs.writeFile(keysDir + "/node-key.pem", store.node.key, (err) => {
 			if (err) {
 				console.error("Failed to write node key", err.name + ":" + err.message);
 			} else {
 				console.log("successfully wrote node key")
 			}
 		});
-		fs.writeFile(homedir + "/.dogma-node/node-cert.pem", store.node.cert, (err) => {
+		fs.writeFile(keysDir + "/node-cert.pem", store.node.cert, (err) => {
 			if (err) {
 				console.error("Failed to write node cert", err.name + ":" + err.message);
 			} else {

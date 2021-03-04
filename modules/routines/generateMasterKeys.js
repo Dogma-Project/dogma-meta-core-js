@@ -1,9 +1,10 @@
 'use strict';
 const {pki,md,random,util} = require("node-forge");
-const homedir = require('os').homedir();
 const fs = require("fs"); // edit
 const {publicKeyFingerprint, getPublicCertHash} = require("../crypt");
 const {emit} = require("../state");
+
+const keysDir = global.datadir + "/keys";
 
 /**
  * 
@@ -54,14 +55,14 @@ module.exports = (store, params) => {
 		store.master.key	= Buffer.from(pki.privateKeyToPem(keys.privateKey));
 		store.master.cert	= Buffer.from(pki.certificateToPem(cert));
 		store.master.hash	= getPublicCertHash(store.master.cert);
-		fs.writeFile(homedir + "/.dogma-node/key.pem", store.master.key, (err) => {
+		fs.writeFile(keysDir + "/key.pem", store.master.key, (err) => {
 			if (err) {
 				console.error("Failed to write master key", err.name + ":" + err.message);
 			} else {
 				console.log("successfully wrote master key")
 			}
 		});
-		fs.writeFile(homedir + "/.dogma-node/cert.pem", store.master.cert, (err) => {
+		fs.writeFile(keysDir + "/cert.pem", store.master.cert, (err) => {
 			if (err) {
 				console.error("Failed to write master cert", err.name + ":" + err.message);
 			} else {

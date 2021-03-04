@@ -1,5 +1,5 @@
 const bonjour = require('bonjour')();
-const store = require("./store");
+const { store } = require("./store");
 /**
  * 
  * @param {String} type dogma-router, dogma-dht

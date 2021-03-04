@@ -34,18 +34,18 @@ const crypt = {
 		});
 	},
 
-    getDogmaCertificate: () => {
+	/**
+	 * 
+	 * @param {Array} nodes result of getOwnNodes
+	 */
+    getDogmaCertificate: (nodes) => {
 		return new Promise( async (resolve, reject) => { 
 			try {
-				var store = require("./store");
+				var { store } = require("./store");
 				var dogmaCert = {
 					pubKey: store.master.cert.toString("utf-8"),
 				}
-				try { 
-					dogmaCert.nodes = await model.selectOwnNodes();
-				} catch (err) {
-					reject(err);
-				}
+				dogmaCert.nodes = nodes || [];
 				const result = Buffer.from(JSON.stringify(dogmaCert)).toString("base64");
 				resolve(result);
 			} catch (err) {
@@ -76,7 +76,7 @@ const crypt = {
 	 */
 	validateDogmaCertificate(cert) { 
 
-		var store = require("./store");
+		var { store } = require("./store");
 		const error = (reason) => {
 			return {
 				result: 0,

@@ -1,7 +1,7 @@
 'use strict';
 var tls = require('tls');
 var connection = require("./connection");
-var store = require("./store");
+var { store } = require("./store");
 
 var client = { 
     connect: (peer) => { 

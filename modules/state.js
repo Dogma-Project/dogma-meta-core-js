@@ -46,6 +46,7 @@ const servicesHandler = {
 	}
 }
 
+module.exports.state = state;
 module.exports.subscribe = subscribe;
 module.exports.emit = emit;
 module.exports.services = new Proxy(services, servicesHandler);

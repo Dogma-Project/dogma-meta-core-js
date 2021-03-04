@@ -1,7 +1,7 @@
-var store = require("./store");
-const db = require("./db");
+var { store } = require("./store");
 const {test} = require("./client");
 const {emit} = require("./state");
+const { nodes } = require("./nedb");
 
 const getExternalIp4 = () => { 
 	return new Promise((resolve, reject) => { 
@@ -38,11 +38,13 @@ const testExternalIp4 = (ip) => {
 	return new Promise((resolve, reject) => {
 		if (store.node.ip4 === ip) {
 			resolve(true);
-		} else {
-			db.run("UPDATE nodes SET ip4 = ? WHERE hash = ?", [ip, store.node.hash]).then(() => {
+		} else { 
+			nodes.update({ hash: store.node.hash }, { ip4: ip}, (err, result) => {
+				if (err) return reject(err);
+				console.log("external ip4 saved", result);
 				store.node.ip4 = ip;
-				resolve(true);
-			}).catch(reject);
+				resolve(true)
+			});
 		}
 	});
 }

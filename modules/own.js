@@ -1,5 +1,5 @@
 'use strict';
-const store = require("./store");
+const { store } = require("./store");
 const server = require("./server"); 
 const {subscribe, services} = require("./state");
 

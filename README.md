@@ -2,9 +2,19 @@
 
 Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package
 
+## Attention!
+
+This package is a dependency for Dogma Application. If you want to try app, switch to "dogma-headless" package.
+
 ## Installation
 
-TODO: Describe the installation process
+```
+git clone https://gitlab.com/dogma-project/dogma-core.git
+```
+or
+```
+npm i dogma-core
+```
 
 ## Usage
 

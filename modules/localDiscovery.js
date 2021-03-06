@@ -1,5 +1,5 @@
 const bonjour = require('bonjour')();
-const store = require("./store");
+const { store } = require("./store");
 /**
  * 
  * @param {String} type dogma-router, dogma-dht
@@ -7,13 +7,17 @@ const store = require("./store");
  */
 module.exports.localPublish = (type, port) => {
 	try {
-		return bonjour.publish({ 
-			name: `${type}-${store.node.hash}`, 
-			type, 
-			port,
-			txt: {
-				hash: store.master.hash
-			}
+		console.log("unpublish: ", `${type}-${store.node.hash}`);
+		bonjour.unpublishAll(() => {
+			console.log("publish: ", `${type}-${store.node.hash}`);
+			bonjour.publish({ 
+				name: `${type}-${store.node.hash}`, 
+				type, 
+				port,
+				txt: {
+					hash: store.master.hash
+				}
+			});
 		});
 	} catch (error) {
 		console.error("BONJOUR P ERROR::", error);

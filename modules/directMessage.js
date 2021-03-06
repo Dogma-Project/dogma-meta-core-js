@@ -1,5 +1,5 @@
 const EventEmitter = require("./eventEmitter");
-
+const { directMessages } = require("./nedb");
 module.exports = {
 	/**
 	 * 
@@ -7,26 +7,38 @@ module.exports = {
 	 * @param {String} message 
 	 * @param {Number} type 0 - outcoming, 1 - incoming
 	 */
-	commit: (hash, message, type) => {
+	commit: (hash, message, type) => { // edit
 		const time = new Date().getTime();
-		const params = [
+		const params = {
 			hash,
 			message,
-			Number(type),
+			type: Number(type),
 			time
-		];
-        global.temp.query("INSERT INTO dm(device_id,message,type,time) VALUES(?,?,?,?)", params).then(() => { 
+		};
+		directMessages.insert(params, (err, result) => {
+			if (err) return console.error(err);
 			EventEmitter.emit("direct-messages", {
 				code: 1,
 				data: {
-					device_id: hash,
+					device_id: hash, // change property to hash
 					message,
 					type,
 					time
 				}
 			});
-        }).catch(async (err) => { 
-            console.error(err);
+		});
+	}, 
+
+	/**
+	 * 
+	 * @param {Object} params hash, since
+	 */
+	getDirectMessages: (params) => { // add test
+		return new Promise((resolve, reject) => {
+			directMessages.find({ device_id: params.hash }, (err, result) => {
+				if (err) return reject(err);
+				resolve(result);
+			});
 		});
 	}
 }

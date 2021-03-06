@@ -19,14 +19,16 @@ let subscribe = (type, callback) => {
 /**
  * 
  * @param {String} type 
- * @param {*} payload 
+ * @param {*} payload | or Boolean "true" for forced emit
  */
 let emit = (type, payload) => { 
 	let action = 'update';
 	if (listeners[type] === undefined) return console.warn("key isn't registered", type); // edit
 	if (state[type] === undefined) action = 'set';
-	if (JSON.stringify(state[type]) === JSON.stringify(payload)) return console.warn("nothing to emit", type);
-	state[type] = payload;
+	if (payload !== true) {
+		if (JSON.stringify(state[type]) === JSON.stringify(payload)) return console.warn("nothing to emit", type);
+		state[type] = payload;
+	} 
 	listeners[type].forEach((entry) => {
 		let ready = entry[0].every((val) => (state[val] !== undefined));
 		ready && entry[1](action, payload, type); // edit
@@ -46,6 +48,7 @@ const servicesHandler = {
 	}
 }
 
+module.exports.state = state;
 module.exports.subscribe = subscribe;
 module.exports.emit = emit;
 module.exports.services = new Proxy(services, servicesHandler);

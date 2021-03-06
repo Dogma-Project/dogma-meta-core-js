@@ -1,15 +1,16 @@
 'use strict';
 
 const crypt = require("./crypt");
-const createDataBase = require("./routines/createDataBase");
-const store = require("./store");
+const { createDataBase } = require("./routines/createDataBase");
+const { store } = require("./store");
 const model = require("./model");
 const { sendToNode } = require("./connection");
 const generateMasterKeys = require("./routines/generateMasterKeys");
 const generateNodeKeys = require("./routines/generateNodeKeys");
 const { services } = require("./state");
 const c = require("./constants");
-
+const { getOwnNodes } = require("./nodes");
+const { getDirectMessages } = require("./directMessage");
 /**
  * 
  * @param {Number} code 
@@ -25,8 +26,9 @@ const response = (code, data) => {
 }
 
 
-const getFriends = (store) => { // edit
-	if (!store || !store.nodes || !store.users) console.warn("empty store");
+const getFriends = (_store) => { // edit
+	// console.log("GET FRIENDS STORE", _store);
+	if (!_store || !_store.nodes || !_store.users) console.warn("empty store");
 	var object = [];
 	var usersKeys = {};
 	object = store.users.map((user, i) => {
@@ -35,7 +37,7 @@ const getFriends = (store) => { // edit
 		usersKeys[user.hash] = i;
 		return user;
 	});
-	store.nodes.forEach((node) => {
+	_store.nodes.forEach((node) => {
 		const uh = node.user_hash;
 		if (usersKeys[uh] !== undefined) {
 			const i = usersKeys[uh];
@@ -61,7 +63,13 @@ module.exports.certificate = {
 	 */
 	get: async () => { 
 		try {
-			const result = await crypt.getDogmaCertificate(); 
+			var nodes = await getOwnNodes();
+		} catch (err) {
+			console.error("get own nodes::", err);
+			var nodes = [];
+		}
+		try {
+			const result = await crypt.getDogmaCertificate(nodes); 
 			return response(c.OK, result);
 		} catch (err) { 
 			console.error("certificate", "get", err);
@@ -128,15 +136,9 @@ module.exports.config = {
 	 * @param {Object} data 
 	 * @returns {Object} result
 	 */
-	set: async (data) => { // edit !!!
+	set: async (data) => {
 		try {
-			const newObject = Object.keys(data).map((key) => {
-				return {
-					param: key,
-					value: data[key]
-				}
-			});
-			const result = await model.persist("config", newObject); // edit
+			const result = await model.persistConfig(data);
 			return response(c.OK, result);
 		} catch (err) {
 			console.error(err);
@@ -153,10 +155,9 @@ module.exports.directMessages = {
 	 */
 	get: async (params) => { // edit
 		try {
-			const result = await global.temp.all("SELECT * FROM dm WHERE time > ? AND device_id = ?", [params.since, params.hash]);
+			const result = await getDirectMessages(params);
 			return response(c.OK, result);
 		} catch (err) { 
-			console.error(err);
 			return response(c.CANNOTGETDM, err);
 		}
 	},

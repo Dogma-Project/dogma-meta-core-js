@@ -1,9 +1,9 @@
 'use strict';
 var tls = require('tls');
 var connection = require("./connection");
-var store = require("./store");
+var { store } = require("./store");
 const {services, emit, subscribe} = require("./state");
-const localDiscovery = require("./localDiscovery");
+// const localDiscovery = require("./localDiscovery");
 const connectionTester = require("./connectionTester");
 
 const getOptions = () => {
@@ -38,7 +38,11 @@ const server = {
         });
 
         server.ss.listen(port, "0.0.0.0", () => { 
-			server.service = localDiscovery.localPublish("dogma-router", port);
+			// try {
+			// 	server.service = localDiscovery.localPublish("dogma-router", port);
+			// } catch (err) {
+			// 	console.error("bonjour announce error::", err);
+			// }
 			emit("server", 1);
             console.log("I'm listening at", port);
         });

@@ -1,6 +1,6 @@
 'use strict';
 var DHT = require('bittorrent-dht');
-var store = require("./store"); 
+var { store } = require("./store"); 
 const {tryPeer} = require("./nodes");
 const {subscribe, emit, services} = require("./state");
 

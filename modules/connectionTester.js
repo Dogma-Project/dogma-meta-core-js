@@ -9,7 +9,6 @@ const getExternalIp4 = () => {
 			var extServices = store.config.external.split("\n").map((item) => {
 				return item.trim();
 			});
-			console.log("EXT SERVICES", extServices);
 			var extIP = require("ext-ip")({
 				mode           : "parallel",
 				replace        : true,
@@ -39,7 +38,7 @@ const testExternalIp4 = (ip) => {
 		if (store.node.ip4 === ip) {
 			resolve(true);
 		} else { 
-			nodes.update({ hash: store.node.hash }, { ip4: ip}, (err, result) => {
+			nodes.update({ hash: store.node.hash }, { $set: {ip4: ip} }, (err, result) => {
 				if (err) return reject(err);
 				console.log("external ip4 saved", result);
 				store.node.ip4 = ip;

@@ -26,8 +26,9 @@ const response = (code, data) => {
 }
 
 
-const getFriends = (store) => { // edit
-	if (!store || !store.nodes || !store.users) console.warn("empty store");
+const getFriends = (_store) => { // edit
+	// console.log("GET FRIENDS STORE", _store);
+	if (!_store || !_store.nodes || !_store.users) console.warn("empty store");
 	var object = [];
 	var usersKeys = {};
 	object = store.users.map((user, i) => {
@@ -36,7 +37,7 @@ const getFriends = (store) => { // edit
 		usersKeys[user.hash] = i;
 		return user;
 	});
-	store.nodes.forEach((node) => {
+	_store.nodes.forEach((node) => {
 		const uh = node.user_hash;
 		if (usersKeys[uh] !== undefined) {
 			const i = usersKeys[uh];
@@ -135,15 +136,9 @@ module.exports.config = {
 	 * @param {Object} data 
 	 * @returns {Object} result
 	 */
-	set: async (data) => { // edit !!!
+	set: async (data) => {
 		try {
-			const newObject = Object.keys(data).map((key) => {
-				return {
-					param: key,
-					value: data[key]
-				}
-			});
-			const result = await model.persist("config", newObject); // edit
+			const result = await model.persistConfig(data);
 			return response(c.OK, result);
 		} catch (err) {
 			console.error(err);

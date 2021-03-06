@@ -25,21 +25,23 @@ var connection = {
 
 		const errorHandler = (err) => { // edit !!! // add duplicates resolving
 			return; // test
-			console.log("DESTROY SOCKET", address, connectionId);
-			return socket.destroy(); // проверить работу системы
-            if (!socket._tlsOptions.isServer) { // edit
-                await _temp._query("UPDATE temp SET address = ? WHERE device_id = ?", [address, key]).then(() => {
-                    // console.log("successfully updated connection", [address, key]);
-                }).catch(error => {
-                    console.error("can't update connection");
-				})
-			} 
-			console.log("DESTROY SOCKET", address, connectionId);
-			socket.destroy(); // check // edit // !!!
+			// console.log("DESTROY SOCKET", address, connectionId);
+			// return socket.destroy(); // проверить работу системы
+            // if (!socket._tlsOptions.isServer) { // edit
+            //     await _temp._query("UPDATE temp SET address = ? WHERE device_id = ?", [address, key]).then(() => {
+            //         // console.log("successfully updated connection", [address, key]);
+            //     }).catch(error => {
+            //         console.error("can't update connection");
+			// 	})
+			// } 
+			// console.log("DESTROY SOCKET", address, connectionId);
+			// socket.destroy(); // check // edit // !!!
 		}
 
+		console.log("INSERT CONNECTION", params);
 		connections.insert(params, (err, _result) => {
 			if (err) return errorHandler(err);
+			console.log("RES IC", _result);
 		});
 
     },
@@ -95,10 +97,15 @@ var connection = {
 		//     socket.dogma.id,
 		//     store.node.hash // wtf????
 		// ];
-		connections.remove(query, { }, (err, _count) => {
-			if (err) return console.error("can't delete connection", err);
-			console.log("successfully deleted connection", socket.dogma.id);
-		});
+		if (!socket.dogma) return console.info("closed socket with unknown attr");
+		try {
+			connections.remove({ connection_id: socket.dogma.id }, { }, (err, _count) => {
+				if (err) return console.error("can't delete connection", err);
+				console.log("successfully deleted connection", socket.dogma.id);
+			});
+		} catch (err) {
+			console.error("connection onClose::", err);
+		}
     }, 
 
 	/**
@@ -127,13 +134,12 @@ var connection = {
 			return res;
 		}
 		try {
-			console.log("SEND TO NODE", message);
-			const result = await this.getConnIdByDeviceId(deviceId);
+			const result = await connection.getConnIdByDeviceId(deviceId);
+			console.log("SEND TO ID", result[0]);
 			if (!result || !result.length) return response(message.id, 0);
 			const cid = result[0].connection_id;
 			const socket = connection.peers[cid];
 			directMessage.commit(deviceId, message.text, 0); 
-			console.log("WRITE TO STREAM", message.text);
 			socket.multiplex.messages.write(message.text);
 			return response(message.id, 1);
 		} catch (err) {

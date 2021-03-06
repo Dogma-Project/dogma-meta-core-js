@@ -1,6 +1,6 @@
 'use strict';
 
-const { config, users, nodes } = require("./nedb");
+const { initPersistDbs, config, users, nodes } = require("./nedb");
 const fs = require("fs"); // edit
 const crypt = require("./crypt");
 const {emit, subscribe, services, state} = require("./state");
@@ -57,53 +57,75 @@ const getKeys = () => {
 
 const readConfigTable = () => {
 	return new Promise((resolve, reject) => {
-		config.find({}, (err, data) => {
-			if (err) return reject(err);
-			data.forEach((element) => {
-				store.config[element.param] = element.value;
-				emit("config-" + element.param, element.value);
-			});
-			resolve(data);
-		})
+		try {
+			config.find({}, (err, data) => {
+				if (err) return reject(err);
+				if (!data.length) return reject(0);
+				data.forEach((element) => {
+					store.config[element.param] = element.value;
+					emit("config-" + element.param, element.value);
+				});
+				resolve(data);
+			})
+		} catch(err) {
+			reject(err);
+		}
 	});
 }
 
 const readUsersTable = () => {
 	return new Promise((resolve, reject) => {
-		users.find({}, (err, data) => {
-			if (err) return reject(err);
-			let caArray = [];
-			data.forEach(user => caArray.push(Buffer.from(user.cert))); // check exception
-			store.ca = caArray;
-			store.users = data;
-			emit("users", data);
-			resolve(data);
-		});
+		try {
+			users.find({}, (err, data) => {
+				if (err) return reject(err);
+				if (!data.length) return reject(0);
+				let caArray = [];
+				data.forEach(user => caArray.push(Buffer.from(user.cert))); // check exception
+				store.ca = caArray;
+				store.users = data;
+				emit("users", data);
+				resolve(data);
+			});
+		} catch (err) {
+			reject(err);
+		}
 	});
 }
 
 const readNodesTable = () => {
 	return new Promise((resolve, reject) => {
-		nodes.find({}, (err, data) => {
-			if (err) return reject(err);
-			store.nodes = data;
-			const currentNode = store.nodes.find(node => node.hash === store.node.hash); 
-			if (currentNode) {
-				store.node.ip4 = currentNode.ip4;
-			} else {
-				console.warn("OWN NODE NOT FOUND");
-			}
-			emit("nodes", store.nodes);
-			resolve(data);
-		})
+		try {
+			nodes.find({}, (err, data) => {
+				if (err) return reject(err);
+				if (!data.length) return reject(0);
+				store.nodes = data;
+				const currentNode = store.nodes.find(node => node.hash === store.node.hash); 
+				if (currentNode) {
+					store.node.ip4 = currentNode.ip4;
+				} else {
+					console.warn("OWN NODE NOT FOUND");
+				}
+				emit("nodes", store.nodes);
+				resolve(data);
+			})
+		} catch (err) {
+			reject(err);
+		}
 	});
 }
 
 const checkHomeDir = () => {
 	return new Promise((resolve, reject) => {
 		try {
-			if (!fs.existsSync(global.datadir)) fs.mkdirSync(global.datadir, {
-				recursive: true
+			const dirs = [
+				"keys",
+				"db"
+			];
+			dirs.forEach((dir) => {
+				dir = global.datadir + "/" + dir;
+				if (!fs.existsSync(dir)) fs.mkdirSync(dir, {
+					recursive: true
+				});
 			});
 			resolve();
 		} catch (err) {
@@ -113,13 +135,6 @@ const checkHomeDir = () => {
 	});
 }
 
-const getConfigs = () => { 
-	readConfigTable();
-	readUsersTable();
-	readNodesTable();
-	services.database = 2;
-}
-
 subscribe(["master-key"], () => {
 	services.masterKey = 2;
 });
@@ -127,25 +142,43 @@ subscribe(["node-key"], () => {
 	services.nodeKey = 2;
 });
 
-subscribe(["db-ready"], () => {
-	services.database = 1;
-	getConfigs();
+// subscribe(["master-key", "node-key"], getConfigs); // edit
+
+subscribe(["config-db"], (_action, _status) => {
+	readConfigTable().then((_result) => {
+		emit("config-db", 2);
+	}).catch((err) => {
+		emit("config-db", 0);
+		console.error("read config db error::", err);
+	});
 });
-subscribe(["master-key", "node-key"], getConfigs);
-subscribe(["config-db"], readConfigTable);
-subscribe(["users-db"], readNodesTable);
-subscribe(["nodes-db"], readUsersTable);
+subscribe(["users-db"], (_action, status) => {
+	readUsersTable().then((result) => {
+		emit("users-db", 2);
+	}).catch((err) => {
+		emit("users-db", 0);
+		console.error("read users db error::", err);
+	});
+});
+subscribe(["nodes-db"], (_action, status) => {
+	readNodesTable().then((result) => {
+		emit("nodes-db", 2);
+	}).catch((err) => { 
+		emit("nodes-db", 0);
+		console.error("read nodes db error::", err);
+	});
+});
 
 subscribe(["config-db", "users-db", "nodes-db"], () => {
-	console.log("STATE", state);
-	if (state["config-db"] == 2 && state["users-db"] == 2 && state["nodes-db"] == 2) {
-		emit("db-ready", 1);
-	}
+	if (state["config-db"] === 2 && state["users-db"] === 2 && state["nodes-db"] === 2) services.database = 2;
 })
 
 // INIT POINT
-checkHomeDir().then(getKeys).catch(error => {
-	console.error("CRITICAL ERROR. CAN'T CREATE HOME DIR");
+checkHomeDir().then(() => {
+	initPersistDbs();
+	getKeys();
+}).catch((err) => {
+	console.error("CRITICAL ERROR. CAN'T CREATE HOME DIR", err);
 });
 
 module.exports.store = store;

@@ -141,13 +141,13 @@ const crypt = {
 	 */
     addDogmaCertificate: async (data) => { // add response
 		try {
-			const result1 = await model.persist("users", {
+			const result1 = await model.persistUser({
 				name: data.name,
 				hash: data.hash,
 				cert: data.cert,
 				type: Number(!data.own)
 			});
-			const result2 = await model.persist("nodes", data.nodes);
+			const result2 = await model.persistNodes(data.nodes);
 			return (result1 && result2);
 		} catch (err) {
 			console.error("cert adding error", err);

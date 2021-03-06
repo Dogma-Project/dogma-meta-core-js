@@ -2,7 +2,7 @@
 const { store } = require("./store");
 const client = require("./client");
 const {subscribe} = require("./state");
-const localDiscovery = require("./localDiscovery");
+// const localDiscovery = require("./localDiscovery");
 const EventEmitter = require("./eventEmitter");
 const { users, nodes, connections } = require("./nedb");
 
@@ -10,7 +10,6 @@ var peers = {};
 var interval1,interval2;
 
 function searchFriends() {
-	console.log("STORE", store);
 	store.users.forEach(user => dhtLookup(user.hash));
 }
 
@@ -45,6 +44,8 @@ function connect(node) { // edit
  */
 function tryPeer(peer, infoHash, from) { // check non-listed peers
 	if (!from || peer.host == "127.0.0.1") return;
+	if (!peer.host) return console.warn("unknown peer host");
+	if (!peer.port) return console.warn("unknown peer port");
 	if (infoHash) {
 		var pubkey = infoHash;
 		if (typeof infoHash !== 'string') {
@@ -67,7 +68,6 @@ function tryPeer(peer, infoHash, from) { // check non-listed peers
  * @param {String} address host:port
  */
 const getConnectionsCount = (address) => {
-	console.log("TRY PEER", address);
 	return new Promise((resolve, reject) => {
 		connections.find({ address }, (err, result) => {
 			if (err) return reject(err);
@@ -90,15 +90,16 @@ const getOwnNodes = () => {
 	});
 }
 
-localDiscovery.subscribe("dogma-router", (service) => {
-	if (service.txt && service.txt.hash) {
-		console.log("trying to connect local service", service.host);
-		tryPeer({
-			host: service.addresses[0],
-			port: service.port
-		}, service.txt.hash, true);
-	}
-});
+// localDiscovery.subscribe("dogma-router", (service) => {
+// 	if (service.txt && service.txt.hash) {
+// 		console.log("trying to connect local service", service.host);
+// 		tryPeer({
+// 			host: service.addresses[0],
+// 			port: service.port
+// 		}, service.txt.hash, true);
+// 	}
+// });
+
 
 subscribe(["nodes", "users"], (_action) => { // edit 
 	EventEmitter.emit("friends", true);

@@ -31,6 +31,9 @@ stores.directMessages = new Datastore({
 	autoload: true
 });
 
+stores.fileTransfer = new Datastore({
+	autoload: true
+});
 
 // ------------------------ PERSIST -------------------------
 

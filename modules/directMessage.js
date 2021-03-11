@@ -6,24 +6,30 @@ module.exports = {
 	 * @param {String} hash
 	 * @param {String} message 
 	 * @param {Number} type 0 - outcoming, 1 - incoming
+	 * @param {Number} format 0 - message, 1 - files
 	 */
-	commit: (hash, message, type) => { // edit
+	commit: (hash, message, type, format) => { // edit
+		format = Number(format) || 0;
+		type = Number(type);
+		console.log("COMMIT FORMAT", format);
 		const time = new Date().getTime();
 		const params = {
 			hash,
 			message,
-			type: Number(type),
-			time
+			type,
+			time,
+			format
 		};
 		directMessages.insert(params, (err, result) => {
 			if (err) return console.error(err);
-			EventEmitter.emit("direct-messages", {
+			EventEmitter.emit("direct-messages", {  // return to own node
 				code: 1,
 				data: {
-					device_id: hash, // change property to hash
+					device_id: hash,
 					message,
 					type,
-					time
+					time,
+					format
 				}
 			});
 		});

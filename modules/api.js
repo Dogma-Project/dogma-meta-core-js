@@ -152,7 +152,7 @@ module.exports.config = {
 module.exports.directMessages = {
 	/**
 	 * 
-	 * @param {Object} params 
+	 * @param {Object} params { since, hash }
 	 * @returns {Array}
 	 */
 	get: async (params) => { // edit

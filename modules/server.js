@@ -34,6 +34,9 @@ const server = {
 			socket.on('close', () => { 
 				connection.onClose(socket);
 			});
+			socket.on('error', (e) => { 
+				console.warn("socket server error 1", e);
+			});
             // add onEnd
         });
 

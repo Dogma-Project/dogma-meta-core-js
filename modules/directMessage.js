@@ -13,24 +13,18 @@ module.exports = {
 		type = Number(type);
 		console.log("COMMIT FORMAT", format);
 		const time = new Date().getTime();
-		const params = {
-			hash,
+		const data = {
+			device_id: hash,
 			message,
 			type,
 			time,
 			format
 		};
-		directMessages.insert(params, (err, result) => {
+		directMessages.insert(data, (err, result) => {
 			if (err) return console.error(err);
 			EventEmitter.emit("direct-messages", {  // return to own node
-				code: 1,
-				data: {
-					device_id: hash,
-					message,
-					type,
-					time,
-					format
-				}
+				code: 1, // check
+				data
 			});
 		});
 	}, 
@@ -41,7 +35,7 @@ module.exports = {
 	 */
 	getDirectMessages: (params) => { // add test
 		return new Promise((resolve, reject) => {
-			directMessages.find({ device_id: params.hash }, (err, result) => {
+			directMessages.find({ device_id: params.hash }).sort({ time: 1 }).exec((err, result) => {
 				if (err) return reject(err);
 				resolve(result);
 			});

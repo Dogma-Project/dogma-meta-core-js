@@ -5,7 +5,9 @@ const directMessage = require("./directMessage");
 const multiplex = require('multiplex');
 const { connections } = require("./nedb");
 const EventEmitter = require("./eventEmitter");
-const { permitFileTransfer } = require("./files")
+const FilesController = require("./files");
+const DogmaTransform = require("./streams");
+
 var connection = {
     peers: {},
 	online: [],
@@ -28,7 +30,9 @@ var connection = {
 		const errorHandler = (socket, err) => { // edit !!! // add duplicates resolving
 			if (socket.dogma.hash == store.node.hash) return console.info("skip self connection");
 			console.log("DESTROY SOCKET", socket.dogma.address, socket.dogma.id, err.errorType);
-			return socket.destroy(); // check system
+			return socket.destroy(); // check system // need
+
+
             // if (!socket._tlsOptions.isServer) { // edit
             //     await _temp._query("UPDATE temp SET address = ? WHERE device_id = ?", [address, key]).then(() => {
             //         // console.log("successfully updated connection", [address, key]);
@@ -119,7 +123,7 @@ var connection = {
 	 */
 	getConnIdByDeviceId: (device_id) => {
 		return new Promise((resolve, reject) => {
-			connections.find({ device_id }, (err, result) => {
+			connections.findOne({ device_id }, (err, result) => {
 				if (err) return reject(err);
 				resolve(result);
 			})
@@ -140,8 +144,8 @@ var connection = {
 		}
 		try {
 			const result = await connection.getConnIdByDeviceId(deviceId);
-			if (!result || !result.length) return response(message.id, 0);
-			const cid = result[0].connection_id;
+			if (!result) return response(message.id, 0); // edit try catch
+			const cid = result.connection_id;
 			const socket = connection.peers[cid];
 
 			/** test */
@@ -156,7 +160,7 @@ var connection = {
 				const fileFormat = 1;
 				directMessage.commit(deviceId, message.files, 0, fileFormat);
 				message.files.forEach(( file ) => {
-					permitFileTransfer(deviceId, file.descriptor).then((_result) => {
+					FilesController.permitFileTransfer(deviceId, file).then((_result) => {
 						console.log("File transfer allowed", file.descriptor);
 					}).catch((err) => {
 						console.error("can't permit file transfer", err);
@@ -173,6 +177,26 @@ var connection = {
 		} catch (err) {
 			console.error("SEND TO NODE::", err);
 			return response(message.id, -1, "can't send message"); // edit text
+		}
+	},
+
+	/**
+	 * 
+	 * @param {String} deviceId 
+	 * @param {Object} readable Readable stream
+	 * @param {Number} descriptor transfer descriptor
+	 * @returns 
+	 */
+	streamToNode: async (deviceId, readable, descriptor) => { // edit
+		try {
+			const transformStream = new DogmaTransform({ highWaterMark: 200000, descriptor });
+			const result = await connection.getConnIdByDeviceId(deviceId);
+			if (!result) return console.error("wtf"); // edit try catch
+			const cid = result.connection_id;
+			const socket = connection.peers[cid];
+			readable.pipe(transformStream).pipe(socket.multiplex.files);
+		} catch (err) {
+			console.error("stream to node error::", err);
 		}
 	},
 
@@ -208,5 +232,9 @@ var connection = {
 	}
 
 }
+
+EventEmitter.on("file-buffer-complete", (payload) => {
+	console.log("PL", payload);
+})
 
 module.exports = connection;

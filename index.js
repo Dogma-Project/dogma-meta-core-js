@@ -1,6 +1,6 @@
 'use strict';
 
-global.datadir = require('os').homedir() + "/.dogma-node" + (process.env.PREFIX || "");
+global.datadir = require('os').homedir() + "/.dogma-node" + (process.env.PREFIX ? `/${process.env.PREFIX}` : "");
 
 require("./modules/dht");
 require("./modules/own");

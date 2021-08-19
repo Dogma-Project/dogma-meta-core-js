@@ -245,17 +245,25 @@ module.exports.files = {
 	/**
 	 * 
 	 * @param {Object} params 
-	 * @returns {Array}
 	 */
-	get: async (params) => { // edit
-
+	get: async (params) => { 
+		console.log("core api get", params);
 	},
 	/**
 	 * 
 	 * @param {Object} data ArrayBuffer
+	 * @returns {Object} response
 	 */
 	push: async (data) => {
 		const result = files.createFileBuffer(data);
 		return response(c.OK, result);
+	},
+
+	/**
+	 * 
+	 * @param {Object} params
+	 */
+	delete: (params) => {
+		console.log("core api delete", params);
 	}
 }

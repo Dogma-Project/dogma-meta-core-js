@@ -4,13 +4,15 @@ const crypt = require("./crypt");
 const { createDataBase } = require("./routines/createDataBase");
 const { store } = require("./store");
 const model = require("./model");
-const { sendToNode } = require("./connection");
+const Connection = require("./connection");
 const generateMasterKeys = require("./routines/generateMasterKeys");
 const generateNodeKeys = require("./routines/generateNodeKeys");
 const { services } = require("./state");
 const c = require("./constants");
 const { getOwnNodes } = require("./nodes");
 const { getDirectMessages } = require("./directMessage");
+const files = require("./files");
+
 /**
  * 
  * @param {Number} code 
@@ -27,7 +29,6 @@ const response = (code, data) => {
 
 
 const getFriends = (_store) => { // edit
-	// console.log("GET FRIENDS STORE", _store);
 	if (!_store || !_store.nodes || !_store.users) console.warn("empty store");
 	var object = [];
 	var usersKeys = {};
@@ -41,10 +42,11 @@ const getFriends = (_store) => { // edit
 		const uh = node.user_hash;
 		if (usersKeys[uh] !== undefined) {
 			const i = usersKeys[uh];
+			const online = Connection.online.indexOf(node.hash) > -1;
 			object[i].nodes.push({
 				name: node.name,
 				hash: node.hash,
-				online: true
+				online
 			});
 		}
 	});
@@ -150,7 +152,7 @@ module.exports.config = {
 module.exports.directMessages = {
 	/**
 	 * 
-	 * @param {Object} params 
+	 * @param {Object} params { since, hash }
 	 * @returns {Array}
 	 */
 	get: async (params) => { // edit
@@ -166,7 +168,7 @@ module.exports.directMessages = {
 	 * @param {Object} data to, message
 	 */
 	push: async (data) => { // add error message
-		const result = await sendToNode(data.to, data.message);
+		const result = await Connection.sendToNode(data.to, data.message);
 		return response(c.OK, result);
 	}
 }
@@ -236,5 +238,32 @@ module.exports.services = {
 	},
 	set: () => {
 
+	}
+}
+
+module.exports.files = {
+	/**
+	 * 
+	 * @param {Object} params 
+	 */
+	get: async (params) => { 
+		console.log("core api get", params);
+	},
+	/**
+	 * 
+	 * @param {Object} data ArrayBuffer
+	 * @returns {Object} response
+	 */
+	push: async (data) => {
+		const result = files.createFileBuffer(data);
+		return response(c.OK, result);
+	},
+
+	/**
+	 * 
+	 * @param {Object} params
+	 */
+	delete: (params) => {
+		console.log("core api delete", params);
 	}
 }

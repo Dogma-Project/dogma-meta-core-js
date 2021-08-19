@@ -3,7 +3,7 @@ var tls = require('tls');
 var connection = require("./connection");
 var { store } = require("./store");
 const {services, emit, subscribe} = require("./state");
-// const localDiscovery = require("./localDiscovery");
+const localDiscovery = require("./localDiscovery");
 const connectionTester = require("./connectionTester");
 
 const getOptions = () => {
@@ -34,15 +34,18 @@ const server = {
 			socket.on('close', () => { 
 				connection.onClose(socket);
 			});
+			socket.on('error', (e) => { 
+				console.warn("socket server error 1", e);
+			});
             // add onEnd
         });
 
         server.ss.listen(port, "0.0.0.0", () => { 
-			// try {
-			// 	server.service = localDiscovery.localPublish("dogma-router", port);
-			// } catch (err) {
-			// 	console.error("bonjour announce error::", err);
-			// }
+			try { // edit!
+				server.service = localDiscovery.localPublish("dogma-router", port);
+			} catch (err) {
+				console.error("bonjour announce error::", err);
+			}
 			emit("server", 1);
             console.log("I'm listening at", port);
         });

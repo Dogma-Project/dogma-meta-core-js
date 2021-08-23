@@ -90,15 +90,15 @@ const getOwnNodes = () => {
 	});
 }
 
-localDiscovery.subscribe("dogma-router", (service) => { // edit
-	if (service.txt && service.txt.hash) {
-		console.log("trying to connect local service", service.host);
-		tryPeer({
-			host: service.addresses[0],
-			port: service.port
-		}, service.txt.hash, true);
-	}
-});
+// localDiscovery.subscribe("dogma-router", (service) => { // edit
+// 	if (service.txt && service.txt.hash) {
+// 		console.log("trying to connect local service", service.host);
+// 		tryPeer({
+// 			host: service.addresses[0],
+// 			port: service.port
+// 		}, service.txt.hash, true);
+// 	}
+// });
 
 
 subscribe(["nodes", "users"], (_action) => { // edit 

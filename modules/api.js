@@ -11,7 +11,7 @@ const { services } = require("./state");
 const c = require("./constants");
 const { getOwnNodes } = require("./nodes");
 const { getDirectMessages } = require("./directMessage");
-const files = require("./files");
+const FilesController = require("./controllers/files");
 
 /**
  * 
@@ -244,10 +244,22 @@ module.exports.services = {
 module.exports.files = {
 	/**
 	 * 
-	 * @param {Object} params 
+	 * @param {Object} params device_id, request{type, action, [data]}
 	 */
 	get: async (params) => { 
-		console.log("core api get", params);
+		const { device_id, request, request: { data: { descriptor, title, size } } } = params;
+		let ready;
+		try {
+			ready = await FilesController.permitFileDownload({ device_id, descriptor, title, size });
+		} catch (err) {
+			return response(c.OK, err); // edit
+		}
+		if (ready) {
+			const result = await Connection.sendRequestToNode(device_id, request);
+			return response(c.OK, result);
+		} else {
+			return response(c.OK, "can't download file"); // edit
+		}
 	},
 	/**
 	 * 
@@ -255,7 +267,7 @@ module.exports.files = {
 	 * @returns {Object} response
 	 */
 	push: async (data) => {
-		const result = files.createFileBuffer(data);
+		const result = FilesController.createFileBuffer(data);
 		return response(c.OK, result);
 	},
 

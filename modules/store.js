@@ -119,7 +119,8 @@ const checkHomeDir = () => {
 		try {
 			const dirs = [
 				"keys",
-				"db"
+				"db",
+				"download"
 			];
 			dirs.forEach((dir) => {
 				dir = global.datadir + "/" + dir;

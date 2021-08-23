@@ -5,12 +5,22 @@ const directMessage = require("./directMessage");
 const multiplex = require('multiplex');
 const { connections } = require("./nedb");
 const EventEmitter = require("./eventEmitter");
-const FilesController = require("./files");
-const DogmaTransform = require("./streams");
+const { EncodeStream, DecodeStream } = require("./streams");
+
+const FilesController = require("./controllers/files"); // move to dir
+const RequestsController = require("./controllers/requests");
+
+const { Readable } = require('stream'); // test
 
 var connection = {
     peers: {},
 	online: [],
+
+	encodedStream: null,
+	decodedStream: null,
+
+	highWaterMark: 8,
+
     accept: (socket) => {
         const connectionId = socket.dogma.id;
         const key = socket.dogma.hash;
@@ -57,26 +67,59 @@ var connection = {
         console.log("CONNECTION ESTABLISHED", connectionId, address); 
 
 		socket.dogmaPlex = multiplex(function onStream(stream, id) {
-			stream.on('data', function(data) { 
+			stream.on('data', (data) => { 
+				console.log("got", data.length, "bytes in subchannel #", id);
 				id = Number(id);
 				switch (id) {
-					case 0:	// control
-						const message = JSON.parse(data.toString());
-						directMessage.commit(socket.dogma.hash, message.items, 1, message.format);
+	
+					// text
+					case 0: // control
+						const request = JSON.parse(data.toString());
+						RequestsController({ 
+							device_id: socket.dogma.hash,
+							request
+						});
 					break;
 					case 1: // messages
 						directMessage.commit(socket.dogma.hash, data.toString(), 1, 0);
 					break;
+					case 3:	// attachments // rename
+						const message = JSON.parse(data.toString()); // edit try catch
+						directMessage.commit(socket.dogma.hash, message.items, 1, message.format);
+					break;
+	
+					// streams
+					case 2: // files
+	
+						const tempStream = Readable.from(data);
+						const decoder = new DecodeStream({ highWaterMark: connection.highWaterMark });
+						decoder.on("error", (err) => console.error("stream decode error", err));
+						decoder.on("data", (decodedData) => {
+							const descriptor = decoder.descriptor.readUInt16BE(0);
+							FilesController.handleFile(descriptor, decodedData);
+							console.log("Dec data", descriptor, decodedData);
+						});
+						tempStream.pipe(decoder);
+						
+					break;
+	
 					default:
 						console.warn("Unknown substream type", id);
 					break;
-				}
-			})
+				}			
+			});
+			stream.on('end', () => { 
+				stream.resume();
+				console.log('There will be no more data.', 'net stream end');
+			});
 		});
+
 		socket.multiplex = {};
 		socket.multiplex.control = socket.dogmaPlex.createStream(0);
 		socket.multiplex.messages = socket.dogmaPlex.createStream(1);
 		socket.multiplex.files = socket.dogmaPlex.createStream(2);
+		socket.multiplex.attachments = socket.dogmaPlex.createStream(3);
+
 		// add more
 		socket.dogmaPlex.pipe(socket);
 		socket.pipe(socket.dogmaPlex);
@@ -137,7 +180,7 @@ var connection = {
 	 * @returns {Object} id,code,message
 	 */
 	sendToNode: async (deviceId, message) => { // edit // add read status message
-		const response = (id, code, message) => {
+		const response = (id, code, message) => { // edit
 			var res = { id, code };
 			if (message) res.message = message;
 			return res;
@@ -148,7 +191,7 @@ var connection = {
 			const cid = result.connection_id;
 			const socket = connection.peers[cid];
 
-			/** test */
+			/** text */
 			if (message.text && message.text.length) {
 				const messageFormat = 0;
 				directMessage.commit(deviceId, message.text, 0, messageFormat);
@@ -166,7 +209,7 @@ var connection = {
 						console.error("can't permit file transfer", err);
 					})
 				});
-				socket.multiplex.control.write(JSON.stringify({
+				socket.multiplex.attachments.write(JSON.stringify({
 					format: fileFormat,
 					items: message.files
 				}));
@@ -182,6 +225,30 @@ var connection = {
 
 	/**
 	 * 
+	 * @param {String} deviceId node device id
+	 * @param {Object} request type, action, [data]
+	 * @returns {Object} id,code,message
+	 */
+	 sendRequestToNode: async (deviceId, request) => { 
+		const response = (id, code, message) => { // edit
+			var res = { id, code };
+			if (message) res.message = message;
+			return res;
+		}
+		try {
+			const result = await connection.getConnIdByDeviceId(deviceId);
+			if (!result) return response(-1, 0, "user is offline"); // edit try catch
+			const cid = result.connection_id;
+			const socket = connection.peers[cid];
+			socket.multiplex.control.write(JSON.stringify(request));			
+		} catch (err) { 
+			console.error("SEND TO NODE::", err);
+			return response(-1, -1, "can't send request"); // edit text		
+		}
+	},
+
+	/**
+	 * 
 	 * @param {String} deviceId 
 	 * @param {Object} readable Readable stream
 	 * @param {Number} descriptor transfer descriptor
@@ -189,12 +256,12 @@ var connection = {
 	 */
 	streamToNode: async (deviceId, readable, descriptor) => { // edit
 		try {
-			const transformStream = new DogmaTransform({ highWaterMark: 200000, descriptor });
 			const result = await connection.getConnIdByDeviceId(deviceId);
-			if (!result) return console.error("wtf"); // edit try catch
-			const cid = result.connection_id;
-			const socket = connection.peers[cid];
-			readable.pipe(transformStream).pipe(socket.multiplex.files);
+			if (!result) return console.warn("connection id didn't find", deviceId); // edit try catch
+			const socket = connection.peers[result.connection_id];
+			const encoder = new EncodeStream({ highWaterMark: connection.highWaterMark, descriptor });
+			encoder.on("error", (err) => console.error("stream encode error", err));
+			readable.pipe(encoder).pipe(socket.multiplex.files, { end: false });
 		} catch (err) {
 			console.error("stream to node error::", err);
 		}
@@ -235,6 +302,11 @@ var connection = {
 
 EventEmitter.on("file-buffer-complete", (payload) => {
 	console.log("PL", payload);
+})
+EventEmitter.on("send-file", (payload) => {
+	// console.log("send file", payload);
+	const { device_id, stream, descriptor } = payload;
+	connection.streamToNode(device_id, stream, descriptor);
 })
 
 module.exports = connection;

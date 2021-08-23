@@ -41,11 +41,11 @@ const server = {
         });
 
         server.ss.listen(port, "0.0.0.0", () => { 
-			try { // edit!
-				server.service = localDiscovery.localPublish("dogma-router", port);
-			} catch (err) {
-				console.error("bonjour announce error::", err);
-			}
+			// try { // edit!
+			// 	server.service = localDiscovery.localPublish("dogma-router", port);
+			// } catch (err) {
+			// 	console.error("bonjour announce error::", err);
+			// }
 			emit("server", 1);
             console.log("I'm listening at", port);
         });

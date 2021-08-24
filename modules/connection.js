@@ -5,12 +5,22 @@ const directMessage = require("./directMessage");
 const multiplex = require('multiplex');
 const { connections } = require("./nedb");
 const EventEmitter = require("./eventEmitter");
-const { EncodeStream, DecodeStream } = require("./streams");
+const { EncodeStream } = require("./streams");
 
 const FilesController = require("./controllers/files"); // move to dir
 const RequestsController = require("./controllers/requests");
 
-const { Readable } = require('stream'); // test
+
+/**
+ * 
+ * @param {Stream} writable 
+ */
+const initEncoder = (writable) => {
+	let encoder = new EncodeStream({ highWaterMark: connection.highWaterMark, descriptor: 0 });
+	encoder.on("error", (err) => console.error("stream encode error", err));
+	encoder.pipe(writable);
+	return encoder;
+}
 
 var connection = {
     peers: {},
@@ -19,7 +29,9 @@ var connection = {
 	encodedStream: null,
 	decodedStream: null,
 
-	highWaterMark: 8,
+	highWaterMark: 200000,
+
+	messageEncoder: null,
 
     accept: (socket) => {
         const connectionId = socket.dogma.id;
@@ -66,59 +78,50 @@ var connection = {
         const connectionId = uuidv4(); // switch to random generator
         console.log("CONNECTION ESTABLISHED", connectionId, address); 
 
-		socket.dogmaPlex = multiplex(function onStream(stream, id) {
-			stream.on('data', (data) => { 
-				console.log("got", data.length, "bytes in subchannel #", id);
-				id = Number(id);
+		socket.dogmaPlex = multiplex((stream, id) => {
+			id = Number(id);
+			// const decoder = new DecodeStream({ highWaterMark: connection.highWaterMark });
+			stream.on("error", (err) => console.error("stream decode error", err));
+			stream.on("data", (data) => {
+				const descriptorSize = 2; // edit size const
+				const descriptor = data.slice(0, descriptorSize).readUInt16BE(0); 
+				const decodedData = data.slice(descriptorSize);
 				switch (id) {
-	
 					// text
 					case 0: // control
-						const request = JSON.parse(data.toString());
+						const request = JSON.parse(decodedData.toString());
 						RequestsController({ 
 							device_id: socket.dogma.hash,
 							request
 						});
 					break;
 					case 1: // messages
-						directMessage.commit(socket.dogma.hash, data.toString(), 1, 0);
+						directMessage.commit(socket.dogma.hash, decodedData.toString(), 1, 0);
+					break;
+					case 2: // files
+						FilesController.handleFile(descriptor, decodedData);
+						console.log("Dec data", descriptor, decodedData.length);
 					break;
 					case 3:	// attachments // rename
-						const message = JSON.parse(data.toString()); // edit try catch
+						const message = JSON.parse(decodedData.toString()); // edit try catch
 						directMessage.commit(socket.dogma.hash, message.items, 1, message.format);
 					break;
-	
-					// streams
-					case 2: // files
-	
-						const tempStream = Readable.from(data);
-						const decoder = new DecodeStream({ highWaterMark: connection.highWaterMark });
-						decoder.on("error", (err) => console.error("stream decode error", err));
-						decoder.on("data", (decodedData) => {
-							const descriptor = decoder.descriptor.readUInt16BE(0);
-							FilesController.handleFile(descriptor, decodedData);
-							console.log("Dec data", descriptor, decodedData);
-						});
-						tempStream.pipe(decoder);
-						
-					break;
-	
 					default:
 						console.warn("Unknown substream type", id);
 					break;
-				}			
-			});
-			stream.on('end', () => { 
-				stream.resume();
-				console.log('There will be no more data.', 'net stream end');
+				}	
 			});
 		});
 
 		socket.multiplex = {};
-		socket.multiplex.control = socket.dogmaPlex.createStream(0);
-		socket.multiplex.messages = socket.dogmaPlex.createStream(1);
+
+		// text substreams
+		socket.multiplex.control = initEncoder(socket.dogmaPlex.createStream(0));
+		socket.multiplex.messages = initEncoder(socket.dogmaPlex.createStream(1));
+		socket.multiplex.attachments = initEncoder(socket.dogmaPlex.createStream(3));
+
+		// binary substreams
 		socket.multiplex.files = socket.dogmaPlex.createStream(2);
-		socket.multiplex.attachments = socket.dogmaPlex.createStream(3);
 
 		// add more
 		socket.dogmaPlex.pipe(socket);
@@ -261,7 +264,7 @@ var connection = {
 			const socket = connection.peers[result.connection_id];
 			const encoder = new EncodeStream({ highWaterMark: connection.highWaterMark, descriptor });
 			encoder.on("error", (err) => console.error("stream encode error", err));
-			readable.pipe(encoder).pipe(socket.multiplex.files, { end: false });
+			readable.pipe(encoder).pipe(socket.multiplex.files, { end: false }); // edit
 		} catch (err) {
 			console.error("stream to node error::", err);
 		}

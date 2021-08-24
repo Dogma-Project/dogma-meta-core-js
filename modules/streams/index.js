@@ -1,5 +1,5 @@
 const EncodeStream = require("./encode");
-const DecodeStream = require("./decode");
+const BufferToStream = require("./buffer-to-stream");
 
 module.exports.EncodeStream = EncodeStream;
-module.exports.DecodeStream = DecodeStream;
+module.exports.BufferToStream = BufferToStream;

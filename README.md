@@ -1,3 +1,10 @@
+#DEPRECATED!
+Use dogma-meta package instead.
+```
+https://www.npmjs.com/package/dogma-meta
+https://gitlab.com/dogma-project/dogma-meta
+```
+
 # Dogma Project
 
 Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package

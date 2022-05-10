@@ -1,4 +1,4 @@
-#DEPRECATED!
+# DEPRECATED!
 Use dogma-meta package instead.
 ```
 https://www.npmjs.com/package/dogma-meta

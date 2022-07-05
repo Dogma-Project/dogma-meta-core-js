@@ -1,15 +1,28 @@
 const EventEmitter = require("./eventEmitter");
+const logger = require("../logger")
+const { STATES } = require("./constants");
 
-let state = {};
-let listeners = [];
-const services = {};
+const state = { };
+const listeners = [];
+const services = {
+	router: STATES.DISABLED,
+	masterKey: STATES.DISABLED,
+	nodeKey: STATES.DISABLED,
+	database: STATES.DISABLED,
+	dhtBootstrap: STATES.DISABLED,
+	dhtLookup: STATES.DISABLED,
+	dhtAnnounce: STATES.DISABLED,
+	localDiscovery: STATES.DISABLED
+};
+
+/** @module State */
 
 /**
- * 
- * @param {Array} type 
- * @param {Function} callback 
+ *
+ * @param {Array} type array of events
+ * @param {Function} callback (action, value, type)
  */
-let subscribe = (type, callback) => { 
+const subscribe = (type, callback) => { 
 	type.forEach((key) => { 
 		if (listeners[key] === undefined) listeners[key] = [];
 		listeners[key].push([type, callback]);
@@ -17,16 +30,16 @@ let subscribe = (type, callback) => {
 }
 
 /**
- * 
+ *
  * @param {String} type 
- * @param {*} payload | or Boolean "true" for forced emit
+ * @param {*} payload Any payload | or Boolean "true" for forced emit
  */
-let emit = (type, payload) => { 
+const emit = (type, payload) => { 
 	let action = 'update';
-	if (listeners[type] === undefined) return console.warn("key isn't registered", type); // edit
+	if (listeners[type] === undefined) return logger.warn("state", "key isn't registered", type);
 	if (state[type] === undefined) action = 'set';
 	if (payload !== true) {
-		if (JSON.stringify(state[type]) === JSON.stringify(payload)) return console.warn("nothing to emit", type);
+		if (JSON.stringify(state[type]) === JSON.stringify(payload)) return; // logger.warn("state", "nothing to emit", type);
 		state[type] = payload;
 	} 
 	listeners[type].forEach((entry) => {

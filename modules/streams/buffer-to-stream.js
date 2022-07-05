@@ -1,7 +1,14 @@
 const { Readable } = require('stream');
-  
+const logger = require("../../logger");
+
 class BufferToStream extends Readable { 
 
+	/**
+	 * 
+	 * @param {Object} opt
+	 * @param {Buffer} opt.buffer
+	 * @param {Number} opt.chunkSize
+	 */
 	constructor(opt) { // add out of range exception
 		super(opt);
 
@@ -18,7 +25,7 @@ class BufferToStream extends Readable {
 			let part = this.buffer.slice(this.byte, this.byte + this.chunkSize); 
 			this.push(part);
 			this.byte += this.chunkSize;
-			console.log("pushed", part.length, "bytes");
+			logger.log("buffer-to-stream", "pushed", part.length, "bytes");
 		}
 		
 	}

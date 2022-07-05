@@ -1,134 +1,201 @@
-'use strict';
 
-const { initPersistDbs, config, users, nodes } = require("./nedb");
+
+const { initPersistDbs } = require("./nedb"); // edit // reorder
 const fs = require("fs"); // edit
 const crypt = require("./crypt");
-const {emit, subscribe, services, state} = require("./state");
+const { emit, subscribe, services, state } = require("./state");
+const logger = require("../logger");
+const { datadir, dogmaDir } = require("./datadir");
+const args = require("./arguments");
+const { DEFAULTS, DHTPERM, STATES, PROTOCOL } = require("./constants");
 
-const keysDir = global.datadir + "/keys";
+const generateMasterKeys = require("./routines/generateMasterKeys");
+const generateNodeKeys = require("./routines/generateNodeKeys");
+const { cconfig, cusers, cnodes } = require("./routines/createDataBase");
+const { Config, User, Node, Protocol } = require("./model");
 
-var store = { 
-	name: "Dogma Username", // edit
-	nodeName: "Dogma Nodename", // edit
-	config: {},
-	protocol: 5,
+const keysDir = datadir + "/keys";
+const _private = {};
+
+/** @module Store */
+
+/**
+ * Default init store
+ */
+const store = {
+	config: {
+		get router() {
+			return Number(args.port) || Number(_private.router) || Number(DEFAULTS.ROUTER);
+		},
+		set router(port) {
+			_private.router = Number(args.port) || Number(port);
+		}
+	},
 	ca: [],
 	users: [],
+	nodes: [],
 	node: {
+		name: DEFAULTS.NODE_NAME,
 		key: null,
 		cert: null,
-		hash: null,
-		ip4: null
+		id: null,
+		public_ipv4: null
 	},
-	master: {
+	user: {
+		name: DEFAULTS.USER_NAME,
 		key: null,
 		cert: null,
-		hash:  null
+		id: null
 	}
 };
 
-const getKeys = () => { 
-	
-	if (!store.master.key) {
+/**
+ * 
+ */
+const getKeys = () => {
+
+	if (!store.user.key) {
 		try {
-			store.master.key = fs.readFileSync(keysDir + "/key.pem");
-			store.master.cert = fs.readFileSync(keysDir + "/cert.pem");
-			store.master.hash = crypt.getPublicCertHash(store.master.cert);
-			emit("master-key", store.master);
+			store.user.key = fs.readFileSync(keysDir + "/key.pem");
+			store.user.cert = fs.readFileSync(keysDir + "/cert.pem");
+			store.user.id = crypt.getPublicCertHash(store.user.cert);
+			emit("master-key", store.user);
 		} catch (e) {
-			console.error("MASTER KEYS NOT FOUND");
-			services.masterKey = 0;
+			logger.log("store", "MASTER KEYS NOT FOUND");
+			services.masterKey = STATES.READY; // edit
 		}
+		/** @todo check result! */
+		if (services.masterKey === STATES.READY && args.auto) generateMasterKeys(store, {
+			name: args.master || DEFAULTS.USER_NAME,
+			length: 2048
+		});
 	}
 
 	if (!store.node.key) {
 		try {
 			store.node.key = fs.readFileSync(keysDir + "/node-key.pem");
 			store.node.cert = fs.readFileSync(keysDir + "/node-cert.pem");
-			store.node.hash = crypt.getPublicCertHash(store.node.cert, true);
+			store.node.id = crypt.getPublicCertHash(store.node.cert);
+			const names = crypt.getNamesFromNodeCert(store.node.cert);
+			store.user.name = names.user_name;
+			store.node.name = names.node_name;
 			emit("node-key", store.node);
 		} catch (e) {
-			console.error("NODE KEYS NOT FOUND");
-			services.nodeKey = 0;
+			logger.log("store", "NODE KEYS NOT FOUND");
+			services.nodeKey = STATES.READY; // edit
 		}
+		/** @todo check result! */
+		if (services.nodeKey === STATES.READY && args.auto) generateNodeKeys(store, {
+			name: args.node || DEFAULTS.NODE_NAME,
+			length: 2048
+		});
 	}
-	
+
 }
 
-const readConfigTable = () => {
-	return new Promise((resolve, reject) => {
-		try {
-			config.find({}, (err, data) => {
-				if (err) return reject(err);
-				if (!data.length) return reject(0);
-				data.forEach((element) => {
-					store.config[element.param] = element.value;
-					emit("config-" + element.param, element.value);
-				});
-				resolve(data);
-			})
-		} catch(err) {
-			reject(err);
+/**
+ * 
+ * @returns {Promise}
+ */
+const readConfigTable = async () => {
+	try {
+		const data = await Config.getAll();
+		if (!data.length) return Promise.reject(0);
+		data.forEach((element) => {
+			store.config[element.param] = element.value;
+			emit("config-" + element.param, element.value);
+		});
+		return data;
+	} catch (err) {
+		return Promise.reject(err);
+	}
+}
+
+
+/**
+ * 
+ * @returns {Promise}
+ */
+const readUsersTable = async () => {
+	try {
+		const data = await User.getAll();
+		if (!data.length) return Promise.reject(0);
+		let caArray = [];
+		data.forEach(user => caArray.push(Buffer.from(user.cert))); // check exception
+		store.ca = caArray;
+		store.users = data;
+		emit("users", data);
+		return data;
+	} catch (err) {
+		return Promise.reject(err);
+	}
+}
+
+/**
+ * 
+ * @returns {Promise}
+ */
+const readNodesTable = async () => {
+	try {
+		const data = await Node.getAll();
+		if (!data.length) return Promise.reject(0);
+		store.nodes = data;
+		// const currentNode = store.nodes.find(node => node.node_id === store.node.id);
+		// if (currentNode) {
+		// 	store.node.public_ipv4 = currentNode.public_ipv4;
+		// } else {
+		// 	logger.warn("store", "OWN NODE NOT FOUND", store.node);
+		// }
+		emit("nodes", store.nodes);
+		return data;
+	} catch (err) {
+		return Promise.reject(err);
+	}
+}
+
+/**
+ * @returns {Promise}
+ */
+const readProtocolTable = async () => {
+	try {
+		const data = await Protocol.getAll();
+		let protocol = {};
+		for (const key in PROTOCOL) {
+			const item = data.find(obj => obj.name === key);
+			const value = !!item ? (item.value || 0) : 0;
+			protocol[key] = value;
+			emit("protocol-" + key, value);
 		}
-	});
+		return protocol;
+	} catch (err) {
+		return Promise.reject(err);
+	}
 }
 
-const readUsersTable = () => {
-	return new Promise((resolve, reject) => {
-		try {
-			users.find({}, (err, data) => {
-				if (err) return reject(err);
-				if (!data.length) return reject(0);
-				let caArray = [];
-				data.forEach(user => caArray.push(Buffer.from(user.cert))); // check exception
-				store.ca = caArray;
-				store.users = data;
-				emit("users", data);
-				resolve(data);
-			});
-		} catch (err) {
-			reject(err);
-		}
-	});
-}
-
-const readNodesTable = () => {
-	return new Promise((resolve, reject) => {
-		try {
-			nodes.find({}, (err, data) => {
-				if (err) return reject(err);
-				if (!data.length) return reject(0);
-				store.nodes = data;
-				const currentNode = store.nodes.find(node => node.hash === store.node.hash); 
-				if (currentNode) {
-					store.node.ip4 = currentNode.ip4;
-				} else {
-					console.warn("OWN NODE NOT FOUND");
-				}
-				emit("nodes", store.nodes);
-				resolve(data);
-			})
-		} catch (err) {
-			reject(err);
-		}
-	});
-}
-
-const checkHomeDir = () => {
+/**
+ * 
+ * @returns {Promise}
+ */
+const checkHomeDir = () => { // check and test
 	return new Promise((resolve, reject) => {
 		try {
 			const dirs = [
 				"keys",
 				"db",
-				"download"
+				"download",
+				"temp"
 			];
+			if (!args.prefix && !fs.existsSync(datadir)) fs.mkdirSync(datadir, { recursive: true });
 			dirs.forEach((dir) => {
-				dir = global.datadir + "/" + dir;
-				if (!fs.existsSync(dir)) fs.mkdirSync(dir, {
-					recursive: true
-				});
+				const oldDir = dogmaDir + "/" + dir;
+				const newDir = datadir + "/" + dir;
+				if (!args.prefix && fs.existsSync(oldDir)) { // if prefix not exist and there's a dirs in a root
+					fs.renameSync(oldDir, newDir);
+				} else if (!fs.existsSync(newDir)) { // if there's no data dir in prefixed space
+					fs.mkdirSync(newDir, { recursive: true });
+				}
 			});
-			resolve();
+			resolve(true);
 		} catch (err) {
 			reject(err);
 		}
@@ -137,52 +204,89 @@ const checkHomeDir = () => {
 }
 
 subscribe(["master-key"], () => {
-	services.masterKey = 2;
+	services.masterKey = STATES.FULL;
 });
 subscribe(["node-key"], () => {
-	services.nodeKey = 2;
+	services.nodeKey = STATES.FULL;
 });
 
-// subscribe(["master-key", "node-key"], getConfigs); // edit
+const defaults = {
+	router: DEFAULTS.ROUTER,
+	bootstrap: DHTPERM.ONLY_FRIENDS,
+	dhtLookup: DHTPERM.ONLY_FRIENDS,
+	dhtAnnounce: DHTPERM.ONLY_FRIENDS,
+	external: DEFAULTS.EXTERNAL,
+	autoDefine: DEFAULTS.AUTO_DEFINE_IP,
+	public_ipv4: ""
+};
 
-subscribe(["config-db"], (_action, _status) => {
+subscribe(["config-db", "protocol-db"], (_action, _value, _type) => {
+	if (state["config-db"] >= STATES.LIMITED) return; // don't trigger when status is loaded
+	if (state["protocol-db"] < STATES.FULL) return;
 	readConfigTable().then((_result) => {
-		emit("config-db", 2);
+		emit("config-db", STATES.FULL);
 	}).catch((err) => {
-		emit("config-db", 0);
-		console.error("read config db error::", err);
+		if (args.auto) {
+			logger.info("STORE", "Creating config table in automatic mode");
+			cconfig(defaults);
+		} else {
+			emit("config-db", STATES.ERROR); // check
+			logger.log("store", "read config db error::", err);
+		}
 	});
 });
-subscribe(["users-db"], (_action, status) => {
-	readUsersTable().then((result) => {
-		emit("users-db", 2);
+subscribe(["users-db", "protocol-db"], (action, value, type) => { // check
+	if (state["users-db"] >= STATES.LIMITED) return; // don't trigger when status is loaded
+	if (state["protocol-db"] < STATES.FULL) return;
+	readUsersTable().then((_result) => {
+		emit("users-db", STATES.FULL);
 	}).catch((err) => {
-		emit("users-db", 0);
-		console.error("read users db error::", err);
+		if (args.auto) {
+			logger.info("STORE", "Creating users table in automatic mode");
+			cusers(store);
+		} else {
+			emit("users-db", STATES.ERROR); // check
+			logger.log("store", "read users db error::", err);
+		}
 	});
 });
-subscribe(["nodes-db"], (_action, status) => {
+subscribe(["nodes-db", "protocol-db"], (_action, status) => {
+	if (state["nodes-db"] >= STATES.LIMITED) return; // don't trigger when status is loaded
+	if (state["protocol-db"] < STATES.FULL) return;
 	readNodesTable().then((result) => {
-		emit("nodes-db", 2);
-	}).catch((err) => { 
-		emit("nodes-db", 0);
-		console.error("read nodes db error::", err);
+		emit("nodes-db", STATES.FULL);
+	}).catch((err) => {
+		if (args.auto) {
+			logger.info("STORE", "Creating nodes table in automatic mode");
+			cnodes(store, defaults);
+		} else {
+			emit("nodes-db", STATES.ERROR); // check
+			logger.log("store", "read nodes db error::", err);
+		}
 	});
 });
 
 subscribe(["config-db", "users-db", "nodes-db"], () => {
-	if (state["config-db"] === 2 && state["users-db"] === 2 && state["nodes-db"] === 2) services.database = 2;
-})
+	const arr = [state["config-db"], state["users-db"], state["nodes-db"]];
+	arr.sort((a, b) => { return a > b });
+	services.database = arr[0]; // min value
+});
 
 // INIT POINT
-checkHomeDir().then(() => {
-	initPersistDbs();
-	getKeys();
-}).catch((err) => {
-	console.error("CRITICAL ERROR. CAN'T CREATE HOME DIR", err);
-});
+const init = async () => {
+	try {
+		await checkHomeDir();
+		await initPersistDbs();
+		getKeys();
+	} catch (err) {
+		logger.error("store.js", "init", err);
+	}
+}
+
+init();
 
 module.exports.store = store;
 module.exports.rconfig = readConfigTable;
 module.exports.rusers = readUsersTable;
 module.exports.rnodes = readNodesTable;
+module.exports.rprotocol = readProtocolTable;

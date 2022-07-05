@@ -1,17 +1,18 @@
-'use strict';
+
 
 const crypt = require("./crypt");
 const { createDataBase } = require("./routines/createDataBase");
 const { store } = require("./store");
-const model = require("./model");
-const Connection = require("./connection");
 const generateMasterKeys = require("./routines/generateMasterKeys");
 const generateNodeKeys = require("./routines/generateNodeKeys");
 const { services } = require("./state");
-const c = require("./constants");
-const { getOwnNodes } = require("./nodes");
-const { getDirectMessages } = require("./directMessage");
+const { API: c, MESSAGES } = require("./constants"); // edit
 const FilesController = require("./controllers/files");
+const logger = require("../logger");
+const connection = require("./connection");
+const { Connection, Config, User, Message } = require("./model");
+
+/** @module GeneralApi */
 
 /**
  * 
@@ -27,69 +28,72 @@ const response = (code, data) => {
 	}
 }
 
-
-const getFriends = (_store) => { // edit
-	if (!_store || !_store.nodes || !_store.users) console.warn("empty store");
-	var object = [];
-	var usersKeys = {};
+/**
+ * 
+ * @param {Object} _store main store
+ * @returns {Object}
+ */
+const getFriends = async (_store) => { // edit
+	if (!_store || !_store.users || !_store.nodes) logger.warn("api", "empty store");
+	let object = [];
+	let usersKeys = {};
 	object = store.users.map((user, i) => {
 		delete user.cert;
 		user.nodes = [];
-		usersKeys[user.hash] = i;
+		usersKeys[user.user_id] = i;
 		return user;
 	});
 	_store.nodes.forEach((node) => {
-		const uh = node.user_hash;
+		const uh = node.user_id;
 		if (usersKeys[uh] !== undefined) {
 			const i = usersKeys[uh];
-			const online = Connection.online.indexOf(node.hash) > -1;
+			const online = connection.online.indexOf(node.node_id) > -1;
 			object[i].nodes.push({
 				name: node.name,
-				hash: node.hash,
+				node_id: node.node_id, // edit // check on client
 				online
 			});
 		}
 	});
-	
-	object.map(item => {
+
+	object = object.map(item => {
 		const online = item.nodes.filter(x => !!x.online);
 		item.onlineCount = online.length;
 		return item;
 	});
+
+	for (let friend of object) {
+		const { user_id } = friend;
+		friend.messages = await Message.getStatus({ id: user_id, type: MESSAGES.USER });
+	}
 	return object;
 }
 
-module.exports.certificate = { 
+module.exports.certificate = {
 	/**
 	 * @returns {Object} result
 	 */
-	get: async () => { 
+	get: async () => {
 		try {
-			var nodes = await getOwnNodes();
-		} catch (err) {
-			console.error("get own nodes::", err);
-			var nodes = [];
-		}
-		try {
-			const result = await crypt.getDogmaCertificate(nodes); 
+			const result = await crypt.getDogmaCertificate(store);
 			return response(c.OK, result);
-		} catch (err) { 
-			console.error("certificate", "get", err);
+		} catch (err) {
+			logger.error("api certificate", "get 2", err);
 			return response(c.CANNOTGETCERT, err);
 		}
 	},
 	set: () => {
-		console.log("nothing to do");
+		logger.log("api certificate", "set", "nothing to do");
 	},
 	/**
 	 * 
 	 * @param {String} cert b64
 	 * @returns {Object} result
 	 */
-	push: async (cert) => { 
-		const parsed = crypt.validateDogmaCertificate(cert);
+	push: async (cert) => {
+		const parsed = crypt.validateDogmaCertificate(cert, store.user.id);
 		if (parsed.result) {
-			const result = await crypt.addDogmaCertificate(parsed); 
+			const result = await crypt.addDogmaCertificate(parsed);
 			if (result) {
 				return response(c.OK, result)
 			} else {
@@ -106,17 +110,28 @@ module.exports.database = {
 	get: () => {
 
 	},
+
 	/**
 	 * 
-	 * @param {Object} defaults  router, bootstrap, dhtLookup, dhtAnnounce, external, autoDefine, ip4, stun, turn
+	 * @param {Object} store
+	 * @param {Object} defaults 
+	 * @param {Number} defaults.router main node's port
+	 * @param {Number} defaults.bootstrap DHT server permission level
+	 * @param {Number} defaults.dhtLookup DHT lookup permission level
+	 * @param {Number} defaults.dhtAnnounce DHT announce permission level
+	 * @param {String} defaults.external
+	 * @param {Number} defaults.autoDefine
+	 * @param {String} defaults.public_ipv4
+	 * @param {Number} defaults.stun
+	 * @param {Number} defaults.turn
 	 * @returns {Object} result
 	 */
-	set: async (defaults) => { 
+	set: async (defaults) => {
 		try {
-			const result = await createDataBase(defaults);
+			const result = await createDataBase(store, defaults);
 			return response(c.OK, result);
 		} catch (err) {
-			console.error(err);
+			logger.error("API database", "set", err);
 			return response(c.CREATEDBERROR, err); // edit
 		}
 	}
@@ -128,8 +143,8 @@ module.exports.config = {
 		try {
 			const result = store.config;
 			return response(c.OK, result);
-		} catch (err) { 
-			console.error(err);
+		} catch (err) {
+			logger.error("API config", "get", err);
 			return response(c.GETCONFIGERROR, err);
 		}
 	},
@@ -140,50 +155,74 @@ module.exports.config = {
 	 */
 	set: async (data) => {
 		try {
-			const result = await model.persistConfig(data);
+			const result = await Config.persistConfig(data);
 			return response(c.OK, result);
 		} catch (err) {
-			console.error(err);
+			logger.error("API config", "set", err);
 			return response(c.CONFIGSAVEERROR, err);
 		}
 	}
 }
 
-module.exports.directMessages = {
+module.exports.messages = {
 	/**
 	 * 
-	 * @param {Object} params { since, hash }
+	 * @param {Object} params 
+	 * @param {String} params.id
+	 * @param {Number} params.since 
+	 * @param {Number} params.type
 	 * @returns {Array}
 	 */
-	get: async (params) => { // edit
+	get: async (params) => {
 		try {
-			const result = await getDirectMessages(params);
+			const result = await Message.get(params);
 			return response(c.OK, result);
-		} catch (err) { 
-			return response(c.CANNOTGETDM, err);
+		} catch (err) {
+			return response(c.CANNOTGETDM, err); // edit
 		}
 	},
 	/**
 	 * 
-	 * @param {Object} data to, message
+	 * @param {Object} data
+	 * @param {String} data.to
+	 * @param {Object} data.message id,text,files
+	 * @param {Number} data.type 
 	 */
-	push: async (data) => { // add error message
-		const result = await Connection.sendToNode(data.to, data.message);
-		return response(c.OK, result);
+	push: async (data) => {
+		try {
+			const { to, message, type } = data;
+			const result = await connection.sendMessage(to, message, type);
+			return response(c.OK, result);
+		} catch (err) {
+			return response(c.CANNOTPUSHMSG, err);
+		}
 	}
 }
 
-module.exports.friends = { // edit
-	get: () => {
+module.exports.friends = {
+	get: async () => {
 		try {
-			const result = getFriends(store);
+			const result = await getFriends(store);
 			return response(c.OK, result);
 		} catch (err) {
-			return response(c.CANNOTGETFRIENDS, err);	
+			return response(c.CANNOTGETFRIENDS, err);
 		}
 	},
 	set: () => {
-		console.log("do nothing");
+		logger.warn("api friends", "set", "do nothing");
+	},
+	/**
+	 * 
+	 * @param {String} user_id 
+	 */
+	delete: async (user_id) => {
+		try {
+			if (store.user.id === user_id) return response(c.CANNOTDELETEITSELF, user_id);
+			const result = await User.removeUser(user_id);
+			return response(c.OK, result);
+		} catch (err) {
+			return response(c.CANNOTDELETEFRIEND, err);
+		}
 	}
 }
 
@@ -195,15 +234,15 @@ module.exports.masterKey = {
 	 * 
 	 * @param {Object} params 
 	 */
-	set: (params) => { 
+	set: (params) => {
 		const result = generateMasterKeys(store, params);
 		if (result.result) {
 			return response(c.OK);
 		} else {
-			return response(c.CANNOTCREATEMK, result.error);	
+			return response(c.CANNOTCREATEMK, result.error);
 		}
 	}
-} 
+}
 
 module.exports.nodeKey = {
 	get: () => {
@@ -218,7 +257,7 @@ module.exports.nodeKey = {
 		if (result.result) {
 			return response(c.OK);
 		} else {
-			return response(c.CANNOTCREATENK, result.error);	
+			return response(c.CANNOTCREATENK, result.error);
 		}
 	}
 }
@@ -232,7 +271,7 @@ module.exports.services = {
 			const result = JSON.parse(JSON.stringify(services));
 			return response(c.OK, result);
 		} catch (err) {
-			console.error(err);
+			logger.error("API services", "get", err);
 			return response(c.CANNOTGETSERVICES, err);
 		}
 	},
@@ -244,21 +283,28 @@ module.exports.services = {
 module.exports.files = {
 	/**
 	 * 
-	 * @param {Object} params device_id, request{type, action, [data]}
+	 * @param {Object} params to, type, request{type, action, [data]}
 	 */
-	get: async (params) => { 
-		const { device_id, request, request: { data: { descriptor, title, size } } } = params;
-		let ready;
+	get: async (params) => {
+		const {
+			to,
+			request,
+			type,
+			request: {
+				data: {
+					descriptor,
+					title,
+					size
+				}
+			}
+		} = params;
+
 		try {
-			ready = await FilesController.permitFileDownload({ device_id, descriptor, title, size });
+			await FilesController.permitFileDownload({ to, type, descriptor, title, size });
+			const result = await connection.sendRequest(to, request, type);
+			return response(c.OK, result);
 		} catch (err) {
 			return response(c.OK, err); // edit
-		}
-		if (ready) {
-			const result = await Connection.sendRequestToNode(device_id, request);
-			return response(c.OK, result);
-		} else {
-			return response(c.OK, "can't download file"); // edit
 		}
 	},
 	/**
@@ -266,9 +312,8 @@ module.exports.files = {
 	 * @param {Object} data ArrayBuffer
 	 * @returns {Object} response
 	 */
-	push: async (data) => {
-		const result = FilesController.createFileBuffer(data);
-		return response(c.OK, result);
+	push: (data) => {
+		// deprecated
 	},
 
 	/**
@@ -276,6 +321,28 @@ module.exports.files = {
 	 * @param {Object} params
 	 */
 	delete: (params) => {
-		console.log("core api delete", params);
+		logger.debug("api files", "delete", params);
+	}
+
+}
+
+module.exports.connections = {
+
+	get: async () => {
+		try {
+			const result = await Connection.getConnections();
+			return response(c.OK, result);
+		} catch (err) {
+			logger.error("API connections", "get", err);
+			return response(c.CANNOTGETCONNECTIONS, err);
+		}
+	},
+
+	/**
+	 * 
+	 * @param {String} id connection id
+	 */
+	delete: (id) => {
+
 	}
 }

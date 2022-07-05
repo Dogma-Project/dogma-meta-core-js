@@ -1,76 +1,103 @@
-var { store } = require("./store");
-const {test} = require("./client");
-const {emit} = require("./state");
-const { nodes } = require("./nedb");
+const { store } = require("./store");
+const { emit } = require("./state");
+//
+const logger = require("../logger");
+//
+const { Node } = require("./model");
+//
+const { test } = require("./client");
+const { STATES } = require("./constants");
 
-const getExternalIp4 = () => { 
-	return new Promise((resolve, reject) => { 
+/** @module ConnectionTester */
+
+/**
+ * 
+ * @returns {Promise}
+ */
+const getExternalIp4 = () => {
+	return new Promise((resolve, reject) => {
 		try {
 			var extServices = store.config.external.split("\n").map((item) => {
 				return item.trim();
 			});
 			var extIP = require("ext-ip")({
-				mode           : "parallel",
-				replace        : true,
-				timeout        : 500,
-				userAgent      : "curl/ext-ip-getter",
-				followRedirect : true,
-				maxRedirects   : 10,
-				services       : extServices
+				mode: "parallel",
+				replace: true,
+				timeout: 500,
+				userAgent: "curl/ext-ip-getter",
+				followRedirect: true,
+				maxRedirects: 10,
+				services: extServices
 			});
 		} catch (err) {
 			return reject(err);
 		}
 		extIP.get().then(resolve).catch(error => {
-			if (store.node.ip4 && store.node.ip4 !== '127.0.0.1') {
-				resolve(store.node.ip4);
+			if (store.node.public_ipv4 && store.node.public_ipv4 !== '127.0.0.1') {
+				resolve(store.node.public_ipv4);
 			} else {
-				console.error(error);
+				logger.error("connection tester", error);
 				reject("can't get public ip");
 			}
 		})
-		
+
 	});
 }
 
-const testExternalIp4 = (ip) => {
-	return new Promise((resolve, reject) => {
-		if (store.node.ip4 === ip) {
-			resolve(true);
-		} else { 
-			nodes.update({ hash: store.node.hash }, { $set: {ip4: ip} }, (err, result) => {
-				if (err) return reject(err);
-				console.log("external ip4 saved", result);
-				store.node.ip4 = ip;
-				resolve(true)
-			});
+/**
+ * 
+ * @param {String} ip 
+ * @returns {Promise}
+ * @todo add config update
+ */
+const testExternalIp4 = async (ip) => {
+	try {
+		if (store.node.public_ipv4 === ip) {
+			return true;
+		} else {
+			const result = await Node.setNodePublicIPv4(store.node.id, ip);
+			logger.log("connection tester", "external public_ipv4 saved", result);
+			store.node.public_ipv4 = ip;
+			return true;
 		}
-	});
+	} catch (err) {
+		return Promise.reject(err);
+	}
 }
 
+/**
+ * 
+ */
 const testExternalPort = () => {
 	const peer = {
-		host: store.node.ip4,
+		host: store.node.public_ipv4,
 		port: store.config.router
 	};
 	test(peer, result => {
 		if (result) {
-			emit("server", 2);
-		} else { 
-			emit("server", 1);
-			console.log("router external port is closed");
+			emit("server", STATES.FULL);
+		} else {
+			emit("server", STATES.LIMITED);
+			logger.log("connection tester", "router external port is closed");
 		}
 	})
 }
 
+/**
+ * 
+ */
 module.exports.check = () => {
 	if (store.config.autoDefine) {
-		getExternalIp4().then(testExternalIp4).then(testExternalPort).catch(console.error);
-	} else { 
-		if (!!store.config.ip4) {
-			testExternalIp4(store.config.ip4).then(testExternalPort).catch(console.error);
+		getExternalIp4().then(testExternalIp4).then(testExternalPort).catch((error) => {
+			logger.error("connection tester", error);
+		});
+	} else {
+		if (!!store.config.public_ipv4) {
+			testExternalIp4(store.config.public_ipv4).then(testExternalPort).catch((error) => {
+				logger.error("connection tester", error);
+			});
 		} else {
-			console.warn("CONNECTION TESTER::", "undefined ip4");
+			logger.warn("connection tester", "undefined public_ipv4");
 		}
 	}
 }

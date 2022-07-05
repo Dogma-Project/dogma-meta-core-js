@@ -1,26 +1,42 @@
-'use strict';
-const {pki,md,random,util} = require("node-forge");
-const fs = require("fs"); // edit
-const {publicKeyFingerprint, getPublicCertHash} = require("../crypt");
-const {emit} = require("../state");
 
-const keysDir = global.datadir + "/keys";
+const { pki, md, random, util } = require("node-forge");
+const fs = require("fs"); // edit
+const { publicKeyFingerprint, getPublicCertHash } = require("../crypt");
+const { emit } = require("../state");
+const logger = require("../../logger");
+const { datadir } = require("../datadir");
+
+const keysDir = datadir + "/keys";
+
+/**
+ * Master keys generator
+ * @module GenerateMasterKeys
+ */
 
 /**
  * 
- * @param {Object} store 
- * @param {Object} params name,length,seed
+ * @param {Object} store main app's store
+ * @param {Object} params
+ * @param {Object} params.name 
+ * @param {Number} params.length 
+ * @param {String} params.seed check
  */
-module.exports = (store, params) => { 
+const generateMasterKeys = (store, params) => {
 	try {
-		console.log("Generating Master Keys for", params.name, params.keylength);
-		store.name = params.name;
-		var rand = random.createInstance();
-		rand.collect(util.createBuffer(params.seed, 'utf8'));
-		var keys = pki.rsa.generateKeyPair({
-			bits: Number(params.keylength),
-			prng: rand
-		});
+		logger.log("generate master keys", "Generating MK for", params.name, params.keylength);
+		store.user.name = params.name;
+		if (params.seed) {
+			var rand = random.createInstance();
+			rand.collect(util.createBuffer(params.seed, 'utf8'));
+			var keys = pki.rsa.generateKeyPair({
+				bits: Number(params.keylength),
+				prng: rand
+			});
+		} else {
+			var keys = pki.rsa.generateKeyPair({
+				bits: Number(params.keylength)
+			});
+		}
 		var cert = pki.createCertificate();
 		cert.publicKey = keys.publicKey;
 		cert.validity.notBefore = new Date();
@@ -33,7 +49,7 @@ module.exports = (store, params) => {
 			value: commonName
 		}, {
 			name: 'organizationName',
-			value: store.name
+			value: store.user.name
 		}];
 
 		cert.setSubject(subject);
@@ -52,33 +68,35 @@ module.exports = (store, params) => {
 
 		cert.sign(keys.privateKey, md.sha256.create());
 
-		store.master.key	= Buffer.from(pki.privateKeyToPem(keys.privateKey));
-		store.master.cert	= Buffer.from(pki.certificateToPem(cert));
-		store.master.hash	= getPublicCertHash(store.master.cert);
-		fs.writeFile(keysDir + "/key.pem", store.master.key, (err) => {
+		store.user.key = Buffer.from(pki.privateKeyToPem(keys.privateKey));
+		store.user.cert = Buffer.from(pki.certificateToPem(cert));
+		store.user.id = getPublicCertHash(store.user.cert);
+		fs.writeFile(keysDir + "/key.pem", store.user.key, (err) => {
 			if (err) {
-				console.error("Failed to write master key", err.name + ":" + err.message);
+				logger.error("generate master keys", "Failed to write master key", err.name + ":" + err.message);
 			} else {
-				console.log("successfully wrote master key")
+				logger.log("generate master keys", "successfully wrote master key");
 			}
 		});
-		fs.writeFile(keysDir + "/cert.pem", store.master.cert, (err) => {
+		fs.writeFile(keysDir + "/cert.pem", store.user.cert, (err) => {
 			if (err) {
-				console.error("Failed to write master cert", err.name + ":" + err.message);
+				logger.error("generate master keys", "Failed to write master cert", err.name + ":" + err.message);
 			} else {
-				console.log("successfully wrote master cert")
+				logger.log("generate master keys", "successfully wrote master cert");
 			}
 		});
-		emit("master-key", store.master);
+		emit("master-key", store.user);
 		return {
 			result: 1,
 			error: null
 		}
 	} catch (err) {
-		console.error(err);
+		logger.error("generate master keys function", err);
 		return {
 			result: 0,
 			error: err // edit
 		}
 	}
 }
+
+module.exports = generateMasterKeys;

@@ -1,41 +1,21 @@
-const bonjour = require('bonjour')();
-const { store } = require("./store");
-/**
- * 
- * @param {String} type dogma-router, dogma-dht
- * @param {Number} port 
- */
-module.exports.localPublish = (type, port) => {
-	try {
-		console.log("unpublish: ", `${type}-${store.node.hash}`);
-		bonjour.unpublishAll(() => {
-			console.log("publish: ", `${type}-${store.node.hash}`);
-			bonjour.publish({ 
-				name: `${type}-${store.node.hash}`, 
-				type, 
-				port,
-				txt: {
-					hash: store.master.hash
-				}
-			});
-		});
-	} catch (error) {
-		console.error("BONJOUR P ERROR::", error);
-	}
-}
+const LocalDiscovery = require("../libs/localDiscovery");
+const logger = require("../logger");
+const { services } = require("./state");
+const { DEFAULTS, STATES } = require("./constants");
 
-/**
- * 
- * @param {String} type dogma-router, dogma-dht
- * @param {Function} cb 
- */
-module.exports.subscribe = (type, cb) => {
-	try {
-		const options = {
-			type
-		};
-		return bonjour.find(options, cb);
-	} catch (error) {
-		console.error("BONJOUR S ERROR::", error);
-	}
-}
+const disc = new LocalDiscovery({
+    port: DEFAULTS.LOCAL_DISCOVERY_PORT
+});
+
+disc.startServer();
+
+disc.on("ready", (data) => {
+    services.localDiscovery = STATES.FULL;
+    logger.log("Local discovery server", "ready", data);
+});
+disc.on("error", (data) => { 
+    services.localDiscovery = STATES.ERROR;
+    logger.error("Local discovery server", "error", data);
+});
+
+module.exports = disc;

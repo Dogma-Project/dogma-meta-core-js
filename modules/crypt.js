@@ -1,20 +1,32 @@
-'use strict';
-const {pki, asn1, md} = require("node-forge");
-const model = require("./model");
 
-const crypt = {
-    getPublicCertHash: (pemCert, formatted) => { 
-        try {
+const { pki, asn1, md } = require("node-forge");
+const { User, Node } = require("./model");
+const logger = require("../logger");
+
+/** @module Crypt */
+
+const crypt = module.exports = {
+
+	/**
+	 * 
+	 * @param {Object} pemCert 
+	 * @param {Boolean} formatted 
+	 * @returns {String}
+	 * @todo certificateFromPem-> computeHash
+	 * @todo delete formatted
+	 */
+	getPublicCertHash: (pemCert, formatted) => {
+		try {
 			/* convert pem to der */
-            const cert = pki.certificateFromPem(pemCert);
-            const certAsn1 = pki.certificateToAsn1(cert);
+			const cert = pki.certificateFromPem(pemCert);
+			const certAsn1 = pki.certificateToAsn1(cert);
 			const certDer = asn1.toDer(certAsn1).getBytes();
 			/* convert pem to der */
 
 			/* get sha256 fingerprint */
-            var hash = md.sha256.create();
-            hash.start();
-            hash.update(certDer);
+			var hash = md.sha256.create();
+			hash.start();
+			hash.update(certDer);
 			const fingerprint = hash.digest().toHex();
 			/* get sha256 fingerprint */
 
@@ -22,11 +34,16 @@ const crypt = {
 			return fingerprint.match(/.{2}/g)
 				.join(':')
 				.toUpperCase();
-        } catch (e) {
-            console.error("Can't get certificate hash");
-        }
-    },
+		} catch (err) {
+			logger.error("crypt.js", "get public cert hash", err);
+		}
+	},
 
+	/**
+	 * 
+	 * @param {Object} publicKey // check
+	 * @returns {String}
+	 */
 	publicKeyFingerprint: (publicKey) => {
 		return pki.getPublicKeyFingerprint(publicKey, {
 			md: md.sha256.create(),
@@ -35,48 +52,77 @@ const crypt = {
 	},
 
 	/**
-	 * 
-	 * @param {Array} nodes result of getOwnNodes
+	 * Generate base64 Dogma certificate
+	 * @param {Object} store
+	 * @param {Object} store.config
+	 * @param {Number} store.config.router
+	 * @param {Object} store.user
+	 * @param {Buffer} store.user.cert
+	 * @param {Object} store.node
+	 * @param {String} store.node.name
+	 * @param {String} store.node.id
+	 * @param {String} store.node.public_ipv4
+	 * @returns {Promise} 
 	 */
-    getDogmaCertificate: (nodes) => {
-		return new Promise( async (resolve, reject) => { 
+	getDogmaCertificate: (store) => {
+		return new Promise(async (resolve, reject) => {
 			try {
-				var { store } = require("./store");
-				var dogmaCert = {
-					pubKey: store.master.cert.toString("utf-8"),
+				/** @todo document */
+				const dogmaCert = {
+					pubKey: store.user.cert.toString("utf-8"),
+					node: {
+						name: store.node.name,
+						node_id: store.node.id,
+						public_ipv4: store.node.public_ipv4,
+						port: store.config.router
+					}
 				}
-				dogmaCert.nodes = nodes || [];
 				const result = Buffer.from(JSON.stringify(dogmaCert)).toString("base64");
 				resolve(result);
 			} catch (err) {
 				reject(err);
 			}
 		});
-    },
-	
+	},
+
 	/**
 	 * 
 	 * @param {String} commonName 
 	 * @param {Object} publicKey 
+	 * @returns {Boolean} result
 	 */
-	validateCommonName(commonName, publicKey) { 
+	validateCommonName(commonName, publicKey) {
 		try {
 			const publicKeyFingerprint = this.publicKeyFingerprint(publicKey);
-			console.log("Validate commonName", commonName, publicKeyFingerprint);
+			logger.log("crypt.js", "Validate commonName", commonName, publicKeyFingerprint);
 			return (commonName === publicKeyFingerprint);
 		} catch (err) {
-			console.error("validateCommonName", err);
+			logger.error("crypt.js", "validateCommonName", err);
 			return false;
 		}
 	},
 
 	/**
 	 * 
-	 * @param {String} cert b64
+	 * @param {String} pem node cert 
+	 * @todo checkings and validation
 	 */
-	validateDogmaCertificate(cert) { 
+	getNamesFromNodeCert(pem) {
+		const cert = pki.certificateFromPem(pem);
+		return {
+			user_name: cert.issuer.getField('O').value,
+			node_name: cert.subject.getField('O').value
+		}
+	},
 
-		var { store } = require("./store");
+	/**
+	 * Validate and parse base64 certificate
+	 * @param {String} cert base64 { pubKey, public_ipv4, port }
+	 * @param {String} user_id own user_id
+	 * @returns {Object} result, error, "user_id", "name", {cert}, {node}, !!own
+	 */
+	validateDogmaCertificate(cert, user_id) {
+
 		const error = (reason) => {
 			return {
 				result: 0,
@@ -84,7 +130,7 @@ const crypt = {
 			}
 		}
 
-        try {
+		try {
 
 			const json = Buffer.from(cert, 'base64').toString("utf-8");
 			var object = JSON.parse(json);
@@ -93,67 +139,84 @@ const crypt = {
 				var userName = cert.subject.getField('O').value;
 				var commonName = cert.subject.getField('CN').value;
 			} catch (err) {
-				console.error("UNKNOWN CERT", err);
+				logger.error("crypt.js", "UNKNOWN CERT", err);
 				return error("error validating certificate:: unknown cert");
 			}
 			if (!this.validateCommonName(commonName, cert.publicKey)) {
 				return error("fake commonName!");
 			}
-			const user_hash = crypt.getPublicCertHash(object.pubKey);
-			const own = Number(user_hash == store.master.hash);
-			if (object.nodes && object.nodes.length > 0) {
-				var fake = 0;
-				object.nodes.forEach((node) => {
-					if (node.user_hash !== user_hash) fake ++;
-					// check input data
-				});
-				if (fake) return error("fake nodes");
-				object.nodes = object.nodes.filter((node) => {
-					return !(store.node.hash == node.hash);
-				});
-				// if (own && !object.nodes.length) return error("can't add own cert"); // return after tests
-
-				// console.log("userName!!!!!!!", userName);
-				return {
-					result: 1,
-					error: null,
-					hash: user_hash,
-					cert: object.pubKey,
-					nodes: object.nodes,
-					own,
-					name: userName
-				}
-			} else {
-				console.log("absense of node data");
+			if (!object.node || !object.node.node_id) {
+				return error("unknown node data in cert!");
 			}
 
-        } catch (err) { 
-			console.error(err);
+			const user_hash = crypt.getPublicCertHash(object.pubKey);
+			const own = Number(user_hash == user_id);
+
+			return {
+				result: 1,
+				error: null,
+				user_id: user_hash,
+				name: userName,
+				cert: object.pubKey,
+				node: {
+					name: object.node.name,
+					node_id: object.node.node_id.toPlainHex(),
+					public_ipv4: object.node.public_ipv4,
+					port: object.node.port
+				},
+				own
+			}
+
+		} catch (err) {
+			logger.error("crypt.js", "validateDogmaCertificate", err);
 			return error("error validating certificate");
-        }
+		}
 
 	},
 
 	/**
-	 * 
+	 * Persist parsed result of validateDogmaCertificate function
 	 * @param {Object} data result of certificate validation
-	 * @return {Boolean} result
+	 * @param {String} data.name
+	 * @param {String} data.user_id
+	 * @param {String} data.cert
+	 * @param {Number} data.own
+	 * @param {Object} data.node
+	 * @param {String} data.node.name 
+	 * @param {String} data.node.node_id 
+	 * @param {String} data.node.public_ipv4 
+	 * @param {Number} data.node.port 
+	 * @return {Promise} result:boolean
 	 */
-    addDogmaCertificate: async (data) => { // add response
+	addDogmaCertificate: async (data) => { // add response
+		let result1, result2, user, node;
 		try {
-			const result1 = await model.persistUser({
+			user = {
 				name: data.name,
-				hash: data.hash,
+				user_id: data.user_id,
 				cert: data.cert,
 				type: Number(!data.own)
-			});
-			const result2 = await model.persistNodes(data.nodes);
-			return (result1 && result2);
+			};
+			result1 = await User.persistUser(user);
 		} catch (err) {
-			console.error("cert adding error", err);
+			logger.debug("crypt.js", user);
+			logger.error("crypt.js", "cert adding error", 1, err);
 			return false;
 		}
-    }
-}
-
-module.exports = crypt;
+		try {
+			node = {
+				name: data.node.name,
+				node_id: data.node.node_id,
+				user_id: data.user_id,
+				public_ipv4: data.node.public_ipv4,
+				router_port: data.node.port
+			}
+			result2 = await Node.persistNodes([node]);
+		} catch (err) {
+			logger.debug("crypt.js", node);
+			logger.error("crypt.js", "cert adding error", 2, err);
+			return false;
+		}
+		return (result1 && result2);
+	}
+} 

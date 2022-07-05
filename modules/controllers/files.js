@@ -1,108 +1,221 @@
-const fs = require('fs');
-
-const { BufferToStream } = require("../streams");
-const { fileTransfer } = require("../nedb");
+const fs = require("fs");
+const fsAsync = require("fs").promises;
+const logger = require("../../logger");
+const { File } = require("../model");
 const EventEmitter = require("../eventEmitter");
+const { datadir } = require("../datadir");
+const { DIRECTION, MESSAGES } = require("../constants");
+const generateSyncId = require("../generateSyncId");
 
-var files = {
+/** @module FilesController */
 
-	buffer: [],
-	sizes: [],
+const files = module.exports = {
 
-	/**
-	 * 
-	 * @param {ArrayBuffer} data
-	 * @returns 
-	 */
-	createFileBuffer(data) {
-		const descriptor = data.readUInt16BE(0);
-		const chunk = data.slice(2);
-		console.log("GOT FILE DATA", descriptor);
-		if (!files.buffer[descriptor]) files.buffer[descriptor] = Buffer.allocUnsafe(0);
-		let buffer = files.buffer[descriptor];
-		const size = files.sizes[descriptor];
-		files.buffer[descriptor] = Buffer.concat([buffer, chunk], buffer.length + chunk.length);
-		if (files.buffer[descriptor].length === size) {
-			console.log("File", descriptor, "bufferization completed");
-			EventEmitter.emit("file-buffer-complete", { descriptor, size });
-		}
-	},
+	sendChunksize: 100000,
+	write: {},
+	downloadProgress: {},
+	uploadProgress: {},
 
 	/**
 	 * 
-	 * @param {String} device_id node id
-	 * @param {Object} file file description
+	 * @param {Object} params
+	 * @param {String} params.to
+	 * @param {Number} params.type 
+	 * @param {Number} params.descriptor check
+	 * @param {String} params.title
+	 * @param {Number} params.size check
 	 */
-	permitFileTransfer(device_id, file) {
-		const { descriptor, size } = file;
-		files.sizes[descriptor] = size;
+	permitFileDownload({ to, type, descriptor, title, size }) {
 		return new Promise((resolve, reject) => {
-			fileTransfer.update({ device_id, descriptor, send: 1 }, { $set: { device_id, descriptor, size, send: 1 } }, { upsert: true }, (err, result) => {
-				if (err) return reject(err);
-				resolve(result);
-			})
+			try {
+				const destination = datadir + "/download/" + title;
+				const stream = fs.createWriteStream(destination); // add stream closing
+				const object = {
+					stream,
+					title,
+					size,
+					downloaded: 0,
+					to,
+					type
+				}
+				files.write[descriptor] = object;
+				stream.on("open", (_fd) => { resolve(true); }); // edit
+				stream.on("close", () => { logger.info("files.js", "write stream for", descriptor, "closed") });
+				stream.on("finish", () => logger.info("files.js", "writable stream finished", descriptor));
+				// resolve(true);
+			} catch (err) {
+				reject(err);
+			}
 		});
 	},
 
 	/**
 	 * 
-	 * @param {Object} params device_id, descriptor, title, size
-	 * @returns 
+	 * @param {Object} params
+	 * @param {String} user_id
+	 * @param {Object} file
+	 * @param {String} file.name
+	 * @param {Number} file.size
+	 * @param {String} file.type
+	 * @param {String} file.pathname optional
+	 * @param {String} file.data optional
+	 * @returns {Promise}
 	 */
-	permitFileDownload(params) { // wtf
-		return new Promise((resolve, reject) => {
-			const { device_id, descriptor, title, size } = params;
-			fileTransfer.update({ device_id, descriptor, title, size, send: 0 }, { $set: { device_id, descriptor, title, size, send: 0 } }, { upsert: true }, (err, result) => {
-				if (err) return reject(err);
-				resolve(result);
-			})
-		});		
-	},
-
-	sendFile({ device_id, descriptor }) {
-		if (files.buffer[descriptor]) {
-			const buffer = files.buffer[descriptor];
-			const stream = new BufferToStream({ buffer, chunkSize: 100000 }); // edit
-			EventEmitter.emit("send-file", { device_id, descriptor, stream });
-		} else {
-			console.warn("file buffer didn't find", descriptor);
+	async permitFileTransfer({ user_id, file }) {
+		try {
+			const { name, size, type, pathname, data } = file;
+			const descriptor = this.getFileDescriptor();
+			if (!!pathname && !data) {
+				file.descriptor = descriptor;
+				await File.permitFileTransfer({ user_id, file });
+				return { descriptor, pathname };
+			} else if (!pathname && !!data) {
+				const regex = /^data:.+\/(.+);base64,(.*)$/;
+				const matches = data.match(regex);
+				const destination = datadir + "/temp/" + name;
+				const fileData = Buffer.from(matches[2], "base64");
+				await fsAsync.writeFile(destination, fileData);
+				const tmpFile = {
+					descriptor,
+					size,
+					pathname: destination
+				}
+				await File.permitFileTransfer({ user_id, file: tmpFile });
+				return { descriptor, pathname: destination };
+			} else {
+				return Promise.reject("undefined data and pathname")
+			}
+		} catch (err) {
+			return Promise.reject(err);
 		}
+
 	},
 
-	handleRequest({ device_id, request }) {
-		const { data: { descriptor } } = request;
-		if (!descriptor) return console.warn("unknown file descriptor");
-		switch (request.action) {
-			case "download":
-				files.sendFile({ device_id, descriptor });
-			break;
+	forbidFileUpload({ descriptor }) {
+
+	},
+
+	/**
+	 * 
+	 * @param {Object} params
+	 * @param {String} params.node_id 
+	 * @param {String} params.user_id
+	 * @param {Number} params.descriptor
+	 */
+	async sendFile({ node_id, user_id, descriptor }) {
+		try {
+			const value = await File.fileTransferAllowed({ user_id, descriptor });
+			if (!value) return logger.warn("files.js", "sendFile", "not allowed for", user_id);
+			const connection = require("../connection"); // edit
+			const channel = await connection.streamToNode({ node_id, descriptor }); // edit
+			let size, stream;
+			let uploaded = 0;
+
+			const fileInfo = fs.statSync(value.pathname);
+			size = fileInfo.size;
+
+			stream = fs.createReadStream(value.pathname, {
+				highWaterMark: files.sendChunksize
+			});
+			stream.on("close", () => {
+				logger.info("files.js", "readable stream closed", descriptor);
+			});
+			stream.on("end", () => {
+				logger.info("files.js", "readable stream ended", descriptor);
+			});
+			stream.on("data", (data) => {
+				uploaded += data.length;
+				const progress = uploaded / size;
+				channel.write(data);
+				if (progress === 1) channel.end();
+
+				const progressValue = progress.toFixed(2);
+				if (files.uploadProgress[descriptor] === progressValue) return;
+				files.uploadProgress[descriptor] = progressValue;
+
+				EventEmitter.emit("file-transfer", {
+					progress: progressValue,
+					direction: DIRECTION.OUTCOMING,
+					descriptor,
+					user_id,
+					node_id
+				});
+			});
+		} catch (err) {
+			logger.error("files.js", "sendFile", err);
 		}
 	},
 
 	/**
 	 * 
-	 * @param {Number} descriptor 
-	 * @param {Buffer} data 
+	* @param {Object} params 
+	* @param {String} params.node_id
+	* @param {String} params.user_id
+	* @param {Object} params.request
+	* @param {String} params.request.type
+	* @param {String} params.request.action
+	* @param {Object} params.request.data
 	 */
-	handleFile(descriptor, data) {
-		fileTransfer.findOne({ descriptor, send: 0 }, async (err, result) => { // get expected file size
-			if (err) return console.error(err);
-			if (!result) return console.warn("file descriptor not found", descriptor, result);
-			console.log("result", result);
-			const size = result.downloaded || 0;
-			if (size >= result.size) return console.log("file", result.title, "already downloaded");
-			const destination = global.datadir + "/download/" + result.title;
-			fs.appendFile(destination, data, (err) => {
-				if (err) return console.error("saving file error", err);
-				console.log(`The file ${result.title} was updated!`);
-				const downloaded = size + data.length;
-				fileTransfer.update({ descriptor, send: 0}, { $set: { downloaded }}, (err) => {
-					if (err) console.error("can't update downloaded file size in db", err);
-				});
-			}); 
-			
-		})
-	}
-}
+	handleRequest({ node_id, user_id, request }) {
+		const { data: { descriptor } } = request;
+		if (!descriptor) return logger.warn("files.js", "unknown file descriptor");
+		switch (request.action) {
+			case "download":
+				files.sendFile({ node_id, user_id, descriptor });
+				break;
+		}
+	},
 
-module.exports = files;
+	/**
+	 * 
+	 * @param {Object} params 
+	 * @param {Number} params.descriptor 
+	 * @param {Buffer} params.decodedData check
+	 * @param {String} params.node_id
+	 * @param {String} params.user_id
+	 */
+	handleFile({ descriptor, decodedData, node_id, user_id }) { // add file opening for write + control size and checksum
+		if (!files.write[descriptor]) return logger.warn("files.js", "this file didn't expected");
+		let object = files.write[descriptor];
+		const { to, type } = object;
+		switch (type) {
+			case MESSAGES.DIRECT:
+				if (to !== node_id) return logger.warn("files.js", node_id, "not allowed");
+				break;
+			case MESSAGES.USER:
+				if (to !== user_id) return logger.warn("files.js", user_id, "not allowed");
+				break;
+			default:
+				return logger.warn("files.js", "CHAT TRANSFER", "not allowed");
+				break;
+		}
+		object.downloaded += decodedData.length;
+		if (object.downloaded > object.size) {
+			object.stream && object.stream.end();
+			return logger.warn("files.js", "can't write more than expected");
+		}
+		object.stream.write(decodedData);
+		const progress = object.downloaded / object.size;
+		if (progress === 1) object.stream.end();
+
+		const progressValue = progress.toFixed(2);
+		if (files.downloadProgress[descriptor] === progressValue) return;
+		files.downloadProgress[descriptor] = progressValue;
+
+		EventEmitter.emit("file-transfer", {
+			progress: progressValue,
+			direction: DIRECTION.INCOMING,
+			descriptor,
+			user_id,
+			node_id
+		});
+	},
+
+	/**
+	 * 
+	 * @returns {String} descriptor size:15
+	 */
+	getFileDescriptor() {
+		return generateSyncId(5);
+	}
+} 

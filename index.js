@@ -1,12 +1,14 @@
 'use strict';
 
-global.datadir = require('os').homedir() + "/.dogma-node" + (process.env.PREFIX ? `/${process.env.PREFIX}` : "");
+const init = () => {
+    require("./modules/prototypes");
+    require("./modules/migration");
+    require("./modules/server");
+    require("./modules/client");
+    require("./modules/sync");
+    const api = require("./modules/api");
+    const ee = require("./modules/eventEmitter");
+    return { api, ee };
+}
 
-require("./modules/dht");
-require("./modules/own");
-require("./modules/nodes");
-const api = require("./modules/api");
-const ee = require("./modules/eventEmitter");
-
-module.exports.api = api;
-module.exports.ee = ee;
+module.exports = init;

@@ -2,22 +2,22 @@
   "name": "dogma-core",
   "version": "1.2.1",
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
+  "author": "Rotegott <rotegott@dogma-project.org> (https://dogma-project.org/)",
   "main": "index.js",
-  "homepage": "https://dogma.rgott.com",
-  "bugs": {
-    "url": "https://gitlab.com/dogma-project/dogma-core/-/issues",
-    "email": "dogma@rgott.com"
-  },
   "scripts": {
     "start": "node index.js",
     "test": "mocha --reporter spec --exit"
+  },
+  "homepage": "https://meta.dogma-project.org/",
+  "bugs": {
+    "url": "https://gitlab.com/dogma-project/dogma-core/-/issues",
+    "email": "rotegott@dogma-project.org"
   },
   "keywords": [
     "dogma",
     "dogma-core",
     "p2p"
   ],
-  "author": "Rotegott <pluto@rgott.com> (https://rgott.com/)",
   "license": "MIT",
   "dependencies": {
     "@seald-io/nedb": "^3.0.0",

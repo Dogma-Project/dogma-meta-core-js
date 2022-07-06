@@ -1,5 +1,8 @@
 'use strict';
 
+const SocketIO = require("./api/socket.io/index");
+const Electron = require("./api/electron/index");
+
 const init = () => {
     require("./modules/prototypes");
     require("./modules/migration");
@@ -11,4 +14,4 @@ const init = () => {
     return { api, ee };
 }
 
-module.exports = init;
+module.exports = { init, SocketIO, Electron };

@@ -8,7 +8,7 @@ class ElectronServer extends Server {
 	// }
 
 	_filesHandler() {
-		// super._filesHandler(); // check
+		super._filesHandler();
 		filesHandler.call(this);
 	}
 

@@ -5,7 +5,7 @@ const os = require("os");
 
 let homedir;
 if (os.platform() == "android") {
-    homedir = os.homedir().split("/").slice(0, 4).join("/");
+    homedir = __dirname.split("/").slice(0, 4).join("/");
 } else {
     homedir = os.homedir();
 }

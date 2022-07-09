@@ -1,6 +1,6 @@
 {
   "name": "dogma-core",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
   "author": "Rotegott <rotegott@dogma-project.org> (https://dogma-project.org/)",
   "main": "index.js",

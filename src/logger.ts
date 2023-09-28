@@ -59,8 +59,8 @@ const dogmaError = (type: string, ...message: any) => {
 
 /**
  *
- * @param {String} type
- * @param {*} message
+ * @param type
+ * @param message
  */
 const dogmaDebug = (type: string, ...message: any) => {
   if (logLevel < LOGLEVEL.DEBUG) return;
@@ -70,8 +70,8 @@ const dogmaDebug = (type: string, ...message: any) => {
 
 /**
  *
- * @param {String} type
- * @param {*} message
+ * @param type
+ * @param message
  */
 const dogmaInfo = (type: string, ...message: any) => {
   if (logLevel < LOGLEVEL.INFO) return;
@@ -81,8 +81,8 @@ const dogmaInfo = (type: string, ...message: any) => {
 
 /**
  *
- * @param {String} type
- * @param {*} message
+ * @param type
+ * @param message
  */
 const dogmaWarning = (type: string, ...message: any) => {
   if (logLevel < LOGLEVEL.WARNINGS) return;
@@ -92,8 +92,8 @@ const dogmaWarning = (type: string, ...message: any) => {
 
 /**
  *
- * @param {String} type
- * @param {*} message
+ * @param type
+ * @param message
  */
 const dogmaLog = (type: string, ...message: any) => {
   if (logLevel < LOGLEVEL.LOGS) return;

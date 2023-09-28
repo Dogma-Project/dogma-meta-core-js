@@ -44,5 +44,5 @@ declare function createUsersTable(store: {
 declare function createNodesTable(store: Object, defaults: {
     public_ipv4: string;
     router: number;
-}): Promise<any>;
+}): any;
 export { createConfigTable as cconfig, createUsersTable as cusers, createNodesTable as cnodes };

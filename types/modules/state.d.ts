@@ -1,15 +1,19 @@
-export const services: any;
-export const state: {};
+type DogmaEventAction = "update" | "set";
+type DogmaEventPayload = any;
+type DogmaEventType = string;
+type DogmaEventListener = (action: DogmaEventAction, payload: DogmaEventPayload, type: DogmaEventType) => void;
 /** @module State */
 /**
  *
- * @param {Array} type array of events
- * @param {Function} callback (action, value, type)
+ * @param type array of events
+ * @param callback (action, value, type)
  */
-export function subscribe(type: any[], callback: Function): void;
+export declare const subscribe: (type: DogmaEventType[], callback: DogmaEventListener) => void;
 /**
  *
- * @param {String} type
- * @param {*} payload Any payload | or Boolean "true" for forced emit
+ * @param type
+ * @param payload Any payload | or Boolean "true" for forced emit
  */
-export function emit(type: string, payload: any): any;
+export declare const emit: (type: DogmaEventType, payload: any | boolean) => void;
+export declare const services: any;
+export {};

@@ -8,13 +8,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const { STATES } = require("../constants");
-const { emit } = require("../state");
-const { nodes: nodesDb } = require("../nedb");
-const generateSyncId = require("../generateSyncId");
-const logger = require("../../logger");
-const Sync = require("./sync");
-const model = module.exports = {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const constants_1 = require("../constants");
+const state_1 = require("../state");
+const nedb_1 = __importDefault(require("../nedb"));
+const generateSyncId_1 = __importDefault(require("../generateSyncId"));
+const logger_1 = __importDefault(require("../../logger"));
+const sync_1 = __importDefault(require("./sync"));
+const { nodes: nodesDb } = nedb_1.default;
+const model = {
     getAll() {
         return __awaiter(this, void 0, void 0, function* () {
             return nodesDb.findAsync({});
@@ -22,8 +27,7 @@ const model = module.exports = {
     },
     /**
      *
-     * @param {String} user_id
-     * @returns {Promise}
+     * @param user_id
      */
     getByUserId(user_id) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -32,24 +36,25 @@ const model = module.exports = {
     },
     /**
      *
-     * @param {Array} nodes [{name, node_id, user_id, public_ipv4, router_port}]
+     * @param nodes [{name, node_id, user_id, public_ipv4, router_port}]
      * @returns {Promise}
      */
     persistNodes(nodes) {
+        // add validation
         const insert = (row) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const { node_id, user_id } = row;
                 if (!row.public_ipv4)
                     delete row.public_ipv4;
-                const exist = yield nodesDb.findOne({ node_id, user_id });
+                const exist = yield nodesDb.findOneAsync({ node_id, user_id });
                 let result;
                 if (exist && exist.node_id) {
                     if (!exist.sync_id)
-                        row.sync_id = generateSyncId(5);
+                        row.sync_id = (0, generateSyncId_1.default)(5);
                     result = yield nodesDb.updateAsync({ node_id, user_id }, { $set: row });
                 }
                 else {
-                    const sync_id = generateSyncId(5);
+                    const sync_id = (0, generateSyncId_1.default)(5);
                     result = yield nodesDb.insertAsync(Object.assign(Object.assign({}, row), { sync_id }));
                 }
                 return result;
@@ -63,7 +68,7 @@ const model = module.exports = {
                 for (let i = 0; i < nodes.length; i++) {
                     yield insert(nodes[i]);
                 }
-                emit("nodes-db", STATES.RELOAD); // downgrade state to reload database
+                (0, state_1.emit)("nodes-db", constants_1.STATES.RELOAD); // downgrade state to reload database
                 resolve(true);
             }
             catch (err) {
@@ -73,8 +78,8 @@ const model = module.exports = {
     },
     /**
      *
-     * @param {String} node_id
-     * @param {String} ip
+     * @param node_id
+     * @param ip
      */
     setNodePublicIPv4(node_id, ip) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -82,24 +87,23 @@ const model = module.exports = {
         });
     },
     /**
-     *
-     * @param {Array} data
-     * @param {String} from node_id
+     * @todo delete _id
+     * @param data
+     * @param from node_id
      */
     sync(data, from) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 for (const row of data) {
-                    const { _id, sync_id, user_id, node_id } = row;
+                    const { sync_id, user_id, node_id } = row;
                     if (!sync_id) {
-                        logger.debug("node", "sync", "unknown sync_id", _id);
+                        logger_1.default.debug("node", "sync", "unknown sync_id", sync_id);
                         continue;
                     }
-                    delete row._id;
                     yield nodesDb.updateAsync({ $or: [{ $and: [{ user_id }, { node_id }] }, { sync_id }] }, row, { upsert: true });
                 }
-                emit("nodes-db", STATES.RELOAD); // downgrade state to reload database
-                Sync.confirm("nodes", from);
+                (0, state_1.emit)("nodes-db", constants_1.STATES.RELOAD); // downgrade state to reload database
+                sync_1.default.confirm("nodes", from);
                 return true;
             }
             catch (err) {
@@ -109,20 +113,25 @@ const model = module.exports = {
     },
     /**
      *
-     * @param {String} node_id
+     * @param node_id
      * @returns
      */
     getSync(node_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const updated = yield Sync.get("nodes", node_id);
+                const updated = yield sync_1.default.get("nodes", node_id);
                 const time = updated && updated.time ? updated.time : 1;
                 const nedbTime = new Date(time);
-                return nodesDb.findAsync({ sync_id: { $exists: true }, updatedAt: { $gt: nedbTime } });
+                return nodesDb.findAsync({
+                    sync_id: { $exists: true },
+                    updatedAt: { $gt: nedbTime },
+                });
             }
             catch (err) {
                 return Promise.reject(err);
             }
         });
-    }
+    },
 };
+exports.default = model;
+module.exports = model;

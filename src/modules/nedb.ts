@@ -1,29 +1,40 @@
 import Datastore from "@seald-io/nedb";
-const { emit } = require("./state");
-const logger = require("../logger");
-const { datadir } = require("./datadir");
-const { STATES } = require("./constants");
+import logger from "../logger";
+import { emit } from "./state";
+import { datadir } from "./datadir";
+import { STATES } from "./constants";
 
 const dbDir = datadir + "/db";
 logger.log("nedb", "HOMEDIR", dbDir);
 
-const stores = {};
+interface NedbStores {
+  connections: Datastore;
+  config: Datastore;
+  users: Datastore;
+  nodes: Datastore;
+  messages: Datastore;
+  fileTransfer: Datastore;
+  sync: Datastore;
+  dht: Datastore;
+  protocol: Datastore;
+  initPersistDbs(): Promise<boolean>;
+}
 
-const indexHandler = (err) => {
+const indexHandler = (err: any) => {
   if (err) logger.error("nedb", "indexHandler error::", err);
 };
 
-stores.connections = new Datastore({
+const connections = new Datastore({
   autoload: true,
 });
-stores.connections.ensureIndex(
+connections.ensureIndex(
   {
     fieldName: "node_id",
     unique: true,
   },
   indexHandler
 );
-stores.connections.ensureIndex(
+connections.ensureIndex(
   {
     fieldName: "address",
     unique: true,
@@ -33,43 +44,43 @@ stores.connections.ensureIndex(
 
 // ------------------------ PERSIST -------------------------
 
-stores.config = new Datastore({
+const config = new Datastore({
   filename: dbDir + "/config.db",
 });
-stores.users = new Datastore({
+const users = new Datastore({
   // sync
   filename: dbDir + "/users.db",
   timestampData: true,
 });
-stores.nodes = new Datastore({
+const nodes = new Datastore({
   // sync
   filename: dbDir + "/nodes.db",
   timestampData: true,
 });
-stores.messages = new Datastore({
+const messages = new Datastore({
   // sync
   filename: dbDir + "/messages.db",
   timestampData: true,
 });
-stores.fileTransfer = new Datastore({
+const fileTransfer = new Datastore({
   filename: dbDir + "/transfer.db",
   timestampData: true,
 });
-stores.sync = new Datastore({
+const sync = new Datastore({
   filename: dbDir + "/sync.db",
 });
-stores.dht = new Datastore({
+const dht = new Datastore({
   filename: dbDir + "/dht.db",
   timestampData: true,
 });
-stores.protocol = new Datastore({
+const protocol = new Datastore({
   filename: dbDir + "/protocol.db",
 });
 
 /**
  * @returns {Promise}
  */
-stores.initPersistDbs = async () => {
+const initPersistDbs = async () => {
   logger.log("nedb", "load databases...");
   try {
     await stores.protocol.loadDatabaseAsync();
@@ -128,4 +139,18 @@ stores.initPersistDbs = async () => {
   }
 };
 
+const stores: NedbStores = {
+  connections,
+  config,
+  users,
+  nodes,
+  messages,
+  fileTransfer,
+  sync,
+  dht,
+  protocol,
+  initPersistDbs,
+};
+
 module.exports = stores;
+export default stores;

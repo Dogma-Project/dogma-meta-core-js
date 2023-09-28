@@ -1,3 +1,4 @@
-declare const _exports: EventEmitter;
-export = _exports;
-import EventEmitter = require("events");
+/// <reference types="node" />
+import EventEmitter from "node:events";
+declare const emitter: EventEmitter;
+export default emitter;

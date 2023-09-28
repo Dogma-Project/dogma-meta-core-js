@@ -5,4 +5,4 @@ export function commit({ id, text, files, direction, format, type }: {
     direction: number;
     format: number;
     type: number;
-}): Promise<string>;
+}): Promise<any>;

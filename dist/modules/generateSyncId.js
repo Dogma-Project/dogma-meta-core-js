@@ -1,10 +1,13 @@
 "use strict";
-const { randomBytes } = require("crypto");
+Object.defineProperty(exports, "__esModule", { value: true });
+const crypto_1 = require("crypto");
 /**
- * @param {Number} size *2
+ * @param size *2
  */
-module.exports = (size = 6) => {
+const generateSyncId = (size = 6) => {
     size = Number(size) || 6;
     const time = new Date().getTime();
-    return randomBytes(size).toString("hex") + time.toString().slice(-size);
+    return (0, crypto_1.randomBytes)(size).toString("hex") + time.toString().slice(-size);
 };
+exports.default = generateSyncId;
+module.exports = generateSyncId;

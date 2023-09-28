@@ -8,8 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const { sync: syncDb } = require("../nedb");
-const model = module.exports = {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const nedb_1 = __importDefault(require("../nedb"));
+const { sync: syncDb } = nedb_1.default;
+const model = {
     getAll() {
         return __awaiter(this, void 0, void 0, function* () {
             return syncDb.findAsync({});
@@ -25,5 +30,7 @@ const model = module.exports = {
             const time = new Date().getTime(); // check
             return syncDb.updateAsync({ db, node_id }, { db, node_id, time }, { upsert: true });
         });
-    }
+    },
 };
+module.exports = model;
+exports.default = model;

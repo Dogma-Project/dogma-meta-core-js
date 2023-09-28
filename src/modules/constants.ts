@@ -5,7 +5,7 @@
  * @type {Object}
  * @default see sources
  */
-module.exports.API = {
+export const API = {
   OK: 1,
   CANNOTGETCERT: 1001,
   INVALIDCERT: 1002,
@@ -29,7 +29,7 @@ module.exports.API = {
  * @type {Object}
  * @default
  */
-module.exports.MX = {
+export const MX = {
   CONTROL: 0,
   MESSAGES: 1,
   FILES: 2,
@@ -46,7 +46,7 @@ module.exports.MX = {
  * @type {Object}
  * @default
  */
-module.exports.DHTPERM = {
+export const DHTPERM = {
   NOBODY: 0,
   ONLY_OWN: 1,
   ONLY_FRIENDS: 2,
@@ -58,7 +58,7 @@ module.exports.DHTPERM = {
  * @type {Object}
  * @default
  */
-module.exports.STATES = {
+export const STATES = {
   ERROR: -1,
   DISABLED: 0,
   READY: 1,
@@ -74,7 +74,7 @@ module.exports.STATES = {
  * @type {Object}
  * @default
  */
-module.exports.DEFAULTS = {
+export const DEFAULTS = {
   UNKNOWN: 0,
   ROUTER: 24601,
   LOG_LEVEL: 5,
@@ -91,7 +91,7 @@ module.exports.DEFAULTS = {
  * @type {Object}
  * @default
  */
-module.exports.LOGLEVEL = {
+export const LOGLEVEL = {
   NOTHING: 0,
   ERRORS: 1,
   DEBUG: 2,
@@ -105,7 +105,7 @@ module.exports.LOGLEVEL = {
  * @type {Object}
  * @default
  */
-module.exports.PROTOCOL = {
+export const PROTOCOL = {
   DB: 1,
   CERTIFICATE: 0,
 };
@@ -115,36 +115,36 @@ module.exports.PROTOCOL = {
  * @type {Object}
  * @default
  */
-module.exports.MESSAGES = {
+export const MESSAGES = {
   DIRECT: 0,
   USER: 1,
   CHAT: 2,
 };
 
-module.exports.DIRECTION = {
+export const DIRECTION = {
   OUTCOMING: 0,
   INCOMING: 1,
 };
 
-module.exports.MSG_FORMAT = {
+export const MSG_FORMAT = {
   DEFAULT: 0,
   FILES: 1,
   ATTACHMENTS: 2,
   COMON: 3,
 };
 
-module.exports.MSG_CODE = {
+export const MSG_CODE = {
   ERROR: -1,
   UNKNOWN: 0,
   SUCCESS: 1,
   CONFIRMED: 2,
 };
 
-module.exports.DESCRIPTOR = {
+export const DESCRIPTOR = {
   SIZE: 15,
 };
 
-module.exports.ATTACHMENTS = {
+export const ATTACHMENTS = {
   FILE: 0,
   IMAGE: 1,
   GIF: 2,

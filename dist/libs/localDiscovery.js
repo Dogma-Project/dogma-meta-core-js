@@ -1,8 +1,12 @@
 "use strict";
-const dgram = require("dgram");
-const EventEmitter = require("events");
-const os = require("os");
-const ifaces = os.networkInterfaces();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const node_dgram_1 = __importDefault(require("node:dgram"));
+const node_events_1 = __importDefault(require("node:events"));
+const node_os_1 = __importDefault(require("node:os"));
+const ifaces = node_os_1.default.networkInterfaces();
 /** @module LocalDiscovery */
 /**
  *
@@ -11,10 +15,9 @@ const ifaces = os.networkInterfaces();
 const convertToBroadcast = (ip) => {
     if (ip === "0.0.0.0")
         return "255.255.255.0"; // fallback
-    ip = ip.split(".");
-    ip[3] = "255"; // broadcast
-    ip = ip.join(".");
-    return ip;
+    const iparr = ip.split(".");
+    iparr[3] = "255"; // broadcast
+    return iparr.join(".");
 };
 /**
  *
@@ -24,15 +27,20 @@ const getLocalAddress = (ip = "") => {
     const pattern = "192.168.";
     let address, broadcast;
     if (ip.indexOf(pattern) === -1) {
-        Object.keys(ifaces).forEach((ifname) => {
-            ifaces[ifname].forEach((iface) => {
-                if (iface.family !== "IPv4" ||
-                    iface.internal !== false ||
-                    iface.address.indexOf(pattern) === -1)
-                    return;
-                address = iface.address;
-            });
-        });
+        for (const ifname in ifaces) {
+            const iface = ifaces[ifname];
+            if (iface) {
+                for (const ifname in iface) {
+                    const inner = iface[ifname];
+                    if (inner.family !== "IPv4" ||
+                        inner.internal !== false ||
+                        inner.address.indexOf(pattern) === -1) {
+                        continue;
+                    }
+                    address = inner.address;
+                }
+            }
+        }
         if (!address) {
             console.warn("Local Discovery Lib", "can't determine local address. fallback to 0.0.0.0");
             address = "0.0.0.0";
@@ -44,26 +52,20 @@ const getLocalAddress = (ip = "") => {
     broadcast = convertToBroadcast(address);
     return { address, broadcast };
 };
-class LocalDiscovery extends EventEmitter {
-    /**
-     *
-     * @param {Object} params
-     * @param {Number} params.port default: 45432
-     * @param {String} params.ip default: 0.0.0.0
-     */
-    constructor({ port = 45432, ip }) {
+class LocalDiscovery extends node_events_1.default {
+    constructor({ port = 45432, ip = "0.0.0.0" }) {
         super();
         const { address, broadcast } = getLocalAddress(ip);
         // this.ip = address;
         this.ip = "0.0.0.0";
         this.port = port;
         this.broadcast = broadcast;
-    }
-    startServer() {
-        this.server = dgram.createSocket({
+        this.server = node_dgram_1.default.createSocket({
             type: "udp4",
             reuseAddr: true,
         });
+    }
+    startServer() {
         this.server.on("listening", () => {
             const address = this.server.address();
             this.emit("ready", {
@@ -90,17 +92,9 @@ class LocalDiscovery extends EventEmitter {
         });
         return this;
     }
-    /**
-     *
-     * @param {Object} card
-     * @param {String} card.type
-     * @param {String} card.user_id
-     * @param {String} card.node_id
-     * @param {Number} card.port
-     */
     announce(card) {
         const message = Buffer.from(JSON.stringify(card));
-        this.server.send(message, 0, message.length, this.port, this.broadcast, (err, bytes) => {
+        this.server.send(message, 0, message.length, this.port, this.broadcast, (err, _bytes) => {
             if (err) {
                 this.emit("error", {
                     type: "client",
@@ -114,4 +108,4 @@ class LocalDiscovery extends EventEmitter {
         return this;
     }
 }
-module.exports = LocalDiscovery;
+exports.default = LocalDiscovery;

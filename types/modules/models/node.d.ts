@@ -1,11 +1,11 @@
 import { Types } from "../types";
 declare const model: {
-    getAll(): Promise<Record<string, any>[]>;
+    getAll(): Promise<any>;
     /**
      *
      * @param user_id
      */
-    getByUserId(user_id: Types.User.Id): Promise<Record<string, any>[]>;
+    getByUserId(user_id: Types.User.Id): Promise<any>;
     /**
      *
      * @param nodes [{name, node_id, user_id, public_ipv4, router_port}]
@@ -17,11 +17,7 @@ declare const model: {
      * @param node_id
      * @param ip
      */
-    setNodePublicIPv4(node_id: Types.Node.Id, ip: string): Promise<{
-        numAffected: number;
-        affectedDocuments: import("@seald-io/nedb").Document<Record<string, any>> | import("@seald-io/nedb").Document<Record<string, any>>[] | null;
-        upsert: boolean;
-    }>;
+    setNodePublicIPv4(node_id: Types.Node.Id, ip: string): Promise<any>;
     /**
      * @todo delete _id
      * @param data
@@ -33,6 +29,6 @@ declare const model: {
      * @param node_id
      * @returns
      */
-    getSync(node_id: Types.Node.Id): Promise<Record<string, any>[]>;
+    getSync(node_id: Types.Node.Id): Promise<any>;
 };
 export default model;

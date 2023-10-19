@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.stores = exports.dht = void 0;
 const nedb_1 = __importDefault(require("@seald-io/nedb"));
 const logger_1 = __importDefault(require("../logger"));
 const state_1 = require("./state");
@@ -60,7 +61,7 @@ const fileTransfer = new nedb_1.default({
 const sync = new nedb_1.default({
     filename: dbDir + "/sync.db",
 });
-const dht = new nedb_1.default({
+exports.dht = new nedb_1.default({
     filename: dbDir + "/dht.db",
     timestampData: true,
 });
@@ -73,31 +74,31 @@ const protocol = new nedb_1.default({
 const initPersistDbs = () => __awaiter(void 0, void 0, void 0, function* () {
     logger_1.default.log("nedb", "load databases...");
     try {
-        yield stores.protocol.loadDatabaseAsync();
+        yield exports.stores.protocol.loadDatabaseAsync();
         logger_1.default.debug("nedb", "load database", "protocol");
-        stores.protocol.ensureIndex({ fieldName: "name", unique: true }, indexHandler);
+        exports.stores.protocol.ensureIndex({ fieldName: "name", unique: true }, indexHandler);
         (0, state_1.emit)("protocol-db", constants_1.STATES.READY);
-        yield stores.config.loadDatabaseAsync();
+        yield exports.stores.config.loadDatabaseAsync();
         logger_1.default.debug("nedb", "load database", "config");
-        stores.config.ensureIndex({ fieldName: "param", unique: true }, indexHandler);
+        exports.stores.config.ensureIndex({ fieldName: "param", unique: true }, indexHandler);
         (0, state_1.emit)("config-db", constants_1.STATES.READY);
-        yield stores.users.loadDatabaseAsync();
+        yield exports.stores.users.loadDatabaseAsync();
         logger_1.default.debug("nedb", "load database", "users");
         (0, state_1.emit)("users-db", constants_1.STATES.READY);
-        yield stores.nodes.loadDatabaseAsync();
+        yield exports.stores.nodes.loadDatabaseAsync();
         logger_1.default.debug("nedb", "load database", "nodes");
         (0, state_1.emit)("nodes-db", constants_1.STATES.READY);
-        yield stores.dht.loadDatabaseAsync();
+        yield exports.stores.dht.loadDatabaseAsync();
         logger_1.default.debug("nedb", "load database", "dht");
-        stores.dht.ensureIndex({ fieldName: "updatedAt", expireAfterSeconds: 3600 }, indexHandler);
+        exports.stores.dht.ensureIndex({ fieldName: "updatedAt", expireAfterSeconds: 3600 }, indexHandler);
         (0, state_1.emit)("dht-db", constants_1.STATES.READY);
-        yield stores.messages.loadDatabaseAsync();
+        yield exports.stores.messages.loadDatabaseAsync();
         logger_1.default.debug("nedb", "load database", "messages");
-        stores.messages.ensureIndex({ fieldName: "createdAt", expireAfterSeconds: 3600 * 24 * 30 }, indexHandler);
-        yield stores.fileTransfer.loadDatabaseAsync();
+        exports.stores.messages.ensureIndex({ fieldName: "createdAt", expireAfterSeconds: 3600 * 24 * 30 }, indexHandler);
+        yield exports.stores.fileTransfer.loadDatabaseAsync();
         logger_1.default.debug("nedb", "load database", "fileTransfer");
-        stores.fileTransfer.ensureIndex({ fieldName: "createdAt", expireAfterSeconds: 3600 * 24 * 30 }, indexHandler);
-        yield stores.sync.loadDatabaseAsync();
+        exports.stores.fileTransfer.ensureIndex({ fieldName: "createdAt", expireAfterSeconds: 3600 * 24 * 30 }, indexHandler);
+        yield exports.stores.sync.loadDatabaseAsync();
         logger_1.default.debug("nedb", "load database", "sync");
         (0, state_1.emit)("sync-db", constants_1.STATES.READY);
         return Promise.resolve(true);
@@ -106,7 +107,7 @@ const initPersistDbs = () => __awaiter(void 0, void 0, void 0, function* () {
         return Promise.reject(err);
     }
 });
-const stores = {
+exports.stores = {
     connections,
     config,
     users,
@@ -114,9 +115,8 @@ const stores = {
     messages,
     fileTransfer,
     sync,
-    dht,
+    dht: exports.dht,
     protocol,
     initPersistDbs,
 };
-module.exports = stores;
-exports.default = stores;
+module.exports = exports.stores;

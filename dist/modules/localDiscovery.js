@@ -1,18 +1,24 @@
 "use strict";
-const LocalDiscovery = require("../libs/localDiscovery");
-const logger = require("../logger");
-const { services } = require("./state");
-const { DEFAULTS, STATES } = require("./constants");
-const disc = new LocalDiscovery({
-    port: DEFAULTS.LOCAL_DISCOVERY_PORT
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const localDiscovery_1 = __importDefault(require("../libs/localDiscovery"));
+const logger_1 = __importDefault(require("../logger"));
+const state_1 = require("./state");
+const constants_1 = require("./constants");
+const disc = new localDiscovery_1.default({
+    port: constants_1.DEFAULTS.LOCAL_DISCOVERY_PORT,
+    ip: "",
 });
 disc.startServer();
 disc.on("ready", (data) => {
-    services.localDiscovery = STATES.FULL;
-    logger.log("Local discovery server", "ready", data);
+    state_1.services.localDiscovery = constants_1.STATES.FULL;
+    logger_1.default.log("Local discovery server", "ready", data);
 });
 disc.on("error", (data) => {
-    services.localDiscovery = STATES.ERROR;
-    logger.error("Local discovery server", "error", data);
+    state_1.services.localDiscovery = constants_1.STATES.ERROR;
+    logger_1.default.error("Local discovery server", "error", data);
 });
 module.exports = disc;
+exports.default = disc;

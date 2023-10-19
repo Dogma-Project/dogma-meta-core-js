@@ -11,5 +11,6 @@ interface NedbStores {
     protocol: Datastore;
     initPersistDbs(): Promise<boolean>;
 }
-declare const stores: NedbStores;
-export default stores;
+export declare const dht: Datastore<Record<string, any>>;
+export declare const stores: NedbStores;
+export {};

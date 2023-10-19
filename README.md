@@ -1,10 +1,3 @@
-# DEPRECATED!
-Use dogma-meta package instead.
-```
-https://www.npmjs.com/package/dogma-meta
-https://gitlab.com/dogma-project/dogma-meta
-```
-
 # Dogma Project
 
 Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package
@@ -18,15 +11,17 @@ This package is a dependency for Dogma Application. If you want to try app, swit
 ```
 git clone https://gitlab.com/dogma-project/dogma-core.git
 ```
+
 or
+
 ```
 npm i dogma-core
 ```
 
 ## Usage
 
-```javascript
-const {ee, api} = require("dogma-core");
+```
+npm run auto
 ```
 
 ## History

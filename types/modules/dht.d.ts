@@ -1,3 +1,2 @@
-declare const _exports: DHT;
+declare const _exports: any;
 export = _exports;
-import DHT = require("../libs/dht");

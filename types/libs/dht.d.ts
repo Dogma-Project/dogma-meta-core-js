@@ -1,27 +1,29 @@
-export = DHT;
+/// <reference types="node" />
+import EventEmitter from "node:events";
+import { Types } from "../types";
 /** @module DHT */
 declare class DHT extends EventEmitter {
-    /**
-     *
-     */
-    constructor();
-    peers: any[];
     permissions: {
         dhtBootstrap: number;
         dhtAnnounce: number;
         dhtLookup: number;
     };
+    peers: Types.Connection.Socket[];
+    /**
+     *
+     */
+    constructor();
     /**
      *
      * @param {Array} peers array of active connections
      */
-    setPeers(peers: any[]): void;
+    setPeers(peers: Types.Connection.Socket[]): void;
     /**
      *
-     * @param {String} type dhtAnnounce, dhtBootstrap, dhtLookup
-     * @param {Number} level 0, 1, 2, 3
+     * @param type dhtAnnounce, dhtBootstrap, dhtLookup
+     * @param level 0, 1, 2, 3
      */
-    setPermission(type: string, level: number): any;
+    setPermission(type: Types.DHT.Type, level: 0 | 1 | 2 | 3): void;
     /**
      * Sends announce to all online connections
      * @param {Number} port
@@ -29,10 +31,10 @@ declare class DHT extends EventEmitter {
     announce(port: number): void;
     /**
      * Sends DHT lookup request to all online connections
-     * @param {String} user_id user's hash
-     * @param {String} node_id [optional] node hash
+     * @param user_id user's hash
+     * @param node_id [optional] node hash
      */
-    lookup(user_id: string, node_id?: string): void;
+    lookup(user_id: Types.User.Id, node_id?: Types.Node.Id): void;
     revoke(): void;
     /**
      * Requests router
@@ -41,28 +43,15 @@ declare class DHT extends EventEmitter {
      * @param {String} params.request.type announce,revoke,lookup
      * @param {String} params.request.action get, set
      * @param {Number} params.request.port node's public port
-     * @param {String} params.request.user_id optional (only foor lookup)
-     * @param {String} params.request.node_id optional (only foor lookup)
+     * @param {String} params.request.user_id optional (only for lookup)
+     * @param {String} params.request.node_id optional (only for lookup)
      * @param {Object} params.from determined by own node
      * @param {String} params.from.user_id user hash
      * @param {String} params.from.node_id node hash
      * @param {String} params.from.public_ipv4 host
      * @param {Object} socket [optional] for a feedback
      */
-    handleRequest(params: {
-        request: {
-            type: string;
-            action: string;
-            port: number;
-            user_id: string;
-            node_id: string;
-        };
-        from: {
-            user_id: string;
-            node_id: string;
-            public_ipv4: string;
-        };
-    }, socket: Object): Promise<any>;
+    handleRequest(params: Types.DHT.Card, socket: Types.Connection.Socket): Promise<void>;
     /**
      * Controller
      * @private
@@ -71,7 +60,10 @@ declare class DHT extends EventEmitter {
      * @param {Object} params.request
      * @returns {Promise}
      */
-    private _handleAnnounce;
+    _handleAnnounce({ from, request, }: {
+        from: Types.DHT.FromData;
+        request: Types.DHT.RequestData.Announce;
+    }): Promise<unknown>;
     /**
      * Controller
      * @private
@@ -82,7 +74,10 @@ declare class DHT extends EventEmitter {
      * @param {String} params.request.node_id optional
      * @returns {Promise}
      */
-    private _handleLookup;
+    _handleLookup({ from, request, }: {
+        from: Types.DHT.FromData;
+        request: Types.DHT.RequestData.Lookup;
+    }): Promise<unknown>;
     /**
      * Controller
      * @private
@@ -90,7 +85,10 @@ declare class DHT extends EventEmitter {
      * @param {Object} params.from
      * @param {Object} params.request
      */
-    private _handleRevoke;
+    _handleRevoke({ from, request, }: {
+        from: Types.DHT.FromData;
+        request: Types.DHT.RequestData.Revoke;
+    }): void;
     /**
      * Controller
      * @private
@@ -101,7 +99,10 @@ declare class DHT extends EventEmitter {
      * @param {String} params.request.data
      * @returns {Promise}
      */
-    private _handlePeers;
+    _handlePeers({ from, request, }: {
+        from: Types.DHT.FromData;
+        request: Types.DHT.RequestData.LookupAnswer;
+    }): void;
     /**
      * Check access level to DHT requests. Handled level can't be 0
      * @param {String} type
@@ -109,7 +110,7 @@ declare class DHT extends EventEmitter {
      * @returns {Boolean}
      * @private
      */
-    private _canUse;
+    _canUse(type: Types.DHT.Request, user_id: Types.User.Id): boolean | undefined;
     /**
      * Send request to all nodes
      * @private
@@ -119,6 +120,6 @@ declare class DHT extends EventEmitter {
      * @param {String} data.user_id [optional] for lookup
      * @param {String} data.node_id [optional] for lookup. only when looking for specific node
      */
-    private _dhtMulticast;
+    _dhtMulticast(type: Types.DHT.Request, data: Types.DHT.RequestData.Outgoing): void;
 }
-import EventEmitter = require("events");
+export default DHT;

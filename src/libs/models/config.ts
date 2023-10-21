@@ -1,11 +1,30 @@
-import { STATES } from "../../constants";
 import { emit } from "../state";
-import { config as configDb } from "../nedb";
 import { Types } from "../../types";
+import { nedbDir } from "../../components/datadir";
+import Datastore from "@seald-io/nedb";
+import logger from "../logger";
 
 const model = {
+  configDb: new Datastore({
+    filename: nedbDir + "/config.db",
+  }),
+
+  async init() {
+    try {
+      logger.debug("nedb", "load database", "config");
+      await this.configDb.loadDatabaseAsync();
+      await this.configDb.ensureIndexAsync({
+        fieldName: "param",
+        unique: true,
+      });
+      emit("config-db", Types.System.States.ready);
+    } catch (err) {
+      logger.error("config.nedb", err);
+    }
+  },
+
   async getAll() {
-    return configDb.findAsync({});
+    return this.configDb.findAsync({});
   },
 
   persistConfig(config: Types.Config.Model) {
@@ -15,7 +34,7 @@ const model = {
     };
     const insert = (row: Entry) => {
       return new Promise((resolve, reject) => {
-        configDb.update(
+        this.configDb.update(
           { param: row.param },
           row,
           { upsert: true },
@@ -37,7 +56,7 @@ const model = {
     return new Promise(async (resolve, reject) => {
       try {
         for (const entry of newObject) await insert(entry);
-        emit("config-db", STATES.RELOAD); // downgrade state to reload database
+        emit("config-db", Types.System.States.reload); // downgrade state to reload database
         resolve(true);
       } catch (err) {
         reject(err);

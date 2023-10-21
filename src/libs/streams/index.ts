@@ -1,4 +1,5 @@
-import EncodeStream from "./encode";
+import { MuxStream, DemuxStream } from "./multiplex";
 import BufferToStream from "./buffer-to-stream";
+import { Encryption, Decryption } from "./encryption";
 
-export { EncodeStream, BufferToStream };
+export { MuxStream, DemuxStream, BufferToStream, Encryption, Decryption };

@@ -1,4 +1,17 @@
-LocalDiscovery.on("message", (data) => {
+import Client from "../libs/client";
+import connections from "./connection";
+import { state, subscribe } from "../libs/state";
+import localDiscovery from "./localDiscovery";
+import logger from "../libs/logger";
+import dht from "./dht";
+import { Types } from "../types";
+import storage from "./storage";
+import args from "./arguments";
+import eventEmitter from "./eventEmitter";
+
+const client = new Client(connections);
+
+localDiscovery.on("message", (data) => {
   // validate
   const {
     msg: { type, user_id, node_id, port },
@@ -19,8 +32,8 @@ LocalDiscovery.on("message", (data) => {
     );
   }
 });
-
-dht.on("peers", (data: Types.DHT.RequestData.LookupAnswerData[]) => {
+// Types.DHT.RequestData.LookupAnswerData
+dht.on("peers", (data: Types.DHT.LookUp.Answer.Data[]) => {
   // check types
   data.forEach((item) => {
     const { public_ipv4, port, user_id, node_id } = item;
@@ -42,12 +55,12 @@ let searchFriendsInterval: NodeJS.Timer | undefined;
 
 subscribe(["update-user", "users"], () => {
   const user_id = state["update-user"];
-  connection.closeConnectionsByUserId(user_id);
+  connections.closeConnectionsByUserId(user_id);
 });
 
 subscribe(["nodes", "users", "nodes", "node-key"], () => {
   // edit
-  EventEmitter.emit("friends", true);
+  eventEmitter.emit("friends", true);
   if (args.discovery) return; // don't lookup in discovery mode
   clearInterval(connectFriendsInterval);
   client.connectFriends(); // check
@@ -58,7 +71,7 @@ subscribe(["config-dhtLookup", "users", "node-key"], () => {
   // edit
   if (args.discovery) return; // don't lookup in discovery mode
   clearInterval(searchFriendsInterval);
-  if (store.config.dhtLookup) {
+  if (storage.config.dhtLookup) {
     client.searchFriends(); // check
     searchFriendsInterval = setInterval(client.searchFriends, 30000); // edit
   }

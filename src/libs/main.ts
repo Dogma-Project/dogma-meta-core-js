@@ -1,14 +1,11 @@
 import { initPersistDbs } from "../components/nedb"; // edit // reorder
 import fs from "node:fs"; // edit
-import * as crypt from "./crypto";
 import { emit, subscribe, services, state } from "./state";
 import logger from "./logger";
 import { datadir, dogmaDir } from "../components/datadir";
 import args from "../components/arguments";
-import { DEFAULTS, DHTPERM, STATES, PROTOCOL } from "../constants";
+import { DEFAULTS, PROTOCOL } from "../constants";
 
-import generateMasterKeys from "./generateMasterKeys";
-import generateNodeKeys from "./generateNodeKeys";
 import {
   createConfigTable as cconfig,
   createUsersTable as cusers,
@@ -18,95 +15,8 @@ import { Config, User, Node, Protocol } from "./model";
 import { Types } from "../types";
 
 const keysDir = datadir + "/keys";
-const _private = {
-  router: 0,
-};
 
 /** @module Store */
-
-/**
- * Default init store
- */
-export const store: Types.Store = {
-  config: {
-    get router() {
-      return Number(args.port) || _private.router || DEFAULTS.ROUTER;
-    },
-    set router(port: number) {
-      _private.router = Number(args.port) || port; // edit // check order
-    },
-    bootstrap: 0,
-    dhtLookup: 0,
-    dhtAnnounce: 0,
-    external: "",
-    autoDefine: 0,
-    public_ipv4: "",
-  },
-  ca: [],
-  users: [],
-  nodes: [],
-  node: {
-    name: DEFAULTS.NODE_NAME,
-    key: null,
-    cert: null,
-    id: "",
-    public_ipv4: "",
-  },
-  user: {
-    name: DEFAULTS.USER_NAME,
-    key: null,
-    cert: null,
-    id: "",
-  },
-};
-
-/**
- *
- */
-const getKeys = () => {
-  if (!store.user.key) {
-    try {
-      store.user.key = fs.readFileSync(keysDir + "/key.pem");
-      store.user.cert = fs.readFileSync(keysDir + "/cert.pem");
-      const id = crypt.getPublicCertHash(store.user.cert.toString()); // edit
-      if (id === undefined) throw "unknown cert"; // edit
-      store.user.id = id;
-      emit("master-key", store.user);
-    } catch (e) {
-      logger.log("store", "MASTER KEYS NOT FOUND");
-      services.masterKey = STATES.READY; // edit
-    }
-    /** @todo check result! */
-    if (services.masterKey === STATES.READY && args.auto)
-      generateMasterKeys(store, {
-        name: args.master || DEFAULTS.USER_NAME,
-        keylength: 2048, // edit
-      });
-  }
-
-  if (!store.node.key) {
-    try {
-      store.node.key = fs.readFileSync(keysDir + "/node-key.pem");
-      store.node.cert = fs.readFileSync(keysDir + "/node-cert.pem");
-      const id = crypt.getPublicCertHash(store.node.cert.toString());
-      if (id === undefined) throw "unknown cert";
-      store.node.id = id;
-      const names = crypt.getNamesFromNodeCert(store.node.cert.toString());
-      store.user.name = names.user_name;
-      store.node.name = names.node_name;
-      emit("node-key", store.node);
-    } catch (e) {
-      logger.log("store", "NODE KEYS NOT FOUND");
-      services.nodeKey = STATES.READY; // edit
-    }
-    /** @todo check result! */
-    if (services.nodeKey === STATES.READY && args.auto)
-      generateNodeKeys(store, {
-        name: args.node || DEFAULTS.NODE_NAME,
-        keylength: 2048,
-      });
-  }
-};
 
 /**
  *
@@ -214,13 +124,6 @@ export const checkHomeDir = () => {
     }
   });
 };
-
-subscribe(["master-key"], () => {
-  services.masterKey = STATES.FULL;
-});
-subscribe(["node-key"], () => {
-  services.nodeKey = STATES.FULL;
-});
 
 const defaults = {
   router: DEFAULTS.ROUTER,

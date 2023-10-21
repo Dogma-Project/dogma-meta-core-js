@@ -1,11 +1,36 @@
+import { Types } from "../../types";
+import Datastore from "@seald-io/nedb";
+import logger from "../logger";
+
 import {
   nodes as nodesDb,
   users as usersDb,
   connections as connectionsDb,
 } from "../../components/nedb";
-import { Types } from "../../types";
+
+/** IN MEMORY */
 
 const model = {
+  connectionsDb: new Datastore({
+    autoload: true,
+  }),
+
+  async init() {
+    try {
+      logger.debug("nedb", "load database", "connections");
+      connectionsDb.ensureIndexAsync({
+        fieldName: "node_id",
+        unique: true,
+      });
+      connectionsDb.ensureIndexAsync({
+        fieldName: "address",
+        unique: true,
+      });
+    } catch (err) {
+      logger.error("config.nedb", err);
+    }
+  },
+
   async push(params: Types.Connection.Description) {
     return connectionsDb.insertAsync(params);
   },

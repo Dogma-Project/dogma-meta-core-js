@@ -1,14 +1,33 @@
-import { STATES } from "../../constants";
 import { emit } from "../state";
-import { nodes as nodesDb } from "../nedb";
 import generateSyncId from "../../libs/generateSyncId";
 import logger from "../../libs/logger";
 import Sync from "./sync";
 import { Types } from "../../types";
+import { nedbDir } from "../../components/datadir";
+import Datastore from "@seald-io/nedb";
 
 const model = {
+  nodesDb: new Datastore({
+    filename: nedbDir + "/nodes.db",
+    timestampData: true,
+  }),
+
+  async init() {
+    try {
+      logger.debug("nedb", "load database", "nodes");
+      await this.nodesDb.loadDatabaseAsync();
+      await this.nodesDb.ensureIndexAsync({
+        fieldName: "param",
+        unique: true,
+      });
+      emit("nodes-db", Types.System.States.ready);
+    } catch (err) {
+      logger.error("config.nodes", err);
+    }
+  },
+
   async getAll() {
-    return nodesDb.findAsync({});
+    return this.nodesDb.findAsync({});
   },
 
   /**
@@ -16,7 +35,7 @@ const model = {
    * @param user_id
    */
   async getByUserId(user_id: Types.User.Id) {
-    return nodesDb.findAsync({ user_id });
+    return this.nodesDb.findAsync({ user_id });
   },
 
   /**
@@ -32,17 +51,17 @@ const model = {
         const { node_id, user_id } = row;
         if (!row.public_ipv4) delete row.public_ipv4;
 
-        const exist = await nodesDb.findOneAsync({ node_id, user_id });
+        const exist = await this.nodesDb.findOneAsync({ node_id, user_id });
         let result;
         if (exist && exist.node_id) {
           if (!exist.sync_id) row.sync_id = generateSyncId(5);
-          result = await nodesDb.updateAsync(
+          result = await this.nodesDb.updateAsync(
             { node_id, user_id },
             { $set: row }
           );
         } else {
           const sync_id = generateSyncId(5);
-          result = await nodesDb.insertAsync({ ...row, sync_id });
+          result = await this.nodesDb.insertAsync({ ...row, sync_id });
         }
         return result;
       } catch (err) {
@@ -55,7 +74,7 @@ const model = {
         for (let i = 0; i < nodes.length; i++) {
           await insert(nodes[i]);
         }
-        emit("nodes-db", STATES.RELOAD); // downgrade state to reload database
+        emit("nodes-db", Types.System.States.reload); // downgrade state to reload database
         resolve(true);
       } catch (err) {
         reject(err);
@@ -69,7 +88,7 @@ const model = {
    * @param ip
    */
   async setNodePublicIPv4(node_id: Types.Node.Id, ip: string) {
-    return nodesDb.updateAsync({ node_id }, { $set: { public_ipv4: ip } });
+    return this.nodesDb.updateAsync({ node_id }, { $set: { public_ipv4: ip } });
   },
 
   /**
@@ -83,13 +102,13 @@ const model = {
           logger.debug("node", "sync", "unknown sync_id", sync_id);
           continue;
         }
-        await nodesDb.updateAsync(
+        await this.nodesDb.updateAsync(
           { $or: [{ $and: [{ user_id }, { node_id }] }, { sync_id }] },
           row,
           { upsert: true }
         );
       }
-      emit("nodes-db", STATES.RELOAD); // downgrade state to reload database
+      emit("nodes-db", Types.System.States.reload); // downgrade state to reload database
       Sync.confirm("nodes", from);
       return true;
     } catch (err) {
@@ -107,7 +126,7 @@ const model = {
       const updated = await Sync.get("nodes", node_id);
       const time = updated && updated.time ? updated.time : 1;
       const nedbTime = new Date(time);
-      return nodesDb.findAsync({
+      return this.nodesDb.findAsync({
         sync_id: { $exists: true },
         updatedAt: { $gt: nedbTime },
       });

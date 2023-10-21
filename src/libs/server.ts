@@ -1,12 +1,12 @@
 import net from "node:net";
 import logger from "./logger";
-import { store } from "./store";
+import { store } from "./main";
 import { state, emit } from "./state";
 import LocalDiscovery from "../components/localDiscovery";
-import dht from "../components/dht";
+// import dht from "../components/dht";
 import args from "../components/arguments";
-import { DHTPERM, STATES } from "../constants";
 import Connection from "./connection";
+import { Types } from "../types";
 // import { Types } from "../types";
 
 /** @module Server */
@@ -29,18 +29,15 @@ export default class Server {
         port: socket.remotePort || 0,
       };
       this.connectionBridge.onConnect(socket, peer);
-      socket.on("close", () => {
-        this.connectionBridge.onClose(socket);
-      });
-      socket.on("error", (e) => {
-        logger.warn("server", "socket server error 1", e);
-      });
-      // add onEnd
     });
 
     const host = "0.0.0.0"; // temp
     this.ss.listen(port, host, () => {
       logger.info("server", `TLS socket is listening on ${host}:${port}`);
+      /**
+       * @todo move from here
+       */
+      /*
       setTimeout(() => {
         const {
           user: { id: user_id },
@@ -55,11 +52,12 @@ export default class Server {
         LocalDiscovery.announce(card);
         dht.announce(port);
       }, 3000);
-      emit("server", STATES.LIMITED);
+      */
+      emit("server", Types.System.States.limited);
     });
 
     this.ss.on("error", (error) => {
-      emit("server", STATES.ERROR);
+      emit("server", Types.System.States.error);
       logger.error("server", "SERVER ERROR", error);
     });
 
@@ -69,7 +67,7 @@ export default class Server {
   }
 
   stop(cb: Function) {
-    emit("server", STATES.DISABLED);
+    emit("server", Types.System.States.disabled);
     this.ss && this.ss.close();
     cb();
   }
@@ -92,7 +90,7 @@ export default class Server {
    */
   permitUnauthorized() {
     const cond1 = !!args.discovery;
-    const cond2 = state["config-bootstrap"] == DHTPERM.ALL;
+    const cond2 = state["config-bootstrap"] === Types.Connection.Group.all;
     return cond1 || cond2;
   }
 }

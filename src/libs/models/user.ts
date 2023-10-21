@@ -1,14 +1,34 @@
-import { STATES } from "../../constants";
 import { emit } from "../state";
-import { users as usersDb, nodes as nodesDb } from "../nedb";
+// import { users as usersDb, nodes as nodesDb } from "../nedb";
 import generateSyncId from "../../libs/generateSyncId";
 import Sync from "./sync";
 import { Types } from "../../types";
 import logger from "../../libs/logger";
+import { nedbDir } from "../../components/datadir";
+import Datastore from "@seald-io/nedb";
 
 const model = {
+  usersDb: new Datastore({
+    filename: nedbDir + "/users.db",
+    timestampData: true,
+  }),
+
+  async init() {
+    try {
+      logger.debug("nedb", "load database", "users");
+      await this.usersDb.loadDatabaseAsync();
+      // await this.usersDb.ensureIndexAsync({
+      //   fieldName: "user_id",
+      //   unique: true,
+      // });
+      emit("users-db", Types.System.States.ready);
+    } catch (err) {
+      logger.error("users.nedb", err);
+    }
+  },
+
   async getAll() {
-    return usersDb.findAsync({});
+    return this.usersDb.findAsync({});
   },
 
   /**
@@ -24,16 +44,16 @@ const model = {
     try {
       const { user_id } = user;
       emit("update-user", user_id);
-      const exist = await usersDb.findOneAsync({ user_id });
+      const exist = await this.usersDb.findOneAsync({ user_id });
       const sync_id = generateSyncId(5);
       let result;
       if (exist && exist.user_id) {
         if (!exist.sync_id) user.sync_id = sync_id;
-        result = await usersDb.updateAsync({ user_id }, { $set: user });
+        result = await this.usersDb.updateAsync({ user_id }, { $set: user });
       } else {
-        result = await usersDb.insertAsync({ ...user, sync_id });
+        result = await this.usersDb.insertAsync({ ...user, sync_id });
       }
-      emit("users-db", STATES.RELOAD); // downgrade state to reload database
+      emit("users-db", Types.System.States.reload); // downgrade state to reload database
       return result;
     } catch (err) {
       return Promise.reject(err);
@@ -45,10 +65,10 @@ const model = {
    */
   async removeUser(user_id: Types.User.Id) {
     try {
-      await usersDb.removeAsync({ user_id }, { multi: true });
-      emit("users-db", STATES.RELOAD); // downgrade state to reload database
-      await nodesDb.removeAsync({ user_id }, { multi: true });
-      emit("nodes-db", STATES.RELOAD); // downgrade state to reload database
+      await this.usersDb.removeAsync({ user_id }, { multi: true });
+      emit("users-db", Types.System.States.reload); // downgrade state to reload database
+      // await nodesDb.removeAsync({ user_id }, { multi: true });
+      emit("nodes-db", Types.System.States.reload); // downgrade state to reload database
       return true;
     } catch (err) {
       return Promise.reject(err);
@@ -67,11 +87,15 @@ const model = {
           continue;
         }
         // delete row._id;
-        await usersDb.updateAsync({ $or: [{ user_id }, { sync_id }] }, row, {
-          upsert: true,
-        });
+        await this.usersDb.updateAsync(
+          { $or: [{ user_id }, { sync_id }] },
+          row,
+          {
+            upsert: true,
+          }
+        );
       }
-      emit("users-db", STATES.RELOAD); // downgrade state to reload database
+      emit("users-db", Types.System.States.reload); // downgrade state to reload database
       Sync.confirm("users", from);
       return true;
     } catch (err) {

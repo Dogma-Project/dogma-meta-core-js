@@ -12,7 +12,11 @@ export default async function closeConnecion(
   try {
     const result = await Connection.getConnDataByUserId(user_id);
     for (const row of result) {
-      peers[row.connection_id].destroy();
+      const socket = peers[row.connection_id];
+      if (socket) {
+        socket.destroy();
+        // delete object
+      }
     }
     emit("update-user", false);
   } catch (err) {

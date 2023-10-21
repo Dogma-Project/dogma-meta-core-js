@@ -1,20 +1,22 @@
-import { Readable } from "node:stream";
+import internal, { Readable } from "node:stream";
 import logger from "../../libs/logger";
 
-class BufferToStream extends Readable {
-  /**
-   *
-   * @param {Object} opt
-   * @param {Buffer} opt.buffer
-   * @param {Number} opt.chunkSize
-   */
-  constructor(opt) {
-    // add out of range exception
-    super(opt);
+type BufferToStreamParams = {
+  buffer: Buffer;
+  chunkSize: number;
+  opts?: internal.ReadableOptions | undefined;
+};
 
-    this.buffer = opt.buffer;
-    this.chunkSize = opt.chunkSize;
-    this.byte = 0;
+class BufferToStream extends Readable {
+  byte: number = 0;
+  buffer: Buffer;
+  chunkSize: number;
+
+  constructor(params: BufferToStreamParams) {
+    // add out of range exception
+    super(params.opts);
+    this.buffer = params.buffer;
+    this.chunkSize = params.chunkSize;
   }
 
   _read() {

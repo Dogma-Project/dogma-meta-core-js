@@ -29,51 +29,6 @@ export const API = {
  * @type {Object}
  * @default
  */
-export const MX = {
-  CONTROL: 0,
-  MESSAGES: 1,
-  FILES: 2,
-  FILES_DATA: 3,
-  DHT: 4,
-  ATTACHMENTS: 5,
-  HANDSHAKE: 6,
-  TEST: 7,
-  MAIL: 8,
-};
-
-/**
- * @constant
- * @type {Object}
- * @default
- */
-export const DHTPERM = {
-  NOBODY: 0,
-  ONLY_OWN: 1,
-  ONLY_FRIENDS: 2,
-  ALL: 3,
-};
-
-/**
- * @constant
- * @type {Object}
- * @default
- */
-export const STATES = {
-  ERROR: -1,
-  DISABLED: 0,
-  READY: 1,
-  EMPTRY: 2,
-  RELOAD: 6,
-  LIMITED: 8,
-  OK: 9,
-  FULL: 10,
-};
-
-/**
- * @constant
- * @type {Object}
- * @default
- */
 export const DEFAULTS = {
   UNKNOWN: 0,
   ROUTER: 24601,
@@ -91,39 +46,9 @@ export const DEFAULTS = {
  * @type {Object}
  * @default
  */
-export const LOGLEVEL = {
-  NOTHING: 0,
-  ERRORS: 1,
-  DEBUG: 2,
-  INFO: 3,
-  WARNINGS: 4,
-  LOGS: 5,
-};
-
-/**
- * @constant
- * @type {Object}
- * @default
- */
 export const PROTOCOL = {
   DB: 1,
   CERTIFICATE: 0,
-};
-
-/**
- * @constant
- * @type {Object}
- * @default
- */
-export const MESSAGES = {
-  DIRECT: 0,
-  USER: 1,
-  CHAT: 2,
-};
-
-export const DIRECTION = {
-  OUTCOMING: 0,
-  INCOMING: 1,
 };
 
 export const MSG_FORMAT = {
@@ -142,6 +67,10 @@ export const MSG_CODE = {
 
 export const DESCRIPTOR = {
   SIZE: 15,
+};
+
+export const SIZES = {
+  MX: 1,
 };
 
 export const ATTACHMENTS = {

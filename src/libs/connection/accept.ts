@@ -3,7 +3,7 @@ import { Connection } from "../../libs/model";
 import { Types } from "../../types";
 import ConnectionClass from "../connection";
 import { emit } from "../state";
-import { store } from "../store";
+import { store } from "../main";
 
 /**
  *

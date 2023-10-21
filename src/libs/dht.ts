@@ -1,8 +1,7 @@
 import EventEmitter from "node:events";
 import logger from "./logger";
 import { dht } from "../components/nedb";
-import { DHTPERM } from "../constants";
-import { store } from "./store";
+import { store } from "./main";
 import { Types } from "../types";
 import { Document } from "@seald-io/nedb";
 
@@ -39,10 +38,10 @@ class DHT extends EventEmitter {
 
   /**
    *
-   * @param type dhtAnnounce, dhtBootstrap, dhtLookup
-   * @param level 0, 1, 2, 3
+   * @param type
+   * @param level minimum group to allow
    */
-  setPermission(type: Types.DHT.Type, level: 0 | 1 | 2 | 3) {
+  setPermission(type: Types.DHT.Type, level: Types.Connection.Group) {
     if (!this.permissions.hasOwnProperty(type)) {
       return logger.warn(
         "DHT",

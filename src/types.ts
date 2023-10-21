@@ -1,5 +1,4 @@
-import EncodeStream from "./libs/streams/encode";
-import net from "node:net";
+import DogmaSocket from "./libs/socket";
 
 export namespace Types {
   export namespace Node {
@@ -28,17 +27,18 @@ export namespace Types {
     export type Model = {
       [index: string]: string | number; // edit
     };
-    export type Params = {
+    export interface Params {
+      _router: number;
       router: number;
-      bootstrap: Constants.DhtPermission;
-      dhtLookup: Constants.DhtPermission;
-      dhtAnnounce: Constants.DhtPermission;
+      bootstrap: Connection.Group;
+      dhtLookup: Connection.Group;
+      dhtAnnounce: Connection.Group;
       external: string;
       autoDefine: Constants.Boolean;
       public_ipv4: string;
       stun?: number; // edit
       turn?: number; // edit
-    };
+    }
   }
   export namespace Sync {
     export type Id = string;
@@ -53,62 +53,88 @@ export namespace Types {
   }
 
   export namespace DHT {
-    export type Type = "dhtAnnounce" | "dhtBootstrap" | "dhtLookup";
-    export type Request = "announce" | "lookup" | "revoke";
-    export type Action = "get" | "set";
-    export namespace RequestData {
-      interface Main {
-        type: DHT.Request;
-        action: DHT.Action;
-        port: number;
-      }
-      export type LookupData = {
-        user_id: User.Id;
-        node_id?: Node.Id;
-      };
-      export type AnnounceData = {
-        port: number;
-      };
+    export enum Type {
+      dhtAnnounce,
+      dhtLookup,
+      dhtBootstrap,
+    }
+    export enum Action {
+      get,
+      set,
+      push,
+    }
+    export enum Request {
+      announce,
+      lookup,
+      revoke,
+    }
+    interface Main {
+      type: DHT.Request;
+      action: DHT.Action;
+    }
 
-      export type LookupAnswerData = {
-        user_id: User.Id;
-        node_id: Node.Id;
-        public_ipv4: string;
-        port: number;
-      };
-      export interface Lookup extends Main {
-        type: "lookup";
-        action: "get";
-        user_id: User.Id;
-        node_id?: Node.Id;
+    export namespace LookUp {
+      export interface Request extends Main {
+        type: DHT.Request.lookup;
+        action: DHT.Action.get;
+        data: Request.Data;
       }
-      export interface LookupAnswer extends Omit<Lookup, "action"> {
-        action: "set";
-        data: RequestData.LookupAnswerData;
+      export namespace Request {
+        export type Data = {
+          user_id: User.Id;
+          node_id?: Node.Id;
+        };
       }
-
-      export type Outgoing = AnnounceData | LookupData;
-
-      export interface Announce extends Main {
-        type: "announce";
-        action: DHT.Action;
+      export interface Answer extends Main {
+        type: DHT.Request.lookup;
+        action: DHT.Action.set;
+        data: Answer.Data;
       }
-      export interface Revoke extends Main {
-        type: "revoke";
-        action: DHT.Action;
+      export namespace Answer {
+        export type Data = {
+          public_ipv4: string;
+          port: number;
+          user_id: User.Id;
+          node_id: Node.Id;
+        }; // edit
       }
     }
+
+    export namespace Announce {
+      export interface Request extends Main {
+        type: DHT.Request.announce;
+        action: DHT.Action.push;
+        data: Request.Data;
+      }
+      export namespace Request {
+        export type Data = {
+          port: number;
+        };
+      }
+    }
+
+    export namespace Revoke {
+      export interface Request extends Main {
+        type: DHT.Request.revoke;
+        action: DHT.Action.push;
+        data: Request.Data;
+      }
+      export namespace Request {
+        export type Data = {};
+      }
+    }
+
     export type FromData = {
       user_id: User.Id;
       node_id: Node.Id;
       public_ipv4: string;
     };
     export type CardQuery = {
-      request: RequestData.Lookup | RequestData.Announce | RequestData.Revoke;
+      request: LookUp.Request | Announce.Request | Revoke.Request;
       from: FromData;
     };
     export type CardAnswer = {
-      request: RequestData.LookupAnswer;
+      request: LookUp.Answer;
       from: FromData;
     };
     export type Card = CardQuery | CardAnswer;
@@ -116,6 +142,25 @@ export namespace Types {
 
   export namespace Connection {
     export type Id = string;
+    export enum Status {
+      notConnected,
+      connected,
+      error,
+      notAuthorized,
+      authorized,
+    }
+    export enum Group {
+      unknown,
+      all,
+      friends,
+      selfUser,
+      selfNode,
+      nobody,
+    }
+    export enum Direction {
+      outcoming,
+      incoming,
+    }
     export interface Description {
       connection_id: Id;
       address: string;
@@ -123,18 +168,8 @@ export namespace Types {
       node_id: Node.Id;
       status: number; // edit
     }
-    export interface Multiplex {
-      control: EncodeStream;
-      messages: EncodeStream;
-      files: EncodeStream;
-      dht: EncodeStream;
-    }
-    export interface Socket extends net.Socket {
-      dogma: Description;
-      multiplex: Multiplex;
-    }
     export type SocketArray = {
-      [index: string]: Socket;
+      [index: string]: DogmaSocket;
     };
     export type Peer = {
       host: string;
@@ -165,7 +200,6 @@ export namespace Types {
 
   export type Store = {
     config: Config.Params;
-    ca: any[];
     users: any[]; // edit
     nodes: any[]; // edit
     node: {
@@ -192,9 +226,10 @@ export namespace Types {
   }
 
   export namespace Constants {
-    export type Boolean = 0 | 1;
-    export type DhtPermission = 0 | 1 | 2 | 3;
-    export type MessagesType = 0 | 1 | 2;
+    export enum Boolean {
+      false = 0,
+      true = 1,
+    }
   }
 
   export namespace File {
@@ -215,6 +250,11 @@ export namespace Types {
   }
 
   export namespace Message {
+    export enum Type {
+      direct,
+      user,
+      chat,
+    }
     export namespace Class {
       interface Base {
         id: number;
@@ -244,6 +284,43 @@ export namespace Types {
       data: string; // edit
     };
     export type File = FileShare | FileEncoded;
+  }
+
+  export namespace Streams {
+    export enum MX {
+      handshake,
+      test,
+      control,
+      messages,
+      mail,
+      dht,
+    }
+    export type DemuxedResult = {
+      mx: MX;
+      data: Buffer;
+      descriptor?: string; // edit
+    };
+  }
+
+  export namespace System {
+    export enum LogLevel {
+      nothing,
+      errors,
+      debug,
+      info,
+      warnings,
+      logs,
+    }
+    export enum States {
+      error,
+      disabled,
+      ready,
+      empty,
+      reload,
+      limited,
+      ok,
+      full,
+    }
   }
 }
 

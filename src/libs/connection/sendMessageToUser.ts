@@ -1,5 +1,4 @@
 import { Connection } from "../../libs/model";
-import { MESSAGES } from "../../constants";
 import logger from "../../libs/logger";
 import { Types } from "../../types";
 import ConnectionClass from "../connection";
@@ -15,7 +14,8 @@ export default async function send(
     if (!nodes.length)
       return logger.warn("connection", "sendMessageToUser", "user is offline");
     const { node_id } = nodes[0]; // edit
-    node_id && this.sendMessageToNode(node_id, message, MESSAGES.USER);
+    node_id &&
+      this.sendMessageToNode(node_id, message, Types.Message.Type.user);
   } catch (err) {
     logger.error("connection", "sendMessageToUser", err);
   }

@@ -1,6 +1,6 @@
 import * as crypt from "./crypto";
 import { createDataBase } from "./createDataBase";
-import { store } from "./store";
+import { store } from "./main";
 import generateMasterKeys from "./generateMasterKeys";
 import generateNodeKeys from "./generateNodeKeys";
 import { services } from "./state";

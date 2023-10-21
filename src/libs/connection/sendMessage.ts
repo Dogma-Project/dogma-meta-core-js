@@ -1,18 +1,18 @@
-import { MESSAGES } from "../../constants";
+import { Types } from "../../types";
 import Connection from "../connection";
 
 export default function sendMessage(
   this: Connection,
   to: string,
   message: any,
-  type: number
+  type: Types.Message.Type
 ) {
   switch (type) {
-    case MESSAGES.DIRECT:
+    case Types.Message.Type.direct:
       return this.sendMessageToNode(to, message);
-    case MESSAGES.USER:
+    case Types.Message.Type.user:
       return this.sendMessageToUser(to, message);
-    case MESSAGES.CHAT:
+    case Types.Message.Type.chat:
       // edit
       break;
   }

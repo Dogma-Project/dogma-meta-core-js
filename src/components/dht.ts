@@ -1,42 +1,39 @@
 import DHT from "../libs/dht";
 import { subscribe, services } from "../libs/state";
-import { DHTPERM, STATES } from "../constants";
+import { Types } from "../types";
 
 const dht = new DHT();
 
 // add validation
+
 subscribe(["config-dhtLookup"], (_action, value, _type) => {
-  dht.setPermission("dhtLookup", value);
-  if (value === DHTPERM.NOBODY) {
-    services.dhtLookup = STATES.DISABLED;
-  } else if (value === DHTPERM.ALL) {
-    services.dhtLookup = STATES.FULL;
+  dht.setPermission(Types.DHT.Type.dhtLookup, value);
+  if (value > Types.Connection.Group.selfUser) {
+    services.dhtLookup = Types.System.States.disabled;
+  } else if (value === Types.Connection.Group.all) {
+    services.dhtLookup = Types.System.States.full;
   } else {
-    services.dhtLookup = STATES.OK;
+    services.dhtLookup = Types.System.States.ok;
   }
 });
-
-// add validation
 subscribe(["config-dhtAnnounce"], (_action, value, _type) => {
-  dht.setPermission("dhtAnnounce", value);
-  if (value === DHTPERM.NOBODY) {
-    services.dhtAnnounce = STATES.DISABLED;
-  } else if (value === DHTPERM.ALL) {
-    services.dhtAnnounce = STATES.FULL;
+  dht.setPermission(Types.DHT.Type.dhtAnnounce, value);
+  if (value > Types.Connection.Group.selfUser) {
+    services.dhtAnnounce = Types.System.States.disabled;
+  } else if (value === Types.Connection.Group.all) {
+    services.dhtAnnounce = Types.System.States.full;
   } else {
-    services.dhtAnnounce = STATES.OK;
+    services.dhtAnnounce = Types.System.States.ok;
   }
 });
-
-// add validation
 subscribe(["config-bootstrap"], (_action, value, _type) => {
-  dht.setPermission("dhtBootstrap", value);
-  if (value === DHTPERM.NOBODY) {
-    services.dhtBootstrap = STATES.DISABLED;
-  } else if (value === DHTPERM.ALL) {
-    services.dhtBootstrap = STATES.FULL;
+  dht.setPermission(Types.DHT.Type.dhtBootstrap, value);
+  if (value > Types.Connection.Group.selfUser) {
+    services.dhtBootstrap = Types.System.States.disabled;
+  } else if (value === Types.Connection.Group.all) {
+    services.dhtBootstrap = Types.System.States.full;
   } else {
-    services.dhtBootstrap = STATES.OK;
+    services.dhtBootstrap = Types.System.States.ok;
   }
 });
 

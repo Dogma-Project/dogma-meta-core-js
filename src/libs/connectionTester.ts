@@ -1,4 +1,4 @@
-import { store } from "./store";
+import { store } from "./main";
 import { emit } from "./state";
 import logger from "./logger";
 import { Node } from "./model";

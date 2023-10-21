@@ -1,6 +1,6 @@
 import { Connection } from "../../libs/model";
 import messages from "../../libs/messages";
-import { DIRECTION, MSG_FORMAT, MSG_CODE, MESSAGES } from "../../constants";
+import { MSG_FORMAT, MSG_CODE } from "../../constants";
 import logger from "../../libs/logger";
 import FilesController from "../controllers/files";
 import { Types } from "../../types";
@@ -11,7 +11,7 @@ export default async function send(
   this: ConnectionClass,
   node_id: Types.Node.Id,
   message: Types.Message.Class.Abstract,
-  type: number = MESSAGES.DIRECT
+  type: Types.Message.Type = Types.Message.Type.direct
 ) {
   // edit // add read status message
 

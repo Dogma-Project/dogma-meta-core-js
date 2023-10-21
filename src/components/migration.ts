@@ -1,5 +1,5 @@
 import { emit, subscribe } from "../libs/state";
-import { readProtocolTable } from "../libs/store";
+import { readProtocolTable } from "../libs/main";
 import logger from "../libs/logger";
 import { PROTOCOL, STATES } from "../constants";
 

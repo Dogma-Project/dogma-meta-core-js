@@ -1,7 +1,7 @@
 import logger from "./logger";
 import { subscribe } from "./state";
 import { Message, User, Node, Connection } from "./model";
-import { store } from "./store";
+import { store } from "./main";
 import { MESSAGES } from "../constants";
 import { Types } from "../types";
 

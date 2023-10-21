@@ -1,5 +1,5 @@
 import { Connection } from "../../libs/model";
-import { MSG_CODE, MESSAGES } from "../../constants";
+import { MSG_CODE } from "../../constants";
 import logger from "../../libs/logger";
 import { Types } from "../../types";
 import ConnectionClass from "../connection";

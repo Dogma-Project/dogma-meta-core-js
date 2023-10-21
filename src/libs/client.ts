@@ -1,11 +1,10 @@
 import net from "node:net";
 import logger from "./logger";
-import { store } from "./store";
+import { store } from "./main";
 import { state } from "./state";
 import ConnectionClass from "./connection";
-import { DHTPERM } from "../constants";
 import { Node, Connection } from "./model";
-import dht from "../components/dht";
+// import dht from "../components/dht";
 import { Types } from "../types";
 
 /** @module Client */
@@ -19,15 +18,8 @@ export default class Client {
 
   connect(peer: Types.Connection.Peer) {
     try {
-      // logger.debug("client", "connect", options);
-      const socket: net.Socket = net.connect(peer.port, peer.host, () => {
+      const socket = net.connect(peer.port, peer.host, () => {
         this.connectionBridge.onConnect(socket, peer);
-      });
-      socket.on("close", () => {
-        this.connectionBridge.onClose(socket);
-      });
-      socket.on("error", (error) => {
-        logger.log("client", "socket error", error);
       });
     } catch (e) {
       logger.error("client", "Can't establish connection", e);
@@ -54,8 +46,8 @@ export default class Client {
   }
 
   permitUnauthorized() {
-    const cond1 = state["config-dhtLookup"] == DHTPERM.ALL;
-    const cond2 = state["config-dhtAnnounce"] == DHTPERM.ALL;
+    const cond1 = state["config-dhtLookup"] === Types.Connection.Group.all;
+    const cond2 = state["config-dhtAnnounce"] === Types.Connection.Group.all;
     return cond1 || cond2;
   }
 
@@ -125,12 +117,16 @@ export default class Client {
     });
   }
 
+  /**
+   *
+   * @todo move from here
+   */
   dhtLookup(user_id: Types.User.Id) {
-    try {
-      logger.log("client", "DHT LOOKUP", user_id);
-      dht.lookup(user_id);
-    } catch (err) {
-      logger.error("client", "DHT lookup error", err);
-    }
+    // try {
+    //   logger.log("client", "DHT LOOKUP", user_id);
+    //   dht.lookup(user_id);
+    // } catch (err) {
+    //   logger.error("client", "DHT lookup error", err);
+    // }
   }
 }

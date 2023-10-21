@@ -1,5 +1,5 @@
 import { Types } from "../types";
-import args from "../components/arguments";
+import args from "./arguments";
 import { DEFAULTS } from "../constants";
 
 class Storage {

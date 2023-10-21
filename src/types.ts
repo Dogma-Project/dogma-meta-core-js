@@ -1,4 +1,4 @@
-import DogmaSocket from "./libs/socket";
+import DogmaSocket from "./modules/socket";
 
 export namespace Types {
   export namespace Node {

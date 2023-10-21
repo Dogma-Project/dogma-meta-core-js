@@ -1,6 +1,6 @@
 import { emit } from "../state-old";
-import generateSyncId from "../../libs/generateSyncId";
-import logger from "../../libs/logger";
+import generateSyncId from "../generateSyncId";
+import logger from "../logger";
 import Sync from "./sync";
 import { Types } from "../../types";
 import { nedbDir } from "../../components/datadir";

@@ -1,7 +1,7 @@
-import logger from "../../libs/logger";
+import logger from "../logger";
 import FilesController from "./files";
 import NodesController from "./nodes";
-import SyncController from "../../libs/sync";
+import SyncController from "../sync";
 import { Types } from "../../types";
 
 /** @module RequestsController */

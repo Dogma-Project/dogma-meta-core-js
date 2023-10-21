@@ -1,4 +1,4 @@
-import StateManager from "../libs/state";
+import StateManager from "../modules/state";
 
 const state = new StateManager();
 

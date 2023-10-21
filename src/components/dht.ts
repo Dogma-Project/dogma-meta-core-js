@@ -1,5 +1,5 @@
-import DHT from "../libs/dht";
-import { subscribe, services } from "../libs/state-old";
+import DHT from "../modules/dht";
+import { subscribe, services } from "../modules/state-old";
 import { Types } from "../types";
 
 const dht = new DHT();

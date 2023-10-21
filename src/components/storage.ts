@@ -1,4 +1,4 @@
-import Storage from "../libs/storage";
+import Storage from "../modules/storage";
 
 const storage = new Storage();
 

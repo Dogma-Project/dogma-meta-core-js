@@ -1,12 +1,12 @@
-import Client from "../libs/client";
+import Client from "../modules/client";
 import connections from "./connection";
-import { state, subscribe } from "../libs/state-old";
+import { state, subscribe } from "../modules/state-old";
 import localDiscovery from "./localDiscovery";
-import logger from "../libs/logger";
+import logger from "../modules/logger";
 import dht from "./dht";
 import { Types } from "../types";
 import storage from "./storage";
-import args from "./arguments";
+import args from "../modules/arguments";
 import eventEmitter from "./eventEmitter";
 
 const client = new Client(connections);

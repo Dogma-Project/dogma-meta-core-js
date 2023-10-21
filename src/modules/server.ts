@@ -1,6 +1,6 @@
 import net from "node:net";
 import logger from "./logger";
-import args from "../components/arguments";
+import args from "./arguments";
 import { Types } from "../types";
 import Connections from "./connection";
 import StateManager from "./state";

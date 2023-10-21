@@ -1,4 +1,4 @@
-import Connection from "../libs/connection";
+import Connection from "../modules/connection";
 
 const connection = new Connection();
 

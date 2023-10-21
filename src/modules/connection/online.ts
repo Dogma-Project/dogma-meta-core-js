@@ -1,4 +1,4 @@
-import logger from "../../libs/logger";
+import logger from "../logger";
 import EventEmitter from "../../components/eventEmitter";
 import { Types } from "../../types";
 import ConnectionClass from "../connection";

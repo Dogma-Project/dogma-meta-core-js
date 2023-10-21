@@ -1,5 +1,5 @@
-import { Connection } from "../../libs/model";
-import logger from "../../libs/logger";
+import { Connection } from "../model";
+import logger from "../logger";
 import ConnectionClass from "../connection";
 import { Types } from "../../types";
 

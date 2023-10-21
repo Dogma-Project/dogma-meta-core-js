@@ -1,5 +1,5 @@
 import internal, { Readable } from "node:stream";
-import logger from "../../libs/logger";
+import logger from "../logger";
 
 type BufferToStreamParams = {
   buffer: Buffer;

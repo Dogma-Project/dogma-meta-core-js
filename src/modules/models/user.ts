@@ -1,9 +1,9 @@
 import { emit } from "../state-old";
 // import { users as usersDb, nodes as nodesDb } from "../nedb";
-import generateSyncId from "../../libs/generateSyncId";
+import generateSyncId from "../generateSyncId";
 import Sync from "./sync";
 import { Types } from "../../types";
-import logger from "../../libs/logger";
+import logger from "../logger";
 import { nedbDir } from "../../components/datadir";
 import Datastore from "@seald-io/nedb";
 

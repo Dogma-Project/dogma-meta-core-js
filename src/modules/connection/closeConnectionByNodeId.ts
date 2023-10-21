@@ -1,6 +1,6 @@
-import { Connection } from "../../libs/model";
+import { Connection } from "../model";
 import ConnectionClass from "../connection";
-import logger from "../../libs/logger";
+import logger from "../logger";
 import { Types } from "../../types";
 
 export default async function closeConnecion(

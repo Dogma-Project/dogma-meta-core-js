@@ -1,6 +1,6 @@
-import { emit, subscribe } from "../libs/state-old";
-import { readProtocolTable } from "../libs/main";
-import logger from "../libs/logger";
+import { emit, subscribe } from "../modules/state-old";
+import { readProtocolTable } from "../modules/main";
+import logger from "../modules/logger";
 import { PROTOCOL, STATES } from "../constants";
 
 subscribe(["protocol-db"], (_action, value) => {

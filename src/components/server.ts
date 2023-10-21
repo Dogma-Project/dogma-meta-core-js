@@ -1,9 +1,9 @@
-import Server from "../libs/server";
+import Server from "../modules/server";
 import connections from "./connection";
-import { emit, services, subscribe } from "../libs/state-old";
+import { emit, services, subscribe } from "../modules/state-old";
 import storage from "./storage";
 import { Types } from "../types";
-import connectionTester from "../libs/connectionTester";
+import connectionTester from "../modules/connectionTester";
 
 const server = new Server(connections);
 

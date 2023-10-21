@@ -1,5 +1,5 @@
 import os from "node:os";
-import args from "./arguments";
+import args from "../modules/arguments";
 
 export const dogmaDir = os.homedir() + "/.dogma-node";
 export const datadir =

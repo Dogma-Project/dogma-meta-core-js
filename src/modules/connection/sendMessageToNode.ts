@@ -1,7 +1,7 @@
-import { Connection } from "../../libs/model";
-import messages from "../../libs/messages";
+import { Connection } from "../model";
+import messages from "../messages";
 import { MSG_FORMAT, MSG_CODE } from "../../constants";
-import logger from "../../libs/logger";
+import logger from "../logger";
 import FilesController from "../controllers/files";
 import { Types } from "../../types";
 import ConnectionClass from "../connection";

@@ -1,10 +1,10 @@
-import "./libs/prototypes";
+import "./modules/prototypes";
 import "./components/migration";
-import "./libs/server";
-import "./libs/client";
-import "./libs/sync"; // edit
+import "./modules/server";
+import "./modules/client";
+import "./modules/sync"; // edit
 
-import api from "./libs/api";
+import api from "./modules/api";
 import ee from "./components/eventEmitter";
 
 export { api, ee };

@@ -1,4 +1,4 @@
-import args from "../components/arguments";
+import args from "./arguments";
 import { DEFAULTS } from "../constants";
 import { Types } from "../types";
 

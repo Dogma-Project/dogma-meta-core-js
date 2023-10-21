@@ -1,5 +1,5 @@
-import { Node } from "../../libs/model";
-import logger from "../../libs/logger";
+import { Node } from "../model";
+import logger from "../logger";
 import { MESSAGES } from "../../constants";
 import { Types } from "../../types";
 

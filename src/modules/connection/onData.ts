@@ -5,10 +5,10 @@ import {
   MSG_FORMAT,
   DESCRIPTOR,
 } from "../../constants";
-import messages from "../../libs/messages";
+import messages from "../messages";
 import FilesController from "../controllers/files"; // move to dir
 import RequestsController from "../controllers/requests";
-import logger from "../../libs/logger";
+import logger from "../logger";
 import dht from "../../components/dht";
 import ConnectionClass from "../connection";
 import { Types } from "../../types";

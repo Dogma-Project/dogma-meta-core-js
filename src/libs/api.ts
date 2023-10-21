@@ -3,7 +3,7 @@ import { createDataBase } from "./createDataBase";
 import { store } from "./main";
 import generateMasterKeys from "./generateMasterKeys";
 import generateNodeKeys from "./generateNodeKeys";
-import { services } from "./state";
+import { services } from "./state-old";
 import { API as c, MESSAGES } from "../constants";
 import FilesController from "./controllers/files";
 import logger from "./logger";

@@ -1,6 +1,6 @@
 import { initPersistDbs } from "../components/nedb"; // edit // reorder
 import fs from "node:fs"; // edit
-import { emit, subscribe, services, state } from "./state";
+import { emit, subscribe, services, state } from "./state-old";
 import logger from "./logger";
 import { datadir, dogmaDir } from "../components/datadir";
 import args from "../components/arguments";

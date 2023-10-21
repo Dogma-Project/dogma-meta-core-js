@@ -3,7 +3,7 @@ import crypto, { KeyObject } from "node:crypto";
 
 import { Types } from "../types";
 import generateSyncId from "./generateSyncId";
-import { emit } from "./state";
+import { emit } from "./state-old";
 import logger from "./logger";
 import { Connection } from "./model";
 import { DemuxStream, MuxStream, Encryption, Decryption } from "./streams";

@@ -1,5 +1,4 @@
 import { Connection } from "../../libs/model";
-import { MESSAGES } from "../../constants";
 import logger from "../../libs/logger";
 import { Types } from "../../types";
 import ConnectionClass from "../connection";
@@ -21,7 +20,7 @@ export default async function send(
   try {
     const nodes = await Connection.getConnDataByUserId(user_id);
     nodes.forEach((node) => {
-      this.sendRequestToNode(node.node_id, request, MESSAGES.USER);
+      this.sendRequestToNode(node.node_id, request, Types.Message.Type.user);
     });
   } catch (err) {
     logger.error("connection", "sendRequestToUser", err);

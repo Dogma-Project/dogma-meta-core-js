@@ -17,10 +17,20 @@ import {
   sendRequest,
 } from "./connection/index";
 import { Types } from "../types";
+import StateManager from "./state";
+import Storage from "./storage";
 
 /** @module Connection */
 
 class Connection {
+  stateBridge: StateManager;
+  storageBridge: Storage;
+
+  constructor({ state, storage }: { state: StateManager; storage: Storage }) {
+    this.stateBridge = state;
+    this.storageBridge = storage;
+  }
+
   peers: Types.Connection.SocketArray = {};
   online: Types.Node.Id[] = [];
 

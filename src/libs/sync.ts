@@ -1,5 +1,5 @@
 import logger from "./logger";
-import { subscribe } from "./state";
+import { subscribe } from "./state-old";
 import { Message, User, Node, Connection } from "./model";
 import { store } from "./main";
 import { MESSAGES } from "../constants";

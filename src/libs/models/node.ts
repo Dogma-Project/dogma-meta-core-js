@@ -1,4 +1,4 @@
-import { emit } from "../state";
+import { emit } from "../state-old";
 import generateSyncId from "../../libs/generateSyncId";
 import logger from "../../libs/logger";
 import Sync from "./sync";

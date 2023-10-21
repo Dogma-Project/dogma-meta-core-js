@@ -7,10 +7,10 @@ export namespace Types {
       node_id: Node.Id;
       user_id: User.Id;
       name: string;
-      public_ipv4?: string;
-      public_ipv6?: string;
-      local_ipv4?: string;
-      local_ipv6?: string;
+      public_ipv4?: Connection.IPv4;
+      public_ipv6?: Connection.IPv4;
+      local_ipv4?: Connection.IPv6;
+      local_ipv6?: Connection.IPv6;
       sync_id?: Sync.Id;
     };
   }
@@ -142,6 +142,8 @@ export namespace Types {
 
   export namespace Connection {
     export type Id = string;
+    export type IPv4 = string;
+    export type IPv6 = string;
     export enum Status {
       notConnected,
       connected,
@@ -174,6 +176,7 @@ export namespace Types {
     export type Peer = {
       host: string;
       port: number;
+      address: string;
       public?: boolean;
       version?: 4 | 6;
     };
@@ -197,25 +200,6 @@ export namespace Types {
       };
     }
   }
-
-  export type Store = {
-    config: Config.Params;
-    users: any[]; // edit
-    nodes: any[]; // edit
-    node: {
-      name: string;
-      id: Node.Id;
-      key: Buffer | null;
-      cert: Buffer | null;
-      public_ipv4: string;
-    };
-    user: {
-      name: string;
-      id: Node.Id;
-      key: Buffer | null;
-      cert: Buffer | null;
-    };
-  };
 
   export namespace Key {
     export type InitialParams = {
@@ -300,6 +284,21 @@ export namespace Types {
       data: Buffer;
       descriptor?: string; // edit
     };
+  }
+
+  export namespace Event {
+    export enum Action {
+      update,
+      set,
+    }
+    export type Payload = any;
+    export type Type = string; // edit
+    export type Listenter = (
+      action: Action,
+      payload: Payload,
+      type: Type
+    ) => void;
+    export type ArrayOfListeners = [Type[], Listenter] | [];
   }
 
   export namespace System {

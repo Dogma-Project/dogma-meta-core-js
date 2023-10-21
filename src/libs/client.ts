@@ -1,25 +1,36 @@
 import net from "node:net";
 import logger from "./logger";
-import { store } from "./main";
-import { state } from "./state";
-import ConnectionClass from "./connection";
 import { Node, Connection } from "./model";
-// import dht from "../components/dht";
 import { Types } from "../types";
+import StateManager from "./state";
+import Storage from "./storage";
+import ConnectionClass from "./connection";
 
 /** @module Client */
 
 export default class Client {
-  connectionBridge: ConnectionClass;
+  connectionsBridge: ConnectionClass;
+  stateBridge: StateManager;
+  storageBridge: Storage;
 
-  constructor(connection: ConnectionClass) {
-    this.connectionBridge = connection;
+  constructor({
+    connections,
+    state,
+    storage,
+  }: {
+    connections: ConnectionClass;
+    state: StateManager;
+    storage: Storage;
+  }) {
+    this.connectionsBridge = connections;
+    this.stateBridge = state;
+    this.storageBridge = storage;
   }
 
   connect(peer: Types.Connection.Peer) {
     try {
       const socket = net.connect(peer.port, peer.host, () => {
-        this.connectionBridge.onConnect(socket, peer);
+        this.connectionsBridge.onConnect(socket, peer);
       });
     } catch (e) {
       logger.error("client", "Can't establish connection", e);
@@ -46,8 +57,11 @@ export default class Client {
   }
 
   permitUnauthorized() {
-    const cond1 = state["config-dhtLookup"] === Types.Connection.Group.all;
-    const cond2 = state["config-dhtAnnounce"] === Types.Connection.Group.all;
+    const cond1 =
+      this.stateBridge.state["config-dhtLookup"] === Types.Connection.Group.all;
+    const cond2 =
+      this.stateBridge.state["config-dhtAnnounce"] ===
+      Types.Connection.Group.all;
     return cond1 || cond2;
   }
 
@@ -57,16 +71,16 @@ export default class Client {
   ) {
     // check non-listed peers
 
-    if (!peer || !peer.host || !peer.port)
-      return logger.warn("nodes", "unknown peer", peer);
+    if (!peer) return logger.warn("nodes", "unknown peer", peer);
     if (!from || !from.user_id || !from.node_id)
       return logger.warn("nodes", "unknown from", from);
 
     const { user_id, node_id } = from;
-    const { host, port } = peer;
 
     if (!this.permitUnauthorized()) {
-      const inFriends = store.users.find((user) => user.user_id === user_id);
+      const inFriends = this.storageBridge.users.find(
+        (user) => user.user_id === user_id
+      );
       // logger.debug("CLIENT", "tryPeer 1", inFriends, store.users, user_id);
       if (!inFriends)
         return logger.log(
@@ -76,9 +90,7 @@ export default class Client {
           "not in the friends list"
         );
     }
-
-    const address = host + ":" + port;
-    Connection.getConnectionsCount(address, node_id)
+    Connection.getConnectionsCount(peer.address, node_id)
       .then((count) => {
         if (count === 0) this.connect(peer);
       })
@@ -87,7 +99,7 @@ export default class Client {
       });
   }
   getOwnNodes() {
-    const user_id = store.user.id;
+    const user_id = this.storageBridge.user.id;
     return Node.getByUserId(user_id);
   }
 
@@ -95,25 +107,26 @@ export default class Client {
    * DHT Lookup all friends
    */
   searchFriends() {
-    store.users.forEach((user) => this.dhtLookup(user.user_id));
+    this.storageBridge.users.forEach((user) => this.dhtLookup(user.user_id));
   }
 
   /**
    * Try to connect all nodes
    */
   connectFriends() {
-    store.nodes.forEach((node) => {
-      const { public_ipv4, router_port, user_id, node_id } = node;
-      this.tryPeer(
-        {
-          host: public_ipv4,
-          port: router_port,
-        },
-        {
-          user_id,
-          node_id,
-        }
-      );
+    this.storageBridge.nodes.forEach((node) => {
+      const { public_ipv4, local_ipv4, user_id, node_id } = node;
+      if (public_ipv4) {
+        // add validation
+        const [host, port] = public_ipv4;
+        const peer: Types.Connection.Peer = {
+          address: public_ipv4,
+          host,
+          port: Number(port),
+          version: 4,
+        };
+        this.tryPeer(peer, { user_id, node_id });
+      }
     });
   }
 

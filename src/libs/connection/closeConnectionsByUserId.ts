@@ -1,6 +1,5 @@
 import { Connection } from "../../libs/model";
 import logger from "../../libs/logger";
-import { emit } from "../state";
 import ConnectionClass from "../connection";
 import { Types } from "../../types";
 
@@ -18,7 +17,7 @@ export default async function closeConnecion(
         // delete object
       }
     }
-    emit("update-user", false);
+    this.stateBridge.emit("update-user", false);
   } catch (err) {
     logger.error("connection.js", "closeConnectionsByUserId", err);
   }

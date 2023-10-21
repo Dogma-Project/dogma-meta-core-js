@@ -1,6 +1,6 @@
 import Datastore from "@seald-io/nedb";
 import logger from "../libs/logger";
-import { emit } from "../libs/state";
+import { emit } from "../libs/state-old";
 import { datadir } from "./datadir";
 
 const dbDir = datadir + "/db";

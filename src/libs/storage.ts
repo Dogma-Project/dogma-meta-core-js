@@ -2,7 +2,9 @@ import { Types } from "../types";
 import args from "../components/arguments";
 import { DEFAULTS } from "../constants";
 
-class Storage implements Types.Store {
+class Storage {
+  constructor() {}
+
   config: Types.Config.Params = {
     _router: 0,
     get router() {
@@ -19,12 +21,8 @@ class Storage implements Types.Store {
     public_ipv4: "",
   };
 
-  constructor() {
-    this.config;
-  }
-
-  users = [];
-  nodes = [];
+  users: Types.User.Model[] = [];
+  nodes: Types.Node.Model[] = [];
   node = {
     name: DEFAULTS.NODE_NAME,
     key: null,

@@ -1,4 +1,4 @@
-import { emit } from "../state";
+import { emit } from "../state-old";
 // import { users as usersDb, nodes as nodesDb } from "../nedb";
 import generateSyncId from "../../libs/generateSyncId";
 import Sync from "./sync";

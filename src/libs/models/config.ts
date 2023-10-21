@@ -1,4 +1,4 @@
-import { emit } from "../state";
+import { emit } from "../state-old";
 import { Types } from "../../types";
 import { nedbDir } from "../../components/datadir";
 import Datastore from "@seald-io/nedb";

@@ -2,7 +2,7 @@ import logger from "../../libs/logger";
 import { Connection } from "../../libs/model";
 import { Types } from "../../types";
 import ConnectionClass from "../connection";
-import { emit } from "../state";
+import { emit } from "../state-old";
 import { store } from "../main";
 
 /**

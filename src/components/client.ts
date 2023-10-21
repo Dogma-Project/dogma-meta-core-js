@@ -1,6 +1,6 @@
 import Client from "../libs/client";
 import connections from "./connection";
-import { state, subscribe } from "../libs/state";
+import { state, subscribe } from "../libs/state-old";
 import localDiscovery from "./localDiscovery";
 import logger from "../libs/logger";
 import dht from "./dht";

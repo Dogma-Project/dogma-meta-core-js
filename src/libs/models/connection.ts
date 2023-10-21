@@ -2,11 +2,11 @@ import { Types } from "../../types";
 import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 
-import {
-  nodes as nodesDb,
-  users as usersDb,
-  connections as connectionsDb,
-} from "../../components/nedb";
+// import {
+//   nodes as nodesDb,
+//   users as usersDb,
+//   connections as connectionsDb,
+// } from "../../components/nedb";
 
 /** IN MEMORY */
 
@@ -18,11 +18,11 @@ const model = {
   async init() {
     try {
       logger.debug("nedb", "load database", "connections");
-      connectionsDb.ensureIndexAsync({
+      this.connectionsDb.ensureIndexAsync({
         fieldName: "node_id",
         unique: true,
       });
-      connectionsDb.ensureIndexAsync({
+      this.connectionsDb.ensureIndexAsync({
         fieldName: "address",
         unique: true,
       });
@@ -32,11 +32,11 @@ const model = {
   },
 
   async push(params: Types.Connection.Description) {
-    return connectionsDb.insertAsync(params);
+    return this.connectionsDb.insertAsync(params);
   },
 
   async delete(connection_id: Types.Connection.Id) {
-    return connectionsDb.removeAsync({ connection_id }, { multi: true });
+    return this.connectionsDb.removeAsync({ connection_id }, { multi: true });
   },
 
   /**
@@ -46,7 +46,7 @@ const model = {
   getConnections() {
     return new Promise(async (resolve, reject) => {
       try {
-        const online = await connectionsDb.findAsync({});
+        const online = await this.connectionsDb.findAsync({});
         const nodesQuery = [];
         const usersQuery = [];
         online.forEach((row) => {
@@ -91,7 +91,7 @@ const model = {
    */
   async isNodeOnline(node_id: Types.Node.Id) {
     try {
-      const result = await connectionsDb.findOneAsync({ node_id });
+      const result = await this.connectionsDb.findOneAsync({ node_id });
       return result && result.connection_id;
     } catch (err) {
       return Promise.reject(err);
@@ -100,7 +100,7 @@ const model = {
 
   async getConnectionsCount(address: string, node_id: Types.Node.Id) {
     try {
-      const result = await connectionsDb.findAsync({
+      const result = await this.connectionsDb.findAsync({
         $or: [{ address }, { node_id }],
       });
       return result.length;
@@ -110,16 +110,16 @@ const model = {
   },
 
   async getConnDataByNodeId(node_id: Types.Node.Id) {
-    return connectionsDb.findOneAsync({ node_id });
+    return this.connectionsDb.findOneAsync({ node_id });
   },
 
   async getConnDataByUserId(user_id: Types.User.Id) {
-    return connectionsDb.findAsync({ user_id });
+    return this.connectionsDb.findAsync({ user_id });
   },
 
   async getUserOnlineNodes(user_id: Types.User.Id) {
     try {
-      const result = await connectionsDb
+      const result = await this.connectionsDb
         .findAsync({ user_id })
         .projection({ node_id: 1, _id: 0 });
       return result.map((item) => item.node_id);

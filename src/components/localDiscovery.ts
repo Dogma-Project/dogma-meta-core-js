@@ -1,6 +1,6 @@
 import LocalDiscovery from "../libs/localDiscovery";
 import logger from "../libs/logger";
-import { services } from "../libs/state";
+import { services } from "../libs/state-old";
 import { DEFAULTS } from "../constants";
 import { Types } from "../types";
 

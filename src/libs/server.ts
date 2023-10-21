@@ -1,34 +1,48 @@
 import net from "node:net";
 import logger from "./logger";
-import { store } from "./main";
-import { state, emit } from "./state";
-import LocalDiscovery from "../components/localDiscovery";
-// import dht from "../components/dht";
 import args from "../components/arguments";
-import Connection from "./connection";
 import { Types } from "../types";
-// import { Types } from "../types";
+import Connections from "./connection";
+import StateManager from "./state";
+import Storage from "./storage";
 
 /** @module Server */
 
 export default class Server {
-  connectionBridge: Connection;
+  connectionsBridge: Connections;
+  stateBridge: StateManager;
+  storageBridge: Storage;
+
   ss: net.Server | null = null;
   port: number = 0;
 
-  constructor(connection: Connection) {
-    this.connectionBridge = connection;
+  constructor({
+    connections,
+    state,
+    storage,
+  }: {
+    connections: Connections;
+    state: StateManager;
+    storage: Storage;
+  }) {
+    this.connectionsBridge = connections;
+    this.stateBridge = state;
+    this.storageBridge = storage;
   }
 
   listen(port: number) {
     this.port = port;
 
     this.ss = net.createServer({}, (socket) => {
-      const peer = {
-        host: socket.remoteAddress || "unk",
-        port: socket.remotePort || 0,
+      const host = socket.remoteAddress || "127.0.0.1"; // edit
+      const port = socket.remotePort || 0; // edit
+      const peer: Types.Connection.Peer = {
+        host,
+        port,
+        address: host + port,
+        version: 4,
       };
-      this.connectionBridge.onConnect(socket, peer);
+      this.connectionsBridge.onConnect(socket, peer);
     });
 
     const host = "0.0.0.0"; // temp
@@ -53,11 +67,11 @@ export default class Server {
         dht.announce(port);
       }, 3000);
       */
-      emit("server", Types.System.States.limited);
+      this.stateBridge.emit("server", Types.System.States.limited);
     });
 
     this.ss.on("error", (error) => {
-      emit("server", Types.System.States.error);
+      this.stateBridge.emit("server", Types.System.States.error);
       logger.error("server", "SERVER ERROR", error);
     });
 
@@ -67,7 +81,7 @@ export default class Server {
   }
 
   stop(cb: Function) {
-    emit("server", Types.System.States.disabled);
+    this.stateBridge.emit("server", Types.System.States.disabled);
     this.ss && this.ss.close();
     cb();
   }
@@ -90,7 +104,8 @@ export default class Server {
    */
   permitUnauthorized() {
     const cond1 = !!args.discovery;
-    const cond2 = state["config-bootstrap"] === Types.Connection.Group.all;
+    const cond2 =
+      this.stateBridge.state["config-bootstrap"] === Types.Connection.Group.all;
     return cond1 || cond2;
   }
 }

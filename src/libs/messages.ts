@@ -1,7 +1,7 @@
 import EventEmitter from "../components/eventEmitter";
 import { Message } from "./model";
 import generateSyncId from "./generateSyncId";
-import { emit } from "./state";
+import { emit } from "./state-old";
 
 /** @module Messages */
 

@@ -4,7 +4,7 @@ import generateSyncId from "../generateSyncId";
 import Sync from "./sync";
 import { Types } from "../../types";
 import logger from "../logger";
-import { nedbDir } from "../../components/datadir";
+import { nedbDir } from "../datadir";
 import Datastore from "@seald-io/nedb";
 
 const model = {

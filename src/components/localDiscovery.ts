@@ -1,6 +1,6 @@
 import LocalDiscovery from "../modules/localDiscovery";
 import logger from "../modules/logger";
-import { services } from "../modules/state-old";
+import stateManager from "./state";
 import { DEFAULTS } from "../constants";
 import { Types } from "../types";
 
@@ -12,11 +12,11 @@ const disc = new LocalDiscovery({
 disc.startServer();
 
 disc.on("ready", (data) => {
-  services.localDiscovery = Types.System.States.full;
+  stateManager.services.localDiscovery = Types.System.States.full;
   logger.log("Local discovery server", "ready", data);
 });
 disc.on("error", (data) => {
-  services.localDiscovery = Types.System.States.error;
+  stateManager.services.localDiscovery = Types.System.States.error;
   logger.error("Local discovery server", "error", data);
 });
 

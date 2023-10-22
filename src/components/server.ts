@@ -1,26 +1,26 @@
 import Server from "../modules/server";
-import connections from "./connection";
-import { emit, services, subscribe } from "../modules/state-old";
+import connections from "./connections";
+import stateManager from "./state";
 import storage from "./storage";
 import { Types } from "../types";
 import connectionTester from "../modules/connectionTester";
 
-const server = new Server(connections);
+const server = new Server({ connections, storage, state: stateManager });
 
-subscribe(["server"], (_action, state) => {
-  services.router = state;
+stateManager.subscribe(["server"], (_action, state) => {
+  stateManager.services.router = state;
 });
 
-subscribe(
+stateManager.subscribe(
   ["server", "config-autoDefine", "config-external", "config-public_ipv4"],
   (_action, _state) => {
-    const state = services.router;
+    const state = stateManager.services.router;
     switch (state) {
       case Types.System.States.limited:
         connectionTester();
         break;
       case Types.System.States.full:
-        emit("externalPort", storage.config.router);
+        stateManager.emit("externalPort", storage.config.router);
         break;
     }
   }
@@ -29,11 +29,11 @@ subscribe(
 /**
  * @todo add "config-bootstrap" dependency
  */
-subscribe(
+stateManager.subscribe(
   ["config-router", "users", "node-key", "config-bootstrap"],
   (_action, _value, _type) => {
     const port = storage.config.router;
-    if (!services.router) {
+    if (!stateManager.services.router) {
       server.listen(port);
     } else {
       server.refresh(port);

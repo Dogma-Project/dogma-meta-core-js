@@ -3,7 +3,7 @@ import fsAsync from "node:fs/promises";
 import logger = require("../logger");
 import { File } from "../model";
 import EventEmitter from "../../components/eventEmitter";
-import { datadir } from "../../components/datadir";
+import { datadir } from "../datadir";
 import { DIRECTION, MESSAGES } from "../../constants";
 import generateSyncId from "../generateSyncId";
 import { Types } from "../../types";

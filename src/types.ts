@@ -45,10 +45,17 @@ export namespace Types {
   }
   export namespace Discovery {
     export type Card = {
-      type: string;
+      type: "dogma-router";
       user_id: User.Id;
       node_id: Node.Id;
       port: number;
+    };
+    export type Candidate = {
+      type: "dogma-router";
+      user_id: User.Id;
+      node_id: Node.Id;
+      local_ipv4: Connection.IPv6;
+      local_ipv6?: Connection.IPv6;
     };
   }
 
@@ -93,10 +100,9 @@ export namespace Types {
       export namespace Answer {
         export type Data = {
           public_ipv4: string;
-          port: number;
           user_id: User.Id;
           node_id: Node.Id;
-        }; // edit
+        };
       }
     }
 

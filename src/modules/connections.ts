@@ -3,9 +3,7 @@ import {
   sendRequestToNode,
   onConnect,
   onData,
-  onClose,
   accept,
-  reject,
   online,
   offline,
   closeConnectionByNodeId,
@@ -15,14 +13,15 @@ import {
   streamToNode,
   sendMessage,
   sendRequest,
+  peerFromIP,
 } from "./connection/index";
 import { Types } from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
 
-/** @module Connection */
+/** @module Connections */
 
-class Connection {
+class Connections {
   stateBridge: StateManager;
   storageBridge: Storage;
 
@@ -40,7 +39,6 @@ class Connection {
   highWaterMark: number = 200000;
 
   accept = accept;
-  reject = reject;
 
   sendMessageToNode = sendMessageToNode;
   sendMessageToUser = sendMessageToUser;
@@ -53,17 +51,18 @@ class Connection {
 
   onData = onData;
   onConnect = onConnect;
-  onClose = onClose;
 
   _online = online;
   _offline = offline;
 
   closeConnectionByNodeId = closeConnectionByNodeId;
   closeConnectionsByUserId = closeConnectionsByUserId;
+
+  peerFromIP = peerFromIP;
 }
 
 /*
 dht.setPeers(connection.peers); // edit
 */
 
-export default Connection;
+export default Connections;

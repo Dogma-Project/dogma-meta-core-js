@@ -1,5 +1,5 @@
 import StateManager from "../modules/state";
 
-const state = new StateManager();
+const stateManager = new StateManager();
 
-export default state;
+export default stateManager;

@@ -3,8 +3,6 @@ import EventEmitter from "node:events";
 import os from "node:os";
 import { Types } from "../types";
 
-const ifaces = os.networkInterfaces();
-
 /** @module LocalDiscovery */
 
 /**
@@ -23,6 +21,7 @@ const convertToBroadcast = (ip: string) => {
  * @param {String} ip "192.168.0.2"
  */
 const getLocalAddress = (ip: string = "") => {
+  const ifaces = os.networkInterfaces();
   const pattern = "192.168.";
   let address, broadcast;
   if (ip.indexOf(pattern) === -1) {
@@ -83,12 +82,17 @@ class LocalDiscovery extends EventEmitter {
       });
     });
     this.server.on("message", (msg, from) => {
-      const decoded = JSON.parse(msg.toString());
-      console.log(decoded);
-      this.emit("message", {
-        msg: decoded,
-        from,
-      });
+      // add validation
+      const decoded = JSON.parse(msg.toString()) as Types.Discovery.Card;
+      const { address } = from;
+      const { type, user_id, node_id, port } = decoded;
+      const response: Types.Discovery.Candidate = {
+        type,
+        user_id,
+        node_id,
+        local_ipv4: `${address}:${port}`,
+      };
+      this.emit("candidate", response);
     });
     this.server.on("error", (err) =>
       this.emit("error", {
@@ -111,7 +115,7 @@ class LocalDiscovery extends EventEmitter {
   }
 
   announce(card: Types.Discovery.Card) {
-    const message = Buffer.from(JSON.stringify(card));
+    const message = JSON.stringify(card);
     this.server.send(
       message,
       0,

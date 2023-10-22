@@ -1,30 +1,35 @@
 import EventEmitter from "node:events";
 import logger from "./logger";
 import { dht } from "../components/nedb";
-import { store } from "./main";
 import { Types } from "../types";
 import { Document } from "@seald-io/nedb";
+import Storage from "./storage";
+import DogmaSocket from "./socket";
 
 /** @module DHT */
 
+type DHTParams = {
+  storage: Storage;
+};
+
 class DHT extends EventEmitter {
   permissions: {
-    dhtBootstrap: number;
-    dhtAnnounce: number;
-    dhtLookup: number;
+    [Types.DHT.Type.dhtBootstrap]: Types.Connection.Group;
+    [Types.DHT.Type.dhtAnnounce]: Types.Connection.Group;
+    [Types.DHT.Type.dhtLookup]: Types.Connection.Group;
   };
-  peers: Types.Connection.Socket[];
+  peers: DogmaSocket[];
 
   /**
    *
    */
-  constructor() {
+  constructor({ storage }: DHTParams) {
     super();
     this.peers = [];
     this.permissions = {
-      dhtBootstrap: 0,
-      dhtAnnounce: 0,
-      dhtLookup: 0,
+      [Types.DHT.Type.dhtBootstrap]: Types.Connection.Group.unknown,
+      [Types.DHT.Type.dhtAnnounce]: Types.Connection.Group.unknown,
+      [Types.DHT.Type.dhtLookup]: Types.Connection.Group.unknown,
     };
   }
 
@@ -32,73 +37,32 @@ class DHT extends EventEmitter {
    *
    * @param {Array} peers array of active connections
    */
-  setPeers(peers: Types.Connection.Socket[]) {
+  setPeers(peers: DogmaSocket[]) {
     this.peers = peers;
   }
 
-  /**
-   *
-   * @param type
-   * @param level minimum group to allow
-   */
-  setPermission(type: Types.DHT.Type, level: Types.Connection.Group) {
-    if (!this.permissions.hasOwnProperty(type)) {
-      return logger.warn(
-        "DHT",
-        "setPermission",
-        "unkonown permission type",
-        type
-      );
-    }
+  public setPermission(type: Types.DHT.Type, level: Types.Connection.Group) {
     this.permissions[type] = level;
     logger.log("DHT", "setPermission", "set permission level", type, level); // change to log
   }
 
-  /**
-   * Sends announce to all online connections
-   * @param {Number} port
-   */
-  announce(port: number) {
-    if (!this.permissions.dhtAnnounce) return;
-    this._dhtMulticast("announce", { port });
+  public announce(port: number) {
+    this._dhtMulticast(Types.DHT.Request.announce, { port });
   }
 
-  /**
-   * Sends DHT lookup request to all online connections
-   * @param user_id user's hash
-   * @param node_id [optional] node hash
-   */
-  lookup(user_id: Types.User.Id, node_id?: Types.Node.Id) {
-    if (!this.permissions.dhtLookup) return;
-    this._dhtMulticast("lookup", { user_id, node_id });
+  public lookup(user_id: Types.User.Id, node_id?: Types.Node.Id) {
+    this._dhtMulticast(Types.DHT.Request.lookup, { user_id, node_id });
   }
 
-  revoke() {
-    if (!this.permissions.dhtAnnounce) return;
-    // multicast
+  public revoke(user_id: Types.User.Id, node_id?: Types.Node.Id) {
+    this._dhtMulticast(Types.DHT.Request.revoke, { user_id, node_id });
   }
 
-  /**
-   * Requests router
-   * @param {Object} params
-   * @param {Object} params.request
-   * @param {String} params.request.type announce,revoke,lookup
-   * @param {String} params.request.action get, set
-   * @param {Number} params.request.port node's public port
-   * @param {String} params.request.user_id optional (only for lookup)
-   * @param {String} params.request.node_id optional (only for lookup)
-   * @param {Object} params.from determined by own node
-   * @param {String} params.from.user_id user hash
-   * @param {String} params.from.node_id node hash
-   * @param {String} params.from.public_ipv4 host
-   * @param {Object} socket [optional] for a feedback
-   */
-  async handleRequest(params: Types.DHT.Card, socket: Types.Connection.Socket) {
+  public async handleRequest(params: Types.DHT.Card, socket: DogmaSocket) {
     // add validation
     try {
       const {
         request: { type, action },
-        request,
         from,
       } = params;
 
@@ -113,35 +77,34 @@ class DHT extends EventEmitter {
       }
 
       switch (params.request.type) {
-        case "announce":
+        case Types.DHT.Request.announce:
           params.request;
           await this._handleAnnounce({
             from,
             request: params.request,
           });
           break;
-        case "revoke":
+        case Types.DHT.Request.revoke:
           await this._handleRevoke({
             from,
             request: params.request,
           });
           break;
-        case "lookup":
-          if (params.request.action === "get") {
+        case Types.DHT.Request.lookup:
+          if (params.request.action === Types.DHT.Action.get) {
             const peers = await this._handleLookup({
               from,
               request: params.request,
             });
             if (peers && Object.keys(peers).length) {
-              socket.multiplex.dht.write(
-                JSON.stringify({
-                  action: "set",
-                  type,
-                  data: peers,
-                })
-              );
+              const card: Types.DHT.LookUp.Answer = {
+                action: Types.DHT.Action.set,
+                type: Types.DHT.Request.lookup,
+                data: peers,
+              };
+              socket.input.dht.write(JSON.stringify());
             }
-          } else if (params.request.action === "set") {
+          } else if (params.request.action === Types.DHT.Action.set) {
             this._handlePeers({
               from,
               request: params.request,
@@ -211,23 +174,7 @@ class DHT extends EventEmitter {
     });
   }
 
-  /**
-   * Controller
-   * @private
-   * @param {Object} params
-   * @param {Object} params.from
-   * @param {Object} params.request
-   * @param {String} params.request.user_id
-   * @param {String} params.request.node_id optional
-   * @returns {Promise}
-   */
-  _handleLookup({
-    from,
-    request,
-  }: {
-    from: Types.DHT.FromData;
-    request: Types.DHT.RequestData.Lookup;
-  }) {
+  _handleLookup({ from, request }: Types.DHT.CardQuery) {
     const { public_ipv4 } = from;
     const { user_id, node_id } = request;
 
@@ -252,40 +199,11 @@ class DHT extends EventEmitter {
     });
   }
 
-  /**
-   * Controller
-   * @private
-   * @param {Object} params
-   * @param {Object} params.from
-   * @param {Object} params.request
-   */
-  _handleRevoke({
-    from,
-    request,
-  }: {
-    from: Types.DHT.FromData;
-    request: Types.DHT.RequestData.Revoke;
-  }) {
+  _handleRevoke({ from, request }: Types.DHT.CardQuery) {
     logger.debug("DHT", "handleRevoke", arguments);
   }
 
-  /**
-   * Controller
-   * @private
-   * @param {Object} params
-   * @param {Object} params.from
-   * @param {Object} params.request
-   * @param {String} params.request.type
-   * @param {String} params.request.data
-   * @returns {Promise}
-   */
-  _handlePeers({
-    from,
-    request,
-  }: {
-    from: Types.DHT.FromData;
-    request: Types.DHT.RequestData.LookupAnswer;
-  }) {
+  _handlePeers({ from, request }: Types.DHT.CardQuery) {
     const { data } = request;
     this.emit("peers", data);
   }
@@ -322,16 +240,13 @@ class DHT extends EventEmitter {
     }
   }
 
-  /**
-   * Send request to all nodes
-   * @private
-   * @param {String} type announce, lookup, revoke
-   * @param {Object} data
-   * @param {Number} data.port [optional] for announce
-   * @param {String} data.user_id [optional] for lookup
-   * @param {String} data.node_id [optional] for lookup. only when looking for specific node
-   */
-  _dhtMulticast(type: Types.DHT.Request, data: Types.DHT.RequestData.Outgoing) {
+  _dhtMulticast(
+    type: Types.DHT.Request,
+    data:
+      | Types.DHT.LookUp.Request.Data
+      | Types.DHT.Announce.Request.Data
+      | Types.DHT.Revoke.Request.Data
+  ) {
     // add validation
     try {
       for (const cid in this.peers) {

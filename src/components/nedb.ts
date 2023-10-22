@@ -1,7 +1,7 @@
 import Datastore from "@seald-io/nedb";
 import logger from "../modules/logger";
 import { emit } from "../modules/state-old";
-import { datadir } from "./datadir";
+import { datadir } from "../modules/datadir";
 
 const dbDir = datadir + "/db";
 logger.log("nedb", "HOMEDIR", dbDir);

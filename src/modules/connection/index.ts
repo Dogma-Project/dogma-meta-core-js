@@ -12,6 +12,7 @@ import sendMessageToUser from "./sendMessageToUser";
 import streamToNode from "./streamToNode";
 import sendRequest from "./sendRequest";
 import sendMessage from "./sendMessage";
+import peerFromIP from "./peerFromIP";
 
 export {
   sendMessageToNode,
@@ -28,4 +29,5 @@ export {
   streamToNode,
   sendRequest,
   sendMessage,
+  peerFromIP,
 };

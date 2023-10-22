@@ -4,12 +4,12 @@ import { Node, Connection } from "./model";
 import { Types } from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
-import ConnectionClass from "./connection";
+import Connections from "./connections";
 
 /** @module Client */
 
 export default class Client {
-  connectionsBridge: ConnectionClass;
+  connectionsBridge: Connections;
   stateBridge: StateManager;
   storageBridge: Storage;
 
@@ -18,7 +18,7 @@ export default class Client {
     state,
     storage,
   }: {
-    connections: ConnectionClass;
+    connections: Connections;
     state: StateManager;
     storage: Storage;
   }) {

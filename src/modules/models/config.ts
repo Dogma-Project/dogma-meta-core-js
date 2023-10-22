@@ -1,6 +1,6 @@
 import { emit } from "../state-old";
 import { Types } from "../../types";
-import { nedbDir } from "../../components/datadir";
+import { nedbDir } from "../datadir";
 import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 

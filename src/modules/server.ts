@@ -1,8 +1,7 @@
 import net from "node:net";
 import logger from "./logger";
-import args from "./arguments";
 import { Types } from "../types";
-import Connections from "./connection";
+import Connections from "./connections";
 import StateManager from "./state";
 import Storage from "./storage";
 
@@ -67,11 +66,14 @@ export default class Server {
         dht.announce(port);
       }, 3000);
       */
-      this.stateBridge.emit("server", Types.System.States.limited);
+      this.stateBridge.emit(
+        Types.Event.Type.server,
+        Types.System.States.limited
+      );
     });
 
     this.ss.on("error", (error) => {
-      this.stateBridge.emit("server", Types.System.States.error);
+      this.stateBridge.emit(Types.Event.Type.server, Types.System.States.error);
       logger.error("server", "SERVER ERROR", error);
     });
 
@@ -81,7 +83,10 @@ export default class Server {
   }
 
   stop(cb: Function) {
-    this.stateBridge.emit("server", Types.System.States.disabled);
+    this.stateBridge.emit(
+      Types.Event.Type.server,
+      Types.System.States.disabled
+    );
     this.ss && this.ss.close();
     cb();
   }
@@ -95,17 +100,5 @@ export default class Server {
       console.log("do nothing");
       // this.ss && this.ss.setSecureContext(getOptions());
     }
-  }
-
-  /**
-   * Allows unauthorized server connections
-   * @returns {Boolean}
-   * @todo check how args.discovery allows ALL permission
-   */
-  permitUnauthorized() {
-    const cond1 = !!args.discovery;
-    const cond2 =
-      this.stateBridge.state["config-bootstrap"] === Types.Connection.Group.all;
-    return cond1 || cond2;
   }
 }

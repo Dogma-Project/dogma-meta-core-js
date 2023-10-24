@@ -3,9 +3,7 @@ import os from "node:os";
 const ifaces = os.networkInterfaces();
 
 /**
- * @module GetLocalAddress
- * @param {String} family default: IPv4
- * @returns {Array} array of ip's
+ * @todo fix
  */
 export const getLocalAddress = (family = "IPv4") => {
   // edit

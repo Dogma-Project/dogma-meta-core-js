@@ -1,26 +1,18 @@
-import { Connection } from "../model";
 import logger from "../logger";
 import { Types } from "../../types";
-import ConnectionClass from "../connection";
+import Connections from "../connections";
 
-/**
- *
- * @param {String} user_id user hash
- * @param {Object} request
- * @param {String} request.type
- * @param {String} request.action
- * @param {*} request.data optional
- * @returns {Promise} { id,code,message }
- */
-export default async function send(
-  this: ConnectionClass,
-  user_id: Types.User.Id,
-  request: object
+export default function send(
+  this: Connections,
+  request: Types.Request,
+  user_id: Types.User.Id
 ) {
   try {
-    const nodes = await Connection.getConnDataByUserId(user_id);
-    nodes.forEach((node) => {
-      this.sendRequestToNode(node.node_id, request, Types.Message.Type.user);
+    const connections = this.getConnectionsByUserId(user_id);
+    connections.forEach((connection) => {
+      if (connection.node_id) {
+        this.sendRequestToNode(request, connection.node_id);
+      }
     });
   } catch (err) {
     logger.error("connection", "sendRequestToUser", err);

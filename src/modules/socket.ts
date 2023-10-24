@@ -1,18 +1,24 @@
 import net from "node:net";
+import EventEmitter from "node:events";
+
 import crypto, { KeyObject } from "node:crypto";
 
 import { Types } from "../types";
 import generateSyncId from "./generateSyncId";
-import { emit } from "./state-old";
 import logger from "./logger";
-import { Connection } from "./model";
 import { DemuxStream, MuxStream, Encryption, Decryption } from "./streams";
+import { onData } from "./socket/index";
+import StateManager from "./state";
 
-class DogmaSocket {
+/**
+ * @todo add online event
+ */
+
+class DogmaSocket extends EventEmitter {
   public readonly id: Types.Connection.Id;
   user_id: Types.User.Id | null;
   node_id: Types.Node.Id | null;
-
+  stateBridge: StateManager;
   private readonly socket: net.Socket;
   public input: {
     handshake: MuxStream;
@@ -37,13 +43,19 @@ class DogmaSocket {
 
   tested: boolean = false;
 
-  constructor(socket: net.Socket, direction: Types.Connection.Direction) {
+  constructor(
+    socket: net.Socket,
+    direction: Types.Connection.Direction,
+    state: StateManager
+  ) {
+    super();
     this.socket = socket;
     this.id = generateSyncId(6);
     this.outSession = generateSyncId(12);
     this.user_id = null;
     this.node_id = null;
     this.direction = direction;
+    this.stateBridge = state;
 
     this.input = {
       handshake: new MuxStream({ substream: Types.Streams.MX.handshake }),
@@ -55,9 +67,9 @@ class DogmaSocket {
     };
     this.output = new DemuxStream({});
     this.setPipes();
-    this.socket.on("close", this.onClose);
+    this.socket.on("close", this._onClose);
     this.socket.on("error", this.onError);
-    this.output.on("data", this.onData);
+    this.output.on("data", this._onData);
   }
 
   private setPipes() {
@@ -78,28 +90,25 @@ class DogmaSocket {
     this.socket.pipe(decryptor).pipe(this.output);
   }
 
-  private onData(result: Types.Streams.DemuxedResult) {
-    console.log(result);
-    switch (result.mx) {
-      case Types.Streams.MX.handshake:
-        break;
-    }
-  }
+  private _onData = onData;
 
-  private async onClose(hadError: boolean) {
-    emit("offline", this.node_id);
+  private async _onClose(hadError: boolean) {
+    // edit
+    this.emit("offline", this.node_id);
     // this._offline(node_id); // move to component
     logger.info("connection", "closed", this.id);
-    try {
-      await Connection.delete(this.id);
-      logger.log("connection", "successfully deleted connection", this.id);
-    } catch (err) {
-      logger.error("connection", "can't delete connection", err);
-    }
   }
 
   private onError(err: Error) {
     logger.error("connection", this.id, err.name, err.message);
+  }
+
+  public handleHandshake(data: Buffer) {
+    console.log("HS", data);
+  }
+
+  public handleTest(data: Buffer) {
+    console.log("TEST", data);
   }
 
   public destroy() {

@@ -1,23 +1,17 @@
-import { Connection } from "../model";
 import logger from "../logger";
-import ConnectionClass from "../connection";
+import Connections from "../connections";
 import { Types } from "../../types";
 
-export default async function closeConnecion(
-  this: ConnectionClass,
+export default function closeConnecion(
+  this: Connections,
   user_id: Types.User.Id
 ) {
-  const { peers } = this;
   try {
-    const result = await Connection.getConnDataByUserId(user_id);
-    for (const row of result) {
-      const socket = peers[row.connection_id];
-      if (socket) {
-        socket.destroy();
-        // delete object
-      }
-    }
-    this.stateBridge.emit("update-user", false);
+    const connections = this.getConnectionsByUserId(user_id);
+    connections.forEach((connection) => {
+      connection.destroy();
+    });
+    // this.stateBridge.emit("update-user", false);
   } catch (err) {
     logger.error("connection.js", "closeConnectionsByUserId", err);
   }

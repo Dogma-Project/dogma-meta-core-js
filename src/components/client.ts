@@ -7,7 +7,6 @@ import { Types } from "../types";
 import storage from "./storage";
 import state from "./state";
 import args from "../modules/arguments";
-import eventEmitter from "./eventEmitter";
 
 const client = new Client({ connections, state, storage });
 
@@ -32,26 +31,35 @@ dht.on("peers", (data: Types.DHT.LookUp.Answer.Data[]) => {
 let connectFriendsInterval: NodeJS.Timer | undefined;
 let searchFriendsInterval: NodeJS.Timer | undefined;
 
-state.subscribe(["update-user", "users"], () => {
-  const user_id = state.state["update-user"];
+state.subscribe([Types.Event.Type.updateUser, Types.Event.Type.users], () => {
+  const user_id = state.state[Types.Event.Type.updateUser];
   connections.closeConnectionsByUserId(user_id);
 });
 
-state.subscribe(["nodes", "users", "nodes", "node-key"], () => {
-  // edit
-  eventEmitter.emit("friends", true);
-  if (args.discovery) return; // don't lookup in discovery mode
-  clearInterval(connectFriendsInterval);
-  client.connectFriends(); // check
-  connectFriendsInterval = setInterval(client.connectFriends, 60000); // edit
-});
-
-state.subscribe(["config-dhtLookup", "users", "node-key"], () => {
-  // edit
-  if (args.discovery) return; // don't lookup in discovery mode
-  clearInterval(searchFriendsInterval);
-  if (storage.config.dhtLookup) {
-    client.searchFriends(); // check
-    searchFriendsInterval = setInterval(client.searchFriends, 30000); // edit
+state.subscribe(
+  [Types.Event.Type.nodes, Types.Event.Type.users, Types.Event.Type.nodeKey],
+  () => {
+    // eventEmitter.emit("friends", true);
+    if (args.discovery) return; // don't lookup in discovery mode
+    clearInterval(connectFriendsInterval);
+    client.connectFriends(); // check
+    connectFriendsInterval = setInterval(client.connectFriends, 60000); // edit
   }
-});
+);
+
+state.subscribe(
+  [
+    Types.Event.Type.configDhtLookup,
+    Types.Event.Type.users,
+    Types.Event.Type.nodeKey,
+  ],
+  () => {
+    // edit
+    if (args.discovery) return; // don't lookup in discovery mode
+    clearInterval(searchFriendsInterval);
+    if (storage.config.dhtLookup) {
+      client.searchFriends(); // check
+      searchFriendsInterval = setInterval(client.searchFriends, 30000); // edit
+    }
+  }
+);

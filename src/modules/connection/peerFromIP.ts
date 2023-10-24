@@ -1,5 +1,5 @@
 import { Types } from "../../types";
-import ConnectionClass from "../connection";
+import ConnectionClass from "../connections";
 
 export default function peerFromIP(
   this: ConnectionClass,

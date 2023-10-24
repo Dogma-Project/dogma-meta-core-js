@@ -1,6 +1,6 @@
 import net from "node:net";
 import logger from "./logger";
-import { Node, Connection } from "./model";
+// import { Node, Connection } from "./model";
 import { Types } from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
@@ -27,7 +27,7 @@ export default class Client {
     this.storageBridge = storage;
   }
 
-  connect(peer: Types.Connection.Peer) {
+  private _connect(peer: Types.Connection.Peer) {
     try {
       const socket = net.connect(peer.port, peer.host, () => {
         this.connectionsBridge.onConnect(socket, peer);
@@ -35,6 +35,35 @@ export default class Client {
     } catch (e) {
       logger.error("client", "Can't establish connection", e);
     }
+  }
+
+  /**
+   *
+   * @todo edit
+   */
+  tryPeer(
+    peer: Types.Connection.Peer,
+    node: { user_id: Types.User.Id; node_id: Types.Node.Id }
+  ) {
+    const { user_id, node_id } = node;
+    if (this.connectionsBridge.online.indexOf(node_id) > -1) return; // add to logs
+
+    const connectNonFriends = true;
+
+    if (!connectNonFriends) {
+      const inFriends = this.storageBridge.users.find(
+        (user) => user.user_id === user_id
+      );
+      if (!inFriends)
+        return logger.log(
+          "client",
+          "tryPeer",
+          user_id,
+          "not in the friends list"
+        );
+    }
+
+    this._connect(peer);
   }
 
   test(peer: Types.Connection.Peer, cb: (result: boolean) => void) {
@@ -56,53 +85,6 @@ export default class Client {
     }
   }
 
-  permitUnauthorized() {
-    const cond1 =
-      this.stateBridge.state["config-dhtLookup"] === Types.Connection.Group.all;
-    const cond2 =
-      this.stateBridge.state["config-dhtAnnounce"] ===
-      Types.Connection.Group.all;
-    return cond1 || cond2;
-  }
-
-  tryPeer(
-    peer: Types.Connection.Peer,
-    from: { user_id: Types.User.Id; node_id: Types.Node.Id }
-  ) {
-    // check non-listed peers
-
-    if (!peer) return logger.warn("nodes", "unknown peer", peer);
-    if (!from || !from.user_id || !from.node_id)
-      return logger.warn("nodes", "unknown from", from);
-
-    const { user_id, node_id } = from;
-
-    if (!this.permitUnauthorized()) {
-      const inFriends = this.storageBridge.users.find(
-        (user) => user.user_id === user_id
-      );
-      // logger.debug("CLIENT", "tryPeer 1", inFriends, store.users, user_id);
-      if (!inFriends)
-        return logger.log(
-          "nodes",
-          "tryPeer",
-          user_id,
-          "not in the friends list"
-        );
-    }
-    Connection.getConnectionsCount(peer.address, node_id)
-      .then((count) => {
-        if (count === 0) this.connect(peer);
-      })
-      .catch((err) => {
-        logger.error("client", "tryPeer", err);
-      });
-  }
-  getOwnNodes() {
-    const user_id = this.storageBridge.user.id;
-    return Node.getByUserId(user_id);
-  }
-
   /**
    * DHT Lookup all friends
    */
@@ -111,7 +93,7 @@ export default class Client {
   }
 
   /**
-   * Try to connect all nodes
+   * @todo move to connections
    */
   connectFriends() {
     this.storageBridge.nodes.forEach((node) => {

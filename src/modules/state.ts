@@ -27,14 +27,8 @@ class StateManager {
     },
   };
 
-  private listeners: {
-    [index: Types.Event.Type]: Types.Event.ArrayOfListeners[];
-  } = {};
-
-  public state: {
-    [index: Types.Event.Type]: any;
-  } = {};
-
+  private listeners: Types.Event.ArrayOfListeners[][] = [];
+  public state: any[] = [];
   public services = new Proxy(this._services, this._servicesHandler);
 
   /**

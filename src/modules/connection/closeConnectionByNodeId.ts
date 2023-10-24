@@ -1,21 +1,14 @@
-import { Connection } from "../model";
-import ConnectionClass from "../connection";
+import ConnectionClass from "../connections";
 import logger from "../logger";
 import { Types } from "../../types";
 
-export default async function closeConnecion(
+export default function closeConnecion(
   this: ConnectionClass,
   node_id: Types.Node.Id
 ) {
-  const { peers } = this;
-  // edit
   try {
-    const result = await Connection.getConnDataByNodeId(node_id);
-    const socket = peers[result.connection_id];
-    if (socket) {
-      socket.destroy();
-      // delete object
-    }
+    const socket = this.getConnectionByNodeId(node_id);
+    if (socket) socket.destroy();
   } catch (err) {
     logger.error("connection.js", "closeConnectionByNodeId", err);
   }

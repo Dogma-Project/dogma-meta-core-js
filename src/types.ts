@@ -95,7 +95,7 @@ export namespace Types {
       export interface Answer extends Main {
         type: DHT.Request.lookup;
         action: DHT.Action.set;
-        data: Answer.Data;
+        data: Answer.Data[];
       }
       export namespace Answer {
         export type Data = {
@@ -135,16 +135,30 @@ export namespace Types {
       node_id: Node.Id;
       public_ipv4: string;
     };
-    export type CardQuery = {
-      request: LookUp.Request | Announce.Request | Revoke.Request;
+    export type Requests = LookUp.Request | Announce.Request | Revoke.Request;
+    export type CardQuery<T> = {
+      request: T;
       from: FromData;
     };
     export type CardAnswer = {
       request: LookUp.Answer;
       from: FromData;
     };
-    export type Card = CardQuery | CardAnswer;
+    export type Card = CardQuery<Requests> | CardAnswer;
+    export type Abstract = {
+      class: Streams.MX.dht;
+      body: DHT.Requests;
+    };
   }
+
+  export namespace Dummmy {
+    export type Abstract = {
+      class: Streams.MX.dummy;
+      body: null;
+    };
+  }
+
+  export type Request = DHT.Abstract | Message.Abstract | Dummmy.Abstract;
 
   export namespace Connection {
     export type Id = string;
@@ -245,39 +259,45 @@ export namespace Types {
       user,
       chat,
     }
-    export namespace Class {
-      interface Base {
-        id: number;
-      }
-      export interface TextMessage extends Base {
-        text: string;
-      }
-      export interface FilesMessage extends Base {
-        files: Message.File[];
-        text?: string;
-      }
-      export interface StickerMessage extends Base {
-        sticker: any; // edit
-      }
-      export type Abstract = TextMessage | FilesMessage | StickerMessage;
+    export enum Action {
+      send,
+      sync,
+      edit,
+      delete,
     }
-    export type FileShare = {
-      name: string;
-      size: number;
-      type: number; // edit
-      pathname: string; // edit
+
+    export namespace Send {
+      export interface Request {
+        type: Type;
+        action: Action.send;
+        data: Request.Data;
+      }
+      export namespace Request {
+        export type Data = {};
+      }
+    }
+
+    export namespace Delete {
+      export interface Request {
+        type: Type;
+        action: Action.delete;
+        data: Request.Data;
+      }
+      export namespace Request {
+        export type Data = {};
+      }
+    }
+
+    export type Requests = Send.Request | Delete.Request;
+    export type Abstract = {
+      class: Streams.MX.messages;
+      body: Requests;
     };
-    export type FileEncoded = {
-      name: string;
-      size: number;
-      type: number; // edit
-      data: string; // edit
-    };
-    export type File = FileShare | FileEncoded;
   }
 
   export namespace Streams {
     export enum MX {
+      dummy, // edit
       handshake,
       test,
       control,
@@ -298,7 +318,32 @@ export namespace Types {
       set,
     }
     export type Payload = any;
-    export type Type = string; // edit
+    export enum Type {
+      online,
+      offline,
+      nodes,
+      users,
+      masterKey,
+      nodeKey,
+      configDb,
+      protocolDb,
+      configRouter,
+      configDhtLookup,
+      configDhtAnnounce,
+      configDhtBootstrap,
+      configAutoDefine,
+      configExternal,
+      configPublicIpV4,
+      externalPort,
+      server,
+      updateUser,
+      sendRequest,
+      dataDummy,
+      dataControl,
+      dataMessages,
+      dataMail,
+      dataDht,
+    }
     export type Listenter = (
       action: Action,
       payload: Payload,

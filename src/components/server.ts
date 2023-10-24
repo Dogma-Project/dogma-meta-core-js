@@ -7,12 +7,17 @@ import connectionTester from "../modules/connectionTester";
 
 const server = new Server({ connections, storage, state: stateManager });
 
-stateManager.subscribe(["server"], (_action, state) => {
+stateManager.subscribe([Types.Event.Type.server], (_action, state) => {
   stateManager.services.router = state;
 });
 
 stateManager.subscribe(
-  ["server", "config-autoDefine", "config-external", "config-public_ipv4"],
+  [
+    Types.Event.Type.server,
+    Types.Event.Type.configAutoDefine,
+    Types.Event.Type.configExternal,
+    Types.Event.Type.configPublicIpV4,
+  ],
   (_action, _state) => {
     const state = stateManager.services.router;
     switch (state) {
@@ -20,17 +25,19 @@ stateManager.subscribe(
         connectionTester();
         break;
       case Types.System.States.full:
-        stateManager.emit("externalPort", storage.config.router);
+        stateManager.emit(Types.Event.Type.externalPort, storage.config.router);
         break;
     }
   }
 );
 
-/**
- * @todo add "config-bootstrap" dependency
- */
 stateManager.subscribe(
-  ["config-router", "users", "node-key", "config-bootstrap"],
+  [
+    Types.Event.Type.configRouter,
+    Types.Event.Type.users,
+    Types.Event.Type.nodeKey,
+    Types.Event.Type.configDhtBootstrap,
+  ],
   (_action, _value, _type) => {
     const port = storage.config.router;
     if (!stateManager.services.router) {

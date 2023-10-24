@@ -1,19 +1,14 @@
 import {
-  sendMessageToNode,
-  sendRequestToNode,
   onConnect,
-  onData,
-  accept,
-  online,
-  offline,
   closeConnectionByNodeId,
   closeConnectionsByUserId,
+  sendRequestToNode,
   sendRequestToUser,
-  sendMessageToUser,
   streamToNode,
-  sendMessage,
-  sendRequest,
   peerFromIP,
+  multicast,
+  getConnectionByNodeId,
+  getConnectionsByUserId,
 } from "./connection/index";
 import { Types } from "../types";
 import StateManager from "./state";
@@ -38,27 +33,19 @@ class Connections {
   messageEncoder: null = null;
   highWaterMark: number = 200000;
 
-  accept = accept;
-
-  sendMessageToNode = sendMessageToNode;
-  sendMessageToUser = sendMessageToUser;
   sendRequestToNode = sendRequestToNode;
   sendRequestToUser = sendRequestToUser;
   streamToNode = streamToNode;
 
-  sendRequest = sendRequest;
-  sendMessage = sendMessage;
-
-  onData = onData;
   onConnect = onConnect;
 
-  _online = online;
-  _offline = offline;
-
+  getConnectionByNodeId = getConnectionByNodeId;
+  getConnectionsByUserId = getConnectionsByUserId;
   closeConnectionByNodeId = closeConnectionByNodeId;
   closeConnectionsByUserId = closeConnectionsByUserId;
 
   peerFromIP = peerFromIP;
+  multicast = multicast;
 }
 
 /*

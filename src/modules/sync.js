@@ -1,17 +1,19 @@
-"use strict";
 // import logger from "./logger";
 // import { subscribe } from "./state-old";
 // import { Message, User, Node, Connection } from "./model";
 // import { store } from "./main";
 // import { MESSAGES } from "../constants";
 // import * as Types from "../types";
+
 // const sync = {
 //   handled: {
 //     messages: Message,
 //     users: User,
 //     nodes: Node,
 //   },
+
 //   state: [],
+
 //   /**
 //    *
 //    * @param {String} node_id
@@ -39,6 +41,7 @@
 //       logger.error("sync", "get", err);
 //     }
 //   },
+
 //   async update(node_id: Types.Node.Id, type: string, payload: object) {
 //     try {
 //       // logger.debug("sync", "update", type, payload);
@@ -50,6 +53,7 @@
 //       logger.error("sync", "update", err);
 //     }
 //   },
+
 //   /**
 //    *
 //    * @param {Object} params
@@ -69,6 +73,7 @@
 //       MESSAGES.DIRECT
 //     );
 //   },
+
 //   /**
 //    *
 //    * @param {Object} params
@@ -101,15 +106,19 @@
 //     }
 //   },
 // };
+
 // // subscribe(["sync-db"], async (action, value, type) => {
 // //     if (value < STATES.LIMITED) {
 // //         const result = await Sync.getAll();
 // //         sync.state = result;
 // //         emit("sync-db", STATES.LIMITED);
 // //     } else if (value === STATES.LIMITED) {
+
 // //     } else if (value === STATES.FULL) {
+
 // //     }
 // // });
+
 // subscribe(["online"], (_action, value, _type) => {
 //   const { node_id, own, mySelf } = value;
 //   if (own && !mySelf) {
@@ -124,6 +133,7 @@
 //     }
 //   }
 // });
+
 // subscribe(["nodes", "users"], async (_action, _value, type) => {
 //   // logger.debug("sync", "resync", action, type);
 //   const nodes = await Connection.getUserOnlineNodes(store.user.id);
@@ -132,6 +142,7 @@
 //     sync.get(node_id, type);
 //   });
 // });
+
 // subscribe(["new-message"], async (_action, value, _type) => {
 //   try {
 //     // logger.debug("sync", "resync", action, type);
@@ -151,4 +162,5 @@
 //     logger.error("sync", "broadcastUpdate", err);
 //   }
 // });
+
 // export default sync;

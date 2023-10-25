@@ -1,9 +1,9 @@
-"use strict";
 // import { Connection } from "../model";
 // import logger from "../logger";
 // import { EncodeStream } from "../streams";
 // import * as Types from "../../types";
 // import ConnectionClass from ".";
+
 // export default async function stream(
 //   this: ConnectionClass,
 //   node_id: Types.Node.Id,

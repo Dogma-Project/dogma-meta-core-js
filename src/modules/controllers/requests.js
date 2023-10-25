@@ -1,10 +1,11 @@
-"use strict";
 // import logger from "../logger";
 // import FilesController from "./files";
 // import NodesController from "./nodes";
 // import SyncController from "../sync";
 // import * as Types from "../../types";
+
 // /** @module RequestsController */
+
 // /**
 //  *
 //  * @param {Object} params
@@ -37,4 +38,5 @@
 //       break;
 //   }
 // };
+
 // export default RequestsController;

@@ -1,4 +1,4 @@
-import { onConnect, closeConnectionByNodeId, closeConnectionsByUserId, sendRequestToNode, sendRequestToUser, streamToNode, peerFromIP, multicast, getConnectionByNodeId, getConnectionsByUserId } from "./connection/index";
+import { onConnect, closeConnectionByNodeId, closeConnectionsByUserId, sendRequestToNode, sendRequestToUser, peerFromIP, multicast, getConnectionByNodeId, getConnectionsByUserId } from "./connection/index";
 import * as Types from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
@@ -18,7 +18,7 @@ declare class Connections {
     highWaterMark: number;
     sendRequestToNode: typeof sendRequestToNode;
     sendRequestToUser: typeof sendRequestToUser;
-    streamToNode: typeof streamToNode;
+    streamToNode: any;
     onConnect: typeof onConnect;
     getConnectionByNodeId: typeof getConnectionByNodeId;
     getConnectionsByUserId: typeof getConnectionsByUserId;

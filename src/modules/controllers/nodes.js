@@ -1,9 +1,10 @@
-"use strict";
 // import { Node } from "../model";
 // import logger from "../logger";
 // import { MESSAGES } from "../../constants";
 // import * as Types from "../../types";
+
 // /** @module NodesController */
+
 // /**
 //  *
 //  * @param {Array} nodes
@@ -21,6 +22,7 @@
 //     };
 //   });
 // };
+
 // const nodes = {
 //   /**
 //    *
@@ -36,6 +38,7 @@
 //     const {
 //       data: { from },
 //     } = request;
+
 //     switch (request.action) {
 //       case "get": // store.nodes
 //         const connection = require("../connection"); // edit
@@ -72,4 +75,5 @@
 //     }
 //   },
 // };
+
 // export default nodes;

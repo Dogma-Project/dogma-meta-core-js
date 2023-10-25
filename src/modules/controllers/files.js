@@ -1,4 +1,3 @@
-"use strict";
 // import fs from "node:fs";
 // import fsAsync from "node:fs/promises";
 // import logger = require("../logger");
@@ -8,12 +7,15 @@
 // import { DIRECTION, MESSAGES } from "../../constants";
 // import generateSyncId from "../generateSyncId";
 // import * as Types from "../../types";
+
 // /** @module FilesController */
+
 // const files = {
 //   sendChunksize: 100000,
 //   write: {},
 //   downloadProgress: {},
 //   uploadProgress: {},
+
 //   /**
 //    *
 //    * @param {Object} params
@@ -52,6 +54,7 @@
 //       }
 //     });
 //   },
+
 //   async permitFileTransfer(
 //     user_id: Types.User.Id,
 //     file: Types.File.Description
@@ -83,7 +86,9 @@
 //       return Promise.reject(err);
 //     }
 //   },
+
 //   forbidFileUpload(descriptor: number) {},
+
 //   async sendFile(
 //     user_id: Types.User.Id,
 //     node_id: Types.Node.Id,
@@ -97,8 +102,10 @@
 //       const channel = await connection.streamToNode({ node_id, descriptor }); // edit
 //       let size, stream;
 //       let uploaded = 0;
+
 //       const fileInfo = fs.statSync(value.pathname);
 //       size = fileInfo.size;
+
 //       stream = fs.createReadStream(value.pathname, {
 //         highWaterMark: files.sendChunksize,
 //       });
@@ -113,9 +120,11 @@
 //         const progress = uploaded / size;
 //         channel.write(data);
 //         if (progress === 1) channel.end();
+
 //         const progressValue = progress.toFixed(2);
 //         if (files.uploadProgress[descriptor] === progressValue) return;
 //         files.uploadProgress[descriptor] = progressValue;
+
 //         EventEmitter.emit("file-transfer", {
 //           progress: progressValue,
 //           direction: DIRECTION.OUTCOMING,
@@ -128,6 +137,7 @@
 //       logger.error("files.js", "sendFile", err);
 //     }
 //   },
+
 //   /**
 //    *
 //    * @param {Object} params
@@ -153,6 +163,7 @@
 //         break;
 //     }
 //   },
+
 //   /**
 //    *
 //    * @param {Object} params
@@ -188,9 +199,11 @@
 //     object.stream.write(decodedData);
 //     const progress = object.downloaded / object.size;
 //     if (progress === 1) object.stream.end();
+
 //     const progressValue = progress.toFixed(2);
 //     if (files.downloadProgress[descriptor] === progressValue) return;
 //     files.downloadProgress[descriptor] = progressValue;
+
 //     EventEmitter.emit("file-transfer", {
 //       progress: progressValue,
 //       direction: DIRECTION.INCOMING,
@@ -199,6 +212,7 @@
 //       node_id,
 //     });
 //   },
+
 //   /**
 //    *
 //    * @returns {String} descriptor size:15
@@ -207,4 +221,5 @@
 //     return generateSyncId(5);
 //   },
 // };
+
 // export default files;

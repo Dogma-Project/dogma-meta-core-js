@@ -30,17 +30,17 @@ const Types = __importStar(require("../../types"));
 const logger_1 = __importDefault(require("../logger"));
 function onData(result) {
     switch (result.mx) {
-        case Types.Streams.MX.handshake:
+        case 1 /* Types.Streams.MX.handshake */:
             this.handleHandshake(result.data);
             break;
-        case Types.Streams.MX.test:
+        case 2 /* Types.Streams.MX.test */:
             this.handleTest(result.data);
             break;
-        case Types.Streams.MX.dht:
-            this.stateBridge.emit(Types.Event.Type.dataDht, result.data);
+        case 6 /* Types.Streams.MX.dht */:
+            this.stateBridge.emit(27 /* Types.Event.Type.dataDht */, result.data);
             break;
-        case Types.Streams.MX.messages:
-            this.stateBridge.emit(Types.Event.Type.dataMessages, result.data);
+        case 4 /* Types.Streams.MX.messages */:
+            this.stateBridge.emit(25 /* Types.Event.Type.dataMessages */, result.data);
             break;
         default:
             logger_1.default.warn("onData", "unknown MX", result.mx);

@@ -54,11 +54,11 @@ dht_1.default.on("peers", (data) => {
 });
 let connectFriendsInterval;
 let searchFriendsInterval;
-state_1.default.subscribe([Types.Event.Type.updateUser, Types.Event.Type.users], () => {
-    const user_id = state_1.default.state[Types.Event.Type.updateUser];
+state_1.default.subscribe([21 /* Types.Event.Type.updateUser */, 3 /* Types.Event.Type.users */], () => {
+    const user_id = state_1.default.state[21 /* Types.Event.Type.updateUser */];
     connections_1.default.closeConnectionsByUserId(user_id);
 });
-state_1.default.subscribe([Types.Event.Type.nodes, Types.Event.Type.users, Types.Event.Type.nodeKey], () => {
+state_1.default.subscribe([2 /* Types.Event.Type.nodes */, 3 /* Types.Event.Type.users */, 5 /* Types.Event.Type.nodeKey */], () => {
     // eventEmitter.emit("friends", true);
     if (arguments_1.default.discovery)
         return; // don't lookup in discovery mode
@@ -67,9 +67,9 @@ state_1.default.subscribe([Types.Event.Type.nodes, Types.Event.Type.users, Types
     connectFriendsInterval = setInterval(client.connectFriends, 60000); // edit
 });
 state_1.default.subscribe([
-    Types.Event.Type.configDhtLookup,
-    Types.Event.Type.users,
-    Types.Event.Type.nodeKey,
+    13 /* Types.Event.Type.configDhtLookup */,
+    3 /* Types.Event.Type.users */,
+    5 /* Types.Event.Type.nodeKey */,
 ], () => {
     // edit
     if (arguments_1.default.discovery)

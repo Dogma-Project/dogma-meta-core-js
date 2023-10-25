@@ -6,14 +6,14 @@ declare namespace Connection {
   export type Id = string;
   export type IPv4 = string;
   export type IPv6 = string;
-  export enum Status {
+  export const enum Status {
     notConnected,
     connected,
     error,
     notAuthorized,
     authorized,
   }
-  export enum Group {
+  export const enum Group {
     unknown,
     all,
     friends,
@@ -21,7 +21,7 @@ declare namespace Connection {
     selfNode,
     nobody,
   }
-  export enum Direction {
+  export const enum Direction {
     outcoming,
     incoming,
   }

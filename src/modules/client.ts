@@ -1,6 +1,5 @@
 import net from "node:net";
 import logger from "./logger";
-// import { Node, Connection } from "./model";
 import * as Types from "../types";
 import StateManager from "./state";
 import Storage from "./storage";

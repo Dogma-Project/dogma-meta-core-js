@@ -6,41 +6,41 @@ import Storage from "./storage";
 import DogmaSocket from "./socket";
 import StateManager from "./state";
 import Connections from "./connections";
-
-/** @module DHT */
+import { DHTModel } from "./model";
 
 type DHTParams = {
   connections: Connections;
   state: StateManager;
   storage: Storage;
+  model: DHTModel;
 };
 
 class DHT extends EventEmitter {
   connectionsBridge: Connections;
   stateBridge: StateManager;
   storageBridge: Storage;
+  modelBridge: DHTModel;
 
   permissions: {
-    [Types.DHT.Type.dhtBootstrap]: Types.Connection.Group;
-    [Types.DHT.Type.dhtAnnounce]: Types.Connection.Group;
-    [Types.DHT.Type.dhtLookup]: Types.Connection.Group;
+    [key in Types.DHT.Type]: Types.Connection.Group;
   };
   peers: DogmaSocket[];
 
   /**
    *
    */
-  constructor({ storage, state, connections }: DHTParams) {
+  constructor({ storage, state, connections, model }: DHTParams) {
     super();
     this.peers = [];
-    this.permissions = {
-      [Types.DHT.Type.dhtBootstrap]: Types.Connection.Group.unknown,
-      [Types.DHT.Type.dhtAnnounce]: Types.Connection.Group.unknown,
-      [Types.DHT.Type.dhtLookup]: Types.Connection.Group.unknown,
-    };
+    this.permissions = [
+      Types.Connection.Group.unknown,
+      Types.Connection.Group.unknown,
+      Types.Connection.Group.unknown,
+    ];
     this.connectionsBridge = connections;
     this.stateBridge = state;
     this.storageBridge = storage;
+    this.modelBridge = model;
   }
 
   /**
@@ -154,58 +154,14 @@ class DHT extends EventEmitter {
     }
   }
 
-  /**
-   * Controller
-   * @private
-   * @param {Object} params
-   * @param {Object} params.from
-   * @param {Object} params.request
-   * @returns {Promise}
-   */
-  _handleAnnounce({
+  async _handleAnnounce({
     from,
     request,
   }: Types.DHT.CardQuery<Types.DHT.Announce.Request>) {
     const { node_id, user_id, public_ipv4 } = from;
     const { port } = request.data;
-
-    const conditions = { node_id, user_id };
-    const full = { node_id, user_id, public_ipv4, port };
-
-    if (!user_id || !node_id || !port) {
-      logger.warn("DHT", "skip non-standard announce");
-      return Promise.reject("non-standard announce");
-    }
-
-    // if (public_ipv4.indexOf("192.168.") > -1) return Promise.reject();
-    return new Promise((resolve, reject) => {
-      logger.info("DHT", "handled announce", `${public_ipv4}:${port}`);
-      dht.find(full, (err: any, result: Document<Record<string, any>>[]) => {
-        // reject if already present
-        if (err)
-          reject({
-            error: "find-announce",
-            data: err,
-          });
-        if (result.length)
-          return reject({
-            error: null,
-            data: "already present",
-          });
-        dht.update(conditions, full, { upsert: true }, (err, result) => {
-          // update or insert new value
-          if (err)
-            reject({
-              error: "find-announce",
-              data: err,
-            });
-          resolve({
-            type: "announce",
-            result: 1,
-          });
-        });
-      });
-    });
+    const full: Types.DHT.Model = { node_id, user_id, public_ipv4, port };
+    return this.modelBridge.checkOrInsert(full);
   }
 
   async _handleLookup({
@@ -220,8 +176,9 @@ class DHT extends EventEmitter {
       node_id?: Types.Node.Id;
     } = { user_id };
     if (node_id) params.node_id = node_id;
+
     try {
-      const documents = await dht.findAsync(params);
+      const documents = await this.modelBridge.get(params);
       const result: Types.DHT.LookUp.Answer.Data[] = documents.map((item) => {
         const { user_id, node_id, public_ipv4, port } = item;
         return { user_id, node_id, public_ipv4, port };

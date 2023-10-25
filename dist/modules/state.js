@@ -31,14 +31,14 @@ const logger_1 = __importDefault(require("./logger"));
 class StateManager {
     constructor() {
         this._services = {
-            router: Types.System.States.disabled,
-            masterKey: Types.System.States.disabled,
-            nodeKey: Types.System.States.disabled,
-            database: Types.System.States.disabled,
-            dhtBootstrap: Types.System.States.disabled,
-            dhtLookup: Types.System.States.disabled,
-            dhtAnnounce: Types.System.States.disabled,
-            localDiscovery: Types.System.States.disabled,
+            router: 1 /* Types.System.States.disabled */,
+            masterKey: 1 /* Types.System.States.disabled */,
+            nodeKey: 1 /* Types.System.States.disabled */,
+            database: 1 /* Types.System.States.disabled */,
+            dhtBootstrap: 1 /* Types.System.States.disabled */,
+            dhtLookup: 1 /* Types.System.States.disabled */,
+            dhtAnnounce: 1 /* Types.System.States.disabled */,
+            localDiscovery: 1 /* Types.System.States.disabled */,
         };
         this._servicesHandler = {
             get: (obj, prop) => {
@@ -73,11 +73,11 @@ class StateManager {
          * @param payload Any payload | or Boolean "true" for forced emit
          */
         this.emit = (type, payload) => {
-            let action = Types.Event.Action.update;
+            let action = 0 /* Types.Event.Action.update */;
             if (this.listeners[type] === undefined)
                 return logger_1.default.warn("state", "key isn't registered", type);
             if (this.state[type] === undefined)
-                action = Types.Event.Action.set;
+                action = 1 /* Types.Event.Action.set */;
             if (payload !== true) {
                 if (JSON.stringify(this.state[type]) === JSON.stringify(payload))
                     return; // logger.warn("state", "nothing to emit", type);

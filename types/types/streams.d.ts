@@ -1,13 +1,13 @@
 /// <reference types="node" />
 declare namespace Streams {
-    enum MX {
-        dummy,
-        handshake,
-        test,
-        control,
-        messages,
-        mail,
-        dht
+    const enum MX {
+        dummy = 0,
+        handshake = 1,
+        test = 2,
+        control = 3,
+        messages = 4,
+        mail = 5,
+        dht = 6
     }
     type DemuxedResult = {
         mx: MX;

@@ -48,8 +48,8 @@ const index_1 = require("./socket/index");
 class DogmaSocket extends node_events_1.default {
     constructor(socket, direction, state) {
         super();
-        this.status = Types.Connection.Status.notConnected;
-        this.group = Types.Connection.Group.unknown;
+        this.status = 0 /* Types.Connection.Status.notConnected */;
+        this.group = 0 /* Types.Connection.Group.unknown */;
         this.tested = false;
         this._onData = index_1.onData;
         this.socket = socket;
@@ -60,12 +60,12 @@ class DogmaSocket extends node_events_1.default {
         this.direction = direction;
         this.stateBridge = state;
         this.input = {
-            handshake: new streams_1.MuxStream({ substream: Types.Streams.MX.handshake }),
-            test: new streams_1.MuxStream({ substream: Types.Streams.MX.test }),
-            control: new streams_1.MuxStream({ substream: Types.Streams.MX.control }),
-            messages: new streams_1.MuxStream({ substream: Types.Streams.MX.messages }),
-            mail: new streams_1.MuxStream({ substream: Types.Streams.MX.mail }),
-            dht: new streams_1.MuxStream({ substream: Types.Streams.MX.dht }),
+            handshake: new streams_1.MuxStream({ substream: 1 /* Types.Streams.MX.handshake */ }),
+            test: new streams_1.MuxStream({ substream: 2 /* Types.Streams.MX.test */ }),
+            control: new streams_1.MuxStream({ substream: 3 /* Types.Streams.MX.control */ }),
+            messages: new streams_1.MuxStream({ substream: 4 /* Types.Streams.MX.messages */ }),
+            mail: new streams_1.MuxStream({ substream: 5 /* Types.Streams.MX.mail */ }),
+            dht: new streams_1.MuxStream({ substream: 6 /* Types.Streams.MX.dht */ }),
         };
         this.output = new streams_1.DemuxStream({});
         this.setPipes();

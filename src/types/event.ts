@@ -1,10 +1,10 @@
 declare namespace Event {
-  export enum Action {
+  export const enum Action {
     update,
     set,
   }
   export type Payload = any;
-  export enum Type {
+  export const enum Type {
     online,
     offline,
     nodes,
@@ -15,6 +15,7 @@ declare namespace Event {
     nodesDb,
     usersDb,
     messagesDb,
+    dhtDb,
     protocolDb,
     configRouter,
     configDhtLookup,

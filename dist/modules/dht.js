@@ -42,17 +42,18 @@ class DHT extends node_events_1.default {
     /**
      *
      */
-    constructor({ storage, state, connections }) {
+    constructor({ storage, state, connections, model }) {
         super();
         this.peers = [];
-        this.permissions = {
-            [Types.DHT.Type.dhtBootstrap]: Types.Connection.Group.unknown,
-            [Types.DHT.Type.dhtAnnounce]: Types.Connection.Group.unknown,
-            [Types.DHT.Type.dhtLookup]: Types.Connection.Group.unknown,
-        };
+        this.permissions = [
+            0 /* Types.Connection.Group.unknown */,
+            0 /* Types.Connection.Group.unknown */,
+            0 /* Types.Connection.Group.unknown */,
+        ];
         this.connectionsBridge = connections;
         this.stateBridge = state;
         this.storageBridge = storage;
+        this.modelBridge = model;
     }
     /**
      *
@@ -66,36 +67,36 @@ class DHT extends node_events_1.default {
         logger_1.default.log("DHT", "setPermission", "set permission level", type, level); // change to log
     }
     announce(port) {
-        const permission = this.permissions[Types.DHT.Type.dhtAnnounce];
+        const permission = this.permissions[0 /* Types.DHT.Type.dhtAnnounce */];
         const request = {
-            class: Types.Streams.MX.dht,
+            class: 6 /* Types.Streams.MX.dht */,
             body: {
-                type: Types.DHT.Request.announce,
-                action: Types.DHT.Action.push,
+                type: 0 /* Types.DHT.Request.announce */,
+                action: 2 /* Types.DHT.Action.push */,
                 data: { port },
             },
         };
         this.connectionsBridge.multicast(request, permission);
     }
     lookup(user_id, node_id) {
-        const permission = this.permissions[Types.DHT.Type.dhtLookup];
+        const permission = this.permissions[1 /* Types.DHT.Type.dhtLookup */];
         const request = {
-            class: Types.Streams.MX.dht,
+            class: 6 /* Types.Streams.MX.dht */,
             body: {
-                type: Types.DHT.Request.lookup,
-                action: Types.DHT.Action.get,
+                type: 1 /* Types.DHT.Request.lookup */,
+                action: 0 /* Types.DHT.Action.get */,
                 data: { user_id, node_id },
             },
         };
         this.connectionsBridge.multicast(request, permission);
     }
     revoke(user_id, node_id) {
-        const permission = this.permissions[Types.DHT.Type.dhtAnnounce];
+        const permission = this.permissions[0 /* Types.DHT.Type.dhtAnnounce */];
         const request = {
-            class: Types.Streams.MX.dht,
+            class: 6 /* Types.Streams.MX.dht */,
             body: {
-                type: Types.DHT.Request.revoke,
-                action: Types.DHT.Action.push,
+                type: 2 /* Types.DHT.Request.revoke */,
+                action: 2 /* Types.DHT.Action.push */,
                 data: { user_id, node_id },
             },
         };
@@ -110,35 +111,35 @@ class DHT extends node_events_1.default {
                     return logger_1.default.warn("DHT", "handleRequest", "unknown request", type, action);
                 }
                 switch (params.request.type) {
-                    case Types.DHT.Request.announce:
+                    case 0 /* Types.DHT.Request.announce */:
                         params.request;
                         yield this._handleAnnounce({
                             from,
                             request: params.request,
                         });
                         break;
-                    case Types.DHT.Request.revoke:
+                    case 2 /* Types.DHT.Request.revoke */:
                         yield this._handleRevoke({
                             from,
                             request: params.request,
                         });
                         break;
-                    case Types.DHT.Request.lookup:
-                        if (params.request.action === Types.DHT.Action.get) {
+                    case 1 /* Types.DHT.Request.lookup */:
+                        if (params.request.action === 0 /* Types.DHT.Action.get */) {
                             const peers = yield this._handleLookup({
                                 from,
                                 request: params.request,
                             });
                             if (peers && Object.keys(peers).length) {
                                 const card = {
-                                    action: Types.DHT.Action.set,
-                                    type: Types.DHT.Request.lookup,
+                                    action: 1 /* Types.DHT.Action.set */,
+                                    type: 1 /* Types.DHT.Request.lookup */,
                                     data: peers,
                                 };
                                 socket.input.dht.write(JSON.stringify(card)); // edit
                             }
                         }
-                        else if (params.request.action === Types.DHT.Action.set) {
+                        else if (params.request.action === 1 /* Types.DHT.Action.set */) {
                             this._handlePeers({
                                 from,
                                 request: params.request,
@@ -152,51 +153,12 @@ class DHT extends node_events_1.default {
             }
         });
     }
-    /**
-     * Controller
-     * @private
-     * @param {Object} params
-     * @param {Object} params.from
-     * @param {Object} params.request
-     * @returns {Promise}
-     */
     _handleAnnounce({ from, request, }) {
-        const { node_id, user_id, public_ipv4 } = from;
-        const { port } = request.data;
-        const conditions = { node_id, user_id };
-        const full = { node_id, user_id, public_ipv4, port };
-        if (!user_id || !node_id || !port) {
-            logger_1.default.warn("DHT", "skip non-standard announce");
-            return Promise.reject("non-standard announce");
-        }
-        // if (public_ipv4.indexOf("192.168.") > -1) return Promise.reject();
-        return new Promise((resolve, reject) => {
-            logger_1.default.info("DHT", "handled announce", `${public_ipv4}:${port}`);
-            dht.find(full, (err, result) => {
-                // reject if already present
-                if (err)
-                    reject({
-                        error: "find-announce",
-                        data: err,
-                    });
-                if (result.length)
-                    return reject({
-                        error: null,
-                        data: "already present",
-                    });
-                dht.update(conditions, full, { upsert: true }, (err, result) => {
-                    // update or insert new value
-                    if (err)
-                        reject({
-                            error: "find-announce",
-                            data: err,
-                        });
-                    resolve({
-                        type: "announce",
-                        result: 1,
-                    });
-                });
-            });
+        return __awaiter(this, void 0, void 0, function* () {
+            const { node_id, user_id, public_ipv4 } = from;
+            const { port } = request.data;
+            const full = { node_id, user_id, public_ipv4, port };
+            return this.modelBridge.checkOrInsert(full);
         });
     }
     _handleLookup({ from, request, }) {
@@ -207,7 +169,7 @@ class DHT extends node_events_1.default {
             if (node_id)
                 params.node_id = node_id;
             try {
-                const documents = yield dht.findAsync(params);
+                const documents = yield this.modelBridge.get(params);
                 const result = documents.map((item) => {
                     const { user_id, node_id, public_ipv4, port } = item;
                     return { user_id, node_id, public_ipv4, port };

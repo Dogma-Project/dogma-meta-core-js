@@ -57,7 +57,7 @@ class UserModel {
                     fieldName: "user_id",
                     unique: true,
                 });
-                this.stateBridge.emit(Types.Event.Type.usersDb, Types.System.States.ready);
+                this.stateBridge.emit(8 /* Types.Event.Type.usersDb */, 2 /* Types.System.States.ready */);
             }
             catch (err) {
                 logger_1.default.error("users.nedb", err);
@@ -73,7 +73,7 @@ class UserModel {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { user_id } = user;
-                this.stateBridge.emit(Types.Event.Type.usersDb, user_id);
+                this.stateBridge.emit(8 /* Types.Event.Type.usersDb */, user_id);
                 const exist = yield this.db.findOneAsync({ user_id });
                 const sync_id = (0, generateSyncId_1.default)(5);
                 let result;
@@ -85,7 +85,7 @@ class UserModel {
                 else {
                     result = yield this.db.insertAsync(Object.assign(Object.assign({}, user), { sync_id }));
                 }
-                this.stateBridge.emit(Types.Event.Type.usersDb, Types.System.States.reload); // downgrade state to reload database
+                this.stateBridge.emit(8 /* Types.Event.Type.usersDb */, 4 /* Types.System.States.reload */); // downgrade state to reload database
                 return result;
             }
             catch (err) {
@@ -100,7 +100,7 @@ class UserModel {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.db.removeAsync({ user_id }, { multi: true });
-                this.stateBridge.emit(Types.Event.Type.usersDb, Types.System.States.reload); // downgrade state to reload database
+                this.stateBridge.emit(8 /* Types.Event.Type.usersDb */, 4 /* Types.System.States.reload */); // downgrade state to reload database
                 /*
                 await nodesDb.removeAsync({ user_id }, { multi: true });
                 this.stateBridge.emit("nodes-db", Types.System.States.reload); // downgrade state to reload database
@@ -129,7 +129,7 @@ class UserModel {
                         upsert: true,
                     });
                 }
-                this.stateBridge.emit(Types.Event.Type.usersDb, Types.System.States.reload); // downgrade state to reload database
+                this.stateBridge.emit(8 /* Types.Event.Type.usersDb */, 4 /* Types.System.States.reload */); // downgrade state to reload database
                 // Sync.confirm("users", from);
                 return true;
             }

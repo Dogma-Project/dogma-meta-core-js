@@ -39,10 +39,10 @@ class Storage {
             set router(port) {
                 this._router = Number(arguments_1.default.port) || port; // edit // check order
             },
-            bootstrap: Types.Connection.Group.unknown,
-            dhtLookup: Types.Connection.Group.unknown,
-            dhtAnnounce: Types.Connection.Group.unknown,
-            autoDefine: Types.Constants.Boolean.false,
+            bootstrap: 0 /* Types.Connection.Group.unknown */,
+            dhtLookup: 0 /* Types.Connection.Group.unknown */,
+            dhtAnnounce: 0 /* Types.Connection.Group.unknown */,
+            autoDefine: 0 /* Types.Constants.Boolean.false */,
             external: "",
             public_ipv4: "",
         };

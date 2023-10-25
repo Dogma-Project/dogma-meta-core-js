@@ -12,7 +12,6 @@ declare class LocalDiscovery extends EventEmitter {
         port: number;
         ip: string;
     });
-    ts: any;
     startServer(): this;
     announce(card: Types.Discovery.Card): this;
 }

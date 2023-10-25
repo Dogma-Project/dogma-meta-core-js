@@ -73,7 +73,7 @@ console.log("LOG LEVEL:", logLevel);
  * @param message
  */
 const dogmaError = (type, ...message) => {
-    if (logLevel < Types.System.LogLevel.errors)
+    if (logLevel < 1 /* Types.System.LogLevel.errors */)
         return;
     type = type.toUpperCase();
     console.error(`\x1b[31m[${type}]\x1b[0m`, ...message); // red
@@ -84,7 +84,7 @@ const dogmaError = (type, ...message) => {
  * @param message
  */
 const dogmaDebug = (type, ...message) => {
-    if (logLevel < Types.System.LogLevel.debug)
+    if (logLevel < 2 /* Types.System.LogLevel.debug */)
         return;
     type = type.toUpperCase();
     console.log(`\x1b[32m\x1b[40m[${type}]\x1b[0m`, ...message); //
@@ -95,7 +95,7 @@ const dogmaDebug = (type, ...message) => {
  * @param message
  */
 const dogmaInfo = (type, ...message) => {
-    if (logLevel < Types.System.LogLevel.info)
+    if (logLevel < 3 /* Types.System.LogLevel.info */)
         return;
     type = type.toUpperCase();
     console.log(`\x1b[36m[${type}]\x1b[0m`, ...message); // blue
@@ -106,7 +106,7 @@ const dogmaInfo = (type, ...message) => {
  * @param message
  */
 const dogmaWarning = (type, ...message) => {
-    if (logLevel < Types.System.LogLevel.warnings)
+    if (logLevel < 4 /* Types.System.LogLevel.warnings */)
         return;
     type = type.toUpperCase();
     console.warn(`\x1b[33m[${type}]\x1b[0m`, ...message); // yellow
@@ -117,7 +117,7 @@ const dogmaWarning = (type, ...message) => {
  * @param message
  */
 const dogmaLog = (type, ...message) => {
-    if (logLevel < Types.System.LogLevel.logs)
+    if (logLevel < 5 /* Types.System.LogLevel.logs */)
         return;
     type = type.toUpperCase();
     console.log(`\x1b[37m\x1b[40m[${type}]\x1b[0m`, ...message); // black

@@ -58,7 +58,7 @@ class NodeModel {
                     fieldName: "param",
                     unique: true,
                 });
-                this.stateBridge.emit(Types.Event.Type.nodesDb, Types.System.States.ready);
+                this.stateBridge.emit(7 /* Types.Event.Type.nodesDb */, 2 /* Types.System.States.ready */);
             }
             catch (err) {
                 logger_1.default.error("config.nodes", err);
@@ -109,7 +109,7 @@ class NodeModel {
                 for (let i = 0; i < nodes.length; i++) {
                     yield insert(nodes[i]);
                 }
-                this.stateBridge.emit(Types.Event.Type.nodesDb, Types.System.States.reload); // downgrade state to reload database
+                this.stateBridge.emit(7 /* Types.Event.Type.nodesDb */, 4 /* Types.System.States.reload */); // downgrade state to reload database
                 resolve(true);
             }
             catch (err) {
@@ -136,7 +136,7 @@ class NodeModel {
                     }
                     yield this.db.updateAsync({ $or: [{ $and: [{ user_id }, { node_id }] }, { sync_id }] }, row, { upsert: true });
                 }
-                this.stateBridge.emit(Types.Event.Type.nodesDb, Types.System.States.reload); // downgrade state to reload database
+                this.stateBridge.emit(7 /* Types.Event.Type.nodesDb */, 4 /* Types.System.States.reload */); // downgrade state to reload database
                 // Sync.confirm("nodes", from);
                 return true;
             }

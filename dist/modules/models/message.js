@@ -56,7 +56,7 @@ class MessageModel {
                     fieldName: "sync_id",
                     unique: true,
                 });
-                this.stateBridge.emit(Types.Event.Type.messagesDb, Types.System.States.ready);
+                this.stateBridge.emit(9 /* Types.Event.Type.messagesDb */, 2 /* Types.System.States.ready */);
             }
             catch (err) {
                 logger_1.default.error("messages.nedb", err);
@@ -103,7 +103,7 @@ class MessageModel {
     }
     push(params) {
         return __awaiter(this, void 0, void 0, function* () {
-            params.type = params.type || Types.Message.Type.direct;
+            params.type = params.type || 0 /* Types.Message.Type.direct */;
             return this.db.insertAsync(params);
         });
     }

@@ -1,5 +1,5 @@
 declare namespace Streams {
-  export enum MX {
+  export const enum MX {
     dummy, // edit
     handshake,
     test,

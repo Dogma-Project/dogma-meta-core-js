@@ -3,11 +3,13 @@ import connections from "./connections";
 import stateManager from "./state";
 import storage from "./storage";
 import * as Types from "../types";
+import { dhtModel } from "./model";
 
 const dht = new DHT({
   state: stateManager,
   storage,
   connections,
+  model: dhtModel,
 });
 
 stateManager.subscribe(

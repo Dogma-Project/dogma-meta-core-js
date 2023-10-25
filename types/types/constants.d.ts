@@ -1,5 +1,5 @@
 declare namespace Constants {
-    enum Boolean {
+    const enum Boolean {
         false = 0,
         true = 1
     }

@@ -5,24 +5,24 @@ declare namespace Connection {
     type Id = string;
     type IPv4 = string;
     type IPv6 = string;
-    enum Status {
-        notConnected,
-        connected,
-        error,
-        notAuthorized,
-        authorized
+    const enum Status {
+        notConnected = 0,
+        connected = 1,
+        error = 2,
+        notAuthorized = 3,
+        authorized = 4
     }
-    enum Group {
-        unknown,
-        all,
-        friends,
-        selfUser,
-        selfNode,
-        nobody
+    const enum Group {
+        unknown = 0,
+        all = 1,
+        friends = 2,
+        selfUser = 3,
+        selfNode = 4,
+        nobody = 5
     }
-    enum Direction {
-        outcoming,
-        incoming
+    const enum Direction {
+        outcoming = 0,
+        incoming = 1
     }
     interface Description {
         connection_id: Id;

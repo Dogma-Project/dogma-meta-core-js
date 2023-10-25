@@ -1,30 +1,38 @@
+import Connection from "./connection";
 import Node from "./node";
 import Streams from "./streams";
 import User from "./user";
 
 declare namespace DHT {
-  export enum Type {
+  export const enum Type {
     dhtAnnounce,
     dhtLookup,
     dhtBootstrap,
   }
-  export enum Action {
+  export const enum Action {
     get,
     set,
     push,
   }
-  export enum Request {
+  export const enum Request {
     announce,
     lookup,
     revoke,
   }
-  interface Main {
-    type: DHT.Request;
-    action: DHT.Action;
+  export const enum Response {
+    alreadyPresent,
+    ok,
   }
 
+  export type Model = {
+    user_id: User.Id;
+    node_id: Node.Id;
+    public_ipv4: Connection.IPv4;
+    port: number;
+  };
+
   export namespace LookUp {
-    export interface Request extends Main {
+    export interface Request {
       type: DHT.Request.lookup;
       action: DHT.Action.get;
       data: Request.Data;
@@ -35,7 +43,7 @@ declare namespace DHT {
         node_id?: Node.Id;
       };
     }
-    export interface Answer extends Main {
+    export interface Answer {
       type: DHT.Request.lookup;
       action: DHT.Action.set;
       data: Answer.Data[];
@@ -50,7 +58,7 @@ declare namespace DHT {
   }
 
   export namespace Announce {
-    export interface Request extends Main {
+    export interface Request {
       type: DHT.Request.announce;
       action: DHT.Action.push;
       data: Request.Data;
@@ -63,7 +71,7 @@ declare namespace DHT {
   }
 
   export namespace Revoke {
-    export interface Request extends Main {
+    export interface Request {
       type: DHT.Request.revoke;
       action: DHT.Action.push;
       data: Request.Data;

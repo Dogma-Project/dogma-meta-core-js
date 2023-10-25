@@ -25,14 +25,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Types = __importStar(require("../../types"));
 function multicast(request, destination) {
-    if (destination === Types.Connection.Group.unknown)
+    if (destination === 0 /* Types.Connection.Group.unknown */)
         return;
-    if (destination > Types.Connection.Group.selfNode)
+    if (destination > 4 /* Types.Connection.Group.selfNode */)
         return;
     for (const cid in this.peers) {
         if (this.peers[cid].group >= destination) {
             switch (request.class) {
-                case Types.Streams.MX.dht:
+                case 6 /* Types.Streams.MX.dht */:
                     this.peers[cid].input.dht.write(JSON.stringify(request.body));
                     break;
                 default:

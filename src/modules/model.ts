@@ -1,9 +1,19 @@
-import Config from "./models/config";
-import Node from "./models/node";
-import Protocol from "./models/protocol";
-import User from "./models/user";
-import File from "./models/file";
-import Message from "./models/message";
-import Sync from "./models/sync";
+import ConfigModel from "./models/config";
+import NodeModel from "./models/node";
+import DHTModel from "./models/dht";
+import UserModel from "./models/user";
+import MessageModel from "./models/message";
+import ProtocolModel from "./models/protocol";
+import FileModel from "./models/file";
+import SyncModel from "./models/sync";
 
-export { Config, Node, Protocol, User, File, Message, Sync };
+export {
+  ConfigModel,
+  NodeModel,
+  DHTModel,
+  UserModel,
+  MessageModel,
+  ProtocolModel,
+  FileModel,
+  SyncModel,
+};

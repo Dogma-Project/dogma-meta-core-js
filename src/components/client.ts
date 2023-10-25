@@ -19,7 +19,6 @@ localDiscovery.on("candidate", (data: Types.Discovery.Candidate) => {
     client.tryPeer(peer, { user_id, node_id });
   }
 });
-
 dht.on("peers", (data: Types.DHT.LookUp.Answer.Data[]) => {
   data.forEach((item) => {
     const { public_ipv4, user_id, node_id } = item;

@@ -73,7 +73,6 @@ class LocalDiscovery extends EventEmitter {
       reuseAddr: true,
     });
   }
-  ts;
 
   startServer() {
     this.server.on("listening", () => {

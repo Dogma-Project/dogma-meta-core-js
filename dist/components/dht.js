@@ -31,45 +31,47 @@ const connections_1 = __importDefault(require("./connections"));
 const state_1 = __importDefault(require("./state"));
 const storage_1 = __importDefault(require("./storage"));
 const Types = __importStar(require("../types"));
+const model_1 = require("./model");
 const dht = new dht_1.default({
     state: state_1.default,
     storage: storage_1.default,
     connections: connections_1.default,
+    model: model_1.dhtModel,
 });
-state_1.default.subscribe([Types.Event.Type.configDhtLookup], (_action, value, _type) => {
-    dht.setPermission(Types.DHT.Type.dhtLookup, value);
-    if (value > Types.Connection.Group.selfUser) {
-        state_1.default.services.dhtLookup = Types.System.States.disabled;
+state_1.default.subscribe([13 /* Types.Event.Type.configDhtLookup */], (_action, value, _type) => {
+    dht.setPermission(1 /* Types.DHT.Type.dhtLookup */, value);
+    if (value > 3 /* Types.Connection.Group.selfUser */) {
+        state_1.default.services.dhtLookup = 1 /* Types.System.States.disabled */;
     }
-    else if (value === Types.Connection.Group.all) {
-        state_1.default.services.dhtLookup = Types.System.States.full;
+    else if (value === 1 /* Types.Connection.Group.all */) {
+        state_1.default.services.dhtLookup = 7 /* Types.System.States.full */;
     }
     else {
-        state_1.default.services.dhtLookup = Types.System.States.ok;
+        state_1.default.services.dhtLookup = 6 /* Types.System.States.ok */;
     }
 });
-state_1.default.subscribe([Types.Event.Type.configDhtAnnounce], (_action, value, _type) => {
-    dht.setPermission(Types.DHT.Type.dhtAnnounce, value);
-    if (value > Types.Connection.Group.selfUser) {
-        state_1.default.services.dhtAnnounce = Types.System.States.disabled;
+state_1.default.subscribe([14 /* Types.Event.Type.configDhtAnnounce */], (_action, value, _type) => {
+    dht.setPermission(0 /* Types.DHT.Type.dhtAnnounce */, value);
+    if (value > 3 /* Types.Connection.Group.selfUser */) {
+        state_1.default.services.dhtAnnounce = 1 /* Types.System.States.disabled */;
     }
-    else if (value === Types.Connection.Group.all) {
-        state_1.default.services.dhtAnnounce = Types.System.States.full;
+    else if (value === 1 /* Types.Connection.Group.all */) {
+        state_1.default.services.dhtAnnounce = 7 /* Types.System.States.full */;
     }
     else {
-        state_1.default.services.dhtAnnounce = Types.System.States.ok;
+        state_1.default.services.dhtAnnounce = 6 /* Types.System.States.ok */;
     }
 });
-state_1.default.subscribe([Types.Event.Type.configDhtBootstrap], (_action, value, _type) => {
-    dht.setPermission(Types.DHT.Type.dhtBootstrap, value);
-    if (value > Types.Connection.Group.selfUser) {
-        state_1.default.services.dhtBootstrap = Types.System.States.disabled;
+state_1.default.subscribe([15 /* Types.Event.Type.configDhtBootstrap */], (_action, value, _type) => {
+    dht.setPermission(2 /* Types.DHT.Type.dhtBootstrap */, value);
+    if (value > 3 /* Types.Connection.Group.selfUser */) {
+        state_1.default.services.dhtBootstrap = 1 /* Types.System.States.disabled */;
     }
-    else if (value === Types.Connection.Group.all) {
-        state_1.default.services.dhtBootstrap = Types.System.States.full;
+    else if (value === 1 /* Types.Connection.Group.all */) {
+        state_1.default.services.dhtBootstrap = 7 /* Types.System.States.full */;
     }
     else {
-        state_1.default.services.dhtBootstrap = Types.System.States.ok;
+        state_1.default.services.dhtBootstrap = 6 /* Types.System.States.ok */;
     }
 });
 exports.default = dht;

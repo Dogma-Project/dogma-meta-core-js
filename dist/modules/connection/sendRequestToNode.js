@@ -36,8 +36,13 @@ function send(request, node_id) {
         if (!socket)
             return (0, response_1.default)(1, constants_1.MSG_CODE.UNKNOWN, "user is offline"); // edit
         switch (request.class) {
-            case Types.Streams.MX.dht:
-                socket.input.dht.write(JSON.stringify(request.body));
+            case 6 /* Types.Streams.MX.dht */:
+                var str = JSON.stringify(request.body);
+                socket.input.dht.write(str);
+                return (0, response_1.default)(1, constants_1.MSG_CODE.SUCCESS);
+            case 4 /* Types.Streams.MX.messages */:
+                var str = JSON.stringify(request.body);
+                socket.input.messages.write(str);
                 return (0, response_1.default)(1, constants_1.MSG_CODE.SUCCESS);
             default:
                 request; // dummy

@@ -1,28 +1,35 @@
+import Connection from "./connection";
 import Node from "./node";
 import Streams from "./streams";
 import User from "./user";
 declare namespace DHT {
-    enum Type {
-        dhtAnnounce,
-        dhtLookup,
-        dhtBootstrap
+    const enum Type {
+        dhtAnnounce = 0,
+        dhtLookup = 1,
+        dhtBootstrap = 2
     }
-    enum Action {
-        get,
-        set,
-        push
+    const enum Action {
+        get = 0,
+        set = 1,
+        push = 2
     }
-    enum Request {
-        announce,
-        lookup,
-        revoke
+    const enum Request {
+        announce = 0,
+        lookup = 1,
+        revoke = 2
     }
-    interface Main {
-        type: DHT.Request;
-        action: DHT.Action;
+    const enum Response {
+        alreadyPresent = 0,
+        ok = 1
     }
+    type Model = {
+        user_id: User.Id;
+        node_id: Node.Id;
+        public_ipv4: Connection.IPv4;
+        port: number;
+    };
     namespace LookUp {
-        interface Request extends Main {
+        interface Request {
             type: DHT.Request.lookup;
             action: DHT.Action.get;
             data: Request.Data;
@@ -33,7 +40,7 @@ declare namespace DHT {
                 node_id?: Node.Id;
             };
         }
-        interface Answer extends Main {
+        interface Answer {
             type: DHT.Request.lookup;
             action: DHT.Action.set;
             data: Answer.Data[];
@@ -47,7 +54,7 @@ declare namespace DHT {
         }
     }
     namespace Announce {
-        interface Request extends Main {
+        interface Request {
             type: DHT.Request.announce;
             action: DHT.Action.push;
             data: Request.Data;
@@ -59,7 +66,7 @@ declare namespace DHT {
         }
     }
     namespace Revoke {
-        interface Request extends Main {
+        interface Request {
             type: DHT.Request.revoke;
             action: DHT.Action.push;
             data: Request.Data;

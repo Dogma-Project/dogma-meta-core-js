@@ -1,16 +1,16 @@
 import Connection from "./connection";
 import Streams from "./streams";
 declare namespace Message {
-    enum Type {
-        direct,
-        user,
-        chat
+    const enum Type {
+        direct = 0,
+        user = 1,
+        chat = 2
     }
-    enum Action {
-        send,
-        sync,
-        edit,
-        delete
+    const enum Action {
+        send = 0,
+        sync = 1,
+        edit = 2,
+        delete = 3
     }
     type Model = {
         id: string;

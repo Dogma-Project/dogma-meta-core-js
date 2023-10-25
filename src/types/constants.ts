@@ -1,5 +1,5 @@
 declare namespace Constants {
-  export enum Boolean {
+  export const enum Boolean {
     false = 0,
     true = 1,
   }

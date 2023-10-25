@@ -35,11 +35,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const nedb_1 = __importDefault(require("@seald-io/nedb"));
 const Types = __importStar(require("../../types"));
 const datadir_1 = require("../datadir");
-const nedb_1 = __importDefault(require("@seald-io/nedb"));
 const logger_1 = __importDefault(require("../logger"));
-class ConfigModel {
+class DHTModel {
     constructor({ state }) {
         this.db = new nedb_1.default({
             filename: datadir_1.nedbDir + "/config.db",
@@ -49,16 +49,16 @@ class ConfigModel {
     init() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                logger_1.default.debug("nedb", "load database", "config");
+                logger_1.default.debug("nedb", "load database", "DHT");
                 yield this.db.loadDatabaseAsync();
-                yield this.db.ensureIndexAsync({
-                    fieldName: "param",
-                    unique: true,
-                });
-                this.stateBridge.emit(6 /* Types.Event.Type.configDb */, 2 /* Types.System.States.ready */);
+                // await this.db.ensureIndexAsync({
+                //   fieldName: "param",
+                //   unique: true,
+                // });
+                this.stateBridge.emit(10 /* Types.Event.Type.dhtDb */, 2 /* Types.System.States.ready */);
             }
             catch (err) {
-                logger_1.default.error("config.nedb", err);
+                logger_1.default.error("dht.nedb", err);
             }
         });
     }
@@ -67,16 +67,28 @@ class ConfigModel {
             return this.db.findAsync({});
         });
     }
-    persistConfig(config) {
+    get(params) {
+        return this.db.findAsync(params);
+    }
+    checkOrInsert(params) {
         return __awaiter(this, void 0, void 0, function* () {
-            const newObject = Object.keys(config).map((key) => ({
-                param: key,
-                value: config[key],
-            }));
-            for (const row of newObject)
-                yield this.db.updateAsync({ param: row.param }, row, { upsert: true });
-            this.stateBridge.emit(6 /* Types.Event.Type.configDb */, 4 /* Types.System.States.reload */); // downgrade state to reload database
+            try {
+                const count = yield this.db.countAsync(params);
+                if (!count) {
+                    const { user_id, node_id } = params;
+                    yield this.db.updateAsync({ user_id, node_id }, params, {
+                        upsert: true,
+                    });
+                    return 1 /* Types.DHT.Response.ok */;
+                }
+                else {
+                    return 0 /* Types.DHT.Response.alreadyPresent */;
+                }
+            }
+            catch (err) {
+                return Promise.reject(err);
+            }
         });
     }
 }
-exports.default = ConfigModel;
+exports.default = DHTModel;

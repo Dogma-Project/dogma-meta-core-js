@@ -1,10 +1,10 @@
-import { Message, User, Node } from "./model";
+import { Node } from "./model";
 import * as Types from "../types";
 declare const sync: {
     handled: {
-        messages: typeof Message;
-        users: typeof User;
-        nodes: typeof Node;
+        messages: any;
+        users: any;
+        nodes: any;
     };
     state: never[];
     /**

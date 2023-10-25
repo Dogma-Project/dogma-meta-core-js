@@ -2,12 +2,12 @@ import Connection from "./connection";
 import Streams from "./streams";
 
 declare namespace Message {
-  export enum Type {
+  export const enum Type {
     direct,
     user,
     chat,
   }
-  export enum Action {
+  export const enum Action {
     send,
     sync,
     edit,

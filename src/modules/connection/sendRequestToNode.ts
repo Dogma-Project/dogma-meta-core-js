@@ -14,7 +14,12 @@ export default function send(
     if (!socket) return response(1, MSG_CODE.UNKNOWN, "user is offline"); // edit
     switch (request.class) {
       case Types.Streams.MX.dht:
-        socket.input.dht.write(JSON.stringify(request.body));
+        var str = JSON.stringify(request.body);
+        socket.input.dht.write(str);
+        return response(1, MSG_CODE.SUCCESS);
+      case Types.Streams.MX.messages:
+        var str = JSON.stringify(request.body);
+        socket.input.messages.write(str);
         return response(1, MSG_CODE.SUCCESS);
       default:
         request; // dummy

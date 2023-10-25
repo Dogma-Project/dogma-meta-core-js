@@ -2,7 +2,7 @@ import logger from "../logger";
 import FilesController from "./files";
 import NodesController from "./nodes";
 import SyncController from "../sync";
-import { Types } from "../../types";
+import * as Types from "../../types";
 
 /** @module RequestsController */
 

@@ -1,53 +1,81 @@
 "use strict";
-LocalDiscovery.on("message", (data) => {
-    // validate
-    const { msg: { type, user_id, node_id, port }, from: { address }, } = data;
-    logger.log("client", "Local discovery candidate", data);
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const client_1 = __importDefault(require("../modules/client"));
+const connections_1 = __importDefault(require("./connections"));
+const localDiscovery_1 = __importDefault(require("./localDiscovery"));
+const logger_1 = __importDefault(require("../modules/logger"));
+const dht_1 = __importDefault(require("./dht"));
+const Types = __importStar(require("../types"));
+const storage_1 = __importDefault(require("./storage"));
+const state_1 = __importDefault(require("./state"));
+const arguments_1 = __importDefault(require("../modules/arguments"));
+const client = new client_1.default({ connections: connections_1.default, state: state_1.default, storage: storage_1.default });
+localDiscovery_1.default.on("candidate", (data) => {
+    const { type, user_id, node_id, local_ipv4 } = data;
+    logger_1.default.log("client", "Local discovery candidate", data);
     if (type && type == "dogma-router" && user_id && node_id) {
-        logger.log("nodes", "trying to connect local service", address);
-        client.tryPeer({
-            host: address,
-            port,
-        }, {
-            user_id,
-            node_id,
-        });
+        logger_1.default.log("nodes", "trying to connect local service", local_ipv4);
+        const peer = connections_1.default.peerFromIP(local_ipv4);
+        client.tryPeer(peer, { user_id, node_id });
     }
 });
-dht.on("peers", (data) => {
-    // check types
+dht_1.default.on("peers", (data) => {
     data.forEach((item) => {
-        const { public_ipv4, port, user_id, node_id } = item;
-        client.tryPeer({
-            host: public_ipv4,
-            port,
-        }, {
-            user_id,
-            node_id,
-        });
+        const { public_ipv4, user_id, node_id } = item;
+        const peer = connections_1.default.peerFromIP(public_ipv4);
+        client.tryPeer(peer, { user_id, node_id });
     });
 });
 let connectFriendsInterval;
 let searchFriendsInterval;
-subscribe(["update-user", "users"], () => {
-    const user_id = state["update-user"];
-    connection.closeConnectionsByUserId(user_id);
+state_1.default.subscribe([Types.Event.Type.updateUser, Types.Event.Type.users], () => {
+    const user_id = state_1.default.state[Types.Event.Type.updateUser];
+    connections_1.default.closeConnectionsByUserId(user_id);
 });
-subscribe(["nodes", "users", "nodes", "node-key"], () => {
-    // edit
-    EventEmitter.emit("friends", true);
-    if (args.discovery)
+state_1.default.subscribe([Types.Event.Type.nodes, Types.Event.Type.users, Types.Event.Type.nodeKey], () => {
+    // eventEmitter.emit("friends", true);
+    if (arguments_1.default.discovery)
         return; // don't lookup in discovery mode
     clearInterval(connectFriendsInterval);
     client.connectFriends(); // check
     connectFriendsInterval = setInterval(client.connectFriends, 60000); // edit
 });
-subscribe(["config-dhtLookup", "users", "node-key"], () => {
+state_1.default.subscribe([
+    Types.Event.Type.configDhtLookup,
+    Types.Event.Type.users,
+    Types.Event.Type.nodeKey,
+], () => {
     // edit
-    if (args.discovery)
+    if (arguments_1.default.discovery)
         return; // don't lookup in discovery mode
     clearInterval(searchFriendsInterval);
-    if (store.config.dhtLookup) {
+    if (storage_1.default.config.dhtLookup) {
         client.searchFriends(); // check
         searchFriendsInterval = setInterval(client.searchFriends, 30000); // edit
     }

@@ -1,4 +1,4 @@
-export = RequestsController;
+import * as Types from "../../types";
 /** @module RequestsController */
 /**
  *
@@ -10,12 +10,5 @@ export = RequestsController;
  * @param {String} params.request.action
  * @param {Object} params.request.data
  */
-declare function RequestsController({ node_id, user_id, request }: {
-    node_id: string;
-    user_id: string;
-    request: {
-        type: string;
-        action: string;
-        data: Object;
-    };
-}): any;
+declare const RequestsController: (node_id: Types.Node.Id, user_id: Types.User.Id, request: object) => void;
+export default RequestsController;

@@ -1,9 +1,9 @@
-import { emit, subscribe } from "../modules/state-old";
+import stateManager from "./state";
 import { readProtocolTable } from "../modules/main";
 import logger from "../modules/logger";
-import { PROTOCOL, STATES } from "../constants";
+import { PROTOCOL } from "../constants";
 
-subscribe(["protocol-db"], (_action, value) => {
+stateManager.subscribe(["protocol-db"], (_action, value) => {
   if (value >= STATES.LIMITED) return; // don't trigger when status is loaded
   readProtocolTable()
     .then((protocol) => {
@@ -15,7 +15,7 @@ subscribe(["protocol-db"], (_action, value) => {
     });
 });
 
-subscribe(["protocol-DB"], (_action, value) => {
+stateManager.subscribe(["protocol-DB"], (_action, value) => {
   try {
     if (value < PROTOCOL.DB) {
       const migration = require(`./migrations/migration-${value}.js`);

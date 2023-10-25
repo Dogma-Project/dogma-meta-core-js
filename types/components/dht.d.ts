@@ -1,3 +1,3 @@
-import DHT from "../libs/dht";
+import DHT from "../modules/dht";
 declare const dht: DHT;
 export default dht;

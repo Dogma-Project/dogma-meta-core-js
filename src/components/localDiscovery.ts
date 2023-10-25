@@ -2,7 +2,7 @@ import LocalDiscovery from "../modules/localDiscovery";
 import logger from "../modules/logger";
 import stateManager from "./state";
 import { DEFAULTS } from "../constants";
-import { Types } from "../types";
+import * as Types from "../types";
 
 const disc = new LocalDiscovery({
   port: DEFAULTS.LOCAL_DISCOVERY_PORT,

@@ -8,55 +8,36 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const { fileTransfer: fileTransferDb } = require("../nedb");
-const model = module.exports = {
-    /**
-     *
-     * @param {Object} params
-     * @param {String} params.user_id
-     * @param {Object} params.file file description
-     * @param {String} params.file.descriptor
-     * @param {Number} params.file.size
-     * @param {String} params.file.pathname
-     */
-    permitFileTransfer({ user_id, file }) {
+Object.defineProperty(exports, "__esModule", { value: true });
+const nedb_1 = require("../nedb");
+const model = {
+    permitFileTransfer({ user_id, file, }) {
         return __awaiter(this, void 0, void 0, function* () {
             const { descriptor, size, pathname } = file;
-            return fileTransferDb.updateAsync({
+            return nedb_1.fileTransfer.updateAsync({
                 user_id,
-                descriptor
+                descriptor,
             }, {
                 $set: {
                     user_id,
                     descriptor,
                     size,
-                    pathname
-                }
+                    pathname,
+                },
             }, {
-                upsert: true
+                upsert: true,
             });
         });
     },
-    /**
-     *
-     * @param {Object} params
-     * @param {String} params.user_id
-     * @param {Number} params.descriptor
-     */
-    forbidFileTransfer({ user_id, descriptor }) {
+    forbidFileTransfer({ user_id, descriptor, }) {
         return __awaiter(this, void 0, void 0, function* () {
-            return fileTransferDb.removeAsync({ user_id, descriptor }, { multi: true });
+            return nedb_1.fileTransfer.removeAsync({ user_id, descriptor }, { multi: true });
         });
     },
-    /**
-     *
-     * @param {Object} params
-     * @param {String} params.user_id
-     * @param {Number} params.descriptor
-     */
-    fileTransferAllowed({ user_id, descriptor }) {
+    fileTransferAllowed({ user_id, descriptor, }) {
         return __awaiter(this, void 0, void 0, function* () {
-            return fileTransferDb.findOneAsync({ user_id, descriptor });
+            return nedb_1.fileTransfer.findOneAsync({ user_id, descriptor });
         });
-    }
+    },
 };
+exports.default = model;

@@ -1,5 +1,5 @@
-import { randomBytes } from "crypto";
-import { Types } from "../types";
+import { randomBytes } from "node:crypto";
+import * as Types from "../types";
 
 /**
  * @param size *2

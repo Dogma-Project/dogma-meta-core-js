@@ -1,8 +1,14 @@
 import DHT from "../modules/dht";
+import connections from "./connections";
 import stateManager from "./state";
-import { Types } from "../types";
+import storage from "./storage";
+import * as Types from "../types";
 
-const dht = new DHT();
+const dht = new DHT({
+  state: stateManager,
+  storage,
+  connections,
+});
 
 stateManager.subscribe(
   [Types.Event.Type.configDhtLookup],

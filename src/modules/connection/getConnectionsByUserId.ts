@@ -1,4 +1,4 @@
-import { Types } from "../../types";
+import * as Types from "../../types";
 import Connections from "../connections";
 import DogmaSocket from "../socket";
 

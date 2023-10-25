@@ -1,6 +1,6 @@
 import args from "./arguments";
 import { DEFAULTS } from "../constants";
-import { Types } from "../types";
+import * as Types from "../types";
 
 /** @module Logger */
 

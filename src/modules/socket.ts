@@ -3,7 +3,7 @@ import EventEmitter from "node:events";
 
 import crypto, { KeyObject } from "node:crypto";
 
-import { Types } from "../types";
+import * as Types from "../types";
 import generateSyncId from "./generateSyncId";
 import logger from "./logger";
 import { DemuxStream, MuxStream, Encryption, Decryption } from "./streams";

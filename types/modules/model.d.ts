@@ -1,9 +1,8 @@
-import Config = require("./models/config");
-import Connection = require("./models/connection");
-import Node = require("./models/node");
-import Protocol = require("./models/protocol");
-import User = require("./models/user");
-import File = require("./models/file");
-import Message = require("./models/message");
-import Sync = require("./models/sync");
-export { Config, Connection, Node, Protocol, User, File, Message, Sync };
+import Config from "./models/config";
+import Node from "./models/node";
+import Protocol from "./models/protocol";
+import User from "./models/user";
+import File from "./models/file";
+import Message from "./models/message";
+import Sync from "./models/sync";
+export { Config, Node, Protocol, User, File, Message, Sync };

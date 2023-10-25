@@ -8,34 +8,45 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const { Node } = require("../model");
-const logger = require("../../logger");
-const { MESSAGES } = require("../constants");
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const model_1 = require("../model");
+const logger_1 = __importDefault(require("../logger"));
+const constants_1 = require("../../constants");
 /** @module NodesController */
 /**
  *
  * @param {Array} nodes
  */
 const validateAndFilterNodes = (nodes) => {
+    // edit
     return nodes.map((node) => {
         const { name, user_id, node_id, public_ipv4, router_port } = node;
-        return { name, user_id, node_id: node_id.toPlainHex(), public_ipv4, router_port };
+        return {
+            name,
+            user_id,
+            node_id: node_id.toPlainHex(),
+            public_ipv4,
+            router_port,
+        };
     });
 };
-const nodes = module.exports = {
+const nodes = {
     /**
-        *
-        * @param {Object} params
-        * @param {String} params.node_id
-        * @param {Object} params.request
-        * @param {String} params.request.type
-        * @param {String} params.request.action
-        * @param {Object} params.request.data
-    */
-    handleRequest({ node_id, request }) {
+     *
+     * @param {Object} params
+     * @param {String} params.node_id
+     * @param {Object} params.request
+     * @param {String} params.request.type
+     * @param {String} params.request.action
+     * @param {Object} params.request.data
+     */
+    handleRequest(node_id, request) {
         return __awaiter(this, void 0, void 0, function* () {
             const { getOwnNodes } = require("../client"); // circular
-            const { data: { from } } = request;
+            const { data: { from }, } = request;
             switch (request.action) {
                 case "get": // store.nodes
                     const connection = require("../connection"); // edit
@@ -46,25 +57,28 @@ const nodes = module.exports = {
                             type: "nodes",
                             action: "update",
                             data: {
-                                nodes: getNodes
-                            }
-                        }, MESSAGES.DIRECT);
+                                nodes: getNodes,
+                            },
+                        }, constants_1.MESSAGES.DIRECT);
                     }
                     catch (err) {
-                        logger.error("nodes controller", err);
+                        logger_1.default.error("nodes controller", err);
                     }
                     break;
                 case "update":
                     if (!request.data || !request.data.nodes)
-                        return logger.warn("NODES", "there's no nodes to persist");
+                        return logger_1.default.warn("NODES", "there's no nodes to persist");
                     const setNodes = validateAndFilterNodes(request.data.nodes);
-                    Node.persistNodes(setNodes).then((result) => {
-                        logger.log("NODES controller", "persist nodes success", result);
-                    }).catch((error) => {
-                        logger.error("NODES controller", "persist nodes error", error);
+                    model_1.Node.persistNodes(setNodes)
+                        .then((result) => {
+                        logger_1.default.log("NODES controller", "persist nodes success", result);
+                    })
+                        .catch((error) => {
+                        logger_1.default.error("NODES controller", "persist nodes error", error);
                     });
                     break;
             }
         });
-    }
+    },
 };
+exports.default = nodes;

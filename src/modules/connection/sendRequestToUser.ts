@@ -1,5 +1,5 @@
 import logger from "../logger";
-import { Types } from "../../types";
+import * as Types from "../../types";
 import Connections from "../connections";
 
 export default function send(

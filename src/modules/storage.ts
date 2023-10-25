@@ -1,4 +1,4 @@
-import { Types } from "../types";
+import * as Types from "../types";
 import args from "./arguments";
 import { DEFAULTS } from "../constants";
 

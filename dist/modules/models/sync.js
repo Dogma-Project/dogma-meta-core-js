@@ -8,27 +8,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const nedb_1 = __importDefault(require("../nedb"));
-const { sync: syncDb } = nedb_1.default;
+const nedb_1 = require("../nedb");
 const model = {
     getAll() {
         return __awaiter(this, void 0, void 0, function* () {
-            return syncDb.findAsync({});
+            return nedb_1.sync.findAsync({});
         });
     },
     get(db, node_id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return syncDb.findOneAsync({ db, node_id });
+            return nedb_1.sync.findOneAsync({ db, node_id });
         });
     },
     confirm(db, node_id) {
         return __awaiter(this, void 0, void 0, function* () {
             const time = new Date().getTime(); // check
-            return syncDb.updateAsync({ db, node_id }, { db, node_id, time }, { upsert: true });
+            return nedb_1.sync.updateAsync({ db, node_id }, { db, node_id, time }, { upsert: true });
         });
     },
 };

@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -12,28 +35,46 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const constants_1 = require("../constants");
-const state_1 = require("../state");
-const nedb_1 = __importDefault(require("../nedb"));
 const generateSyncId_1 = __importDefault(require("../generateSyncId"));
-const logger_1 = __importDefault(require("../../logger"));
-const sync_1 = __importDefault(require("./sync"));
-const { nodes: nodesDb } = nedb_1.default;
-const model = {
+const logger_1 = __importDefault(require("../logger"));
+// import Sync from "./sync";
+const Types = __importStar(require("../../types"));
+const datadir_1 = require("../datadir");
+const nedb_1 = __importDefault(require("@seald-io/nedb"));
+class NodeModel {
+    constructor({ state }) {
+        this.db = new nedb_1.default({
+            filename: datadir_1.nedbDir + "/nodes.db",
+            timestampData: true,
+        });
+        this.stateBridge = state;
+    }
+    init() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                logger_1.default.debug("nedb", "load database", "nodes");
+                yield this.db.loadDatabaseAsync();
+                yield this.db.ensureIndexAsync({
+                    fieldName: "param",
+                    unique: true,
+                });
+                this.stateBridge.emit(Types.Event.Type.nodesDb, Types.System.States.ready);
+            }
+            catch (err) {
+                logger_1.default.error("config.nodes", err);
+            }
+        });
+    }
     getAll() {
         return __awaiter(this, void 0, void 0, function* () {
-            return nodesDb.findAsync({});
+            return this.db.findAsync({});
         });
-    },
-    /**
-     *
-     * @param user_id
-     */
+    }
     getByUserId(user_id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return nodesDb.findAsync({ user_id });
+            return this.db.findAsync({ user_id });
         });
-    },
+    }
     /**
      *
      * @param nodes [{name, node_id, user_id, public_ipv4, router_port}]
@@ -46,16 +87,16 @@ const model = {
                 const { node_id, user_id } = row;
                 if (!row.public_ipv4)
                     delete row.public_ipv4;
-                const exist = yield nodesDb.findOneAsync({ node_id, user_id });
+                const exist = yield this.db.findOneAsync({ node_id, user_id });
                 let result;
                 if (exist && exist.node_id) {
                     if (!exist.sync_id)
                         row.sync_id = (0, generateSyncId_1.default)(5);
-                    result = yield nodesDb.updateAsync({ node_id, user_id }, { $set: row });
+                    result = yield this.db.updateAsync({ node_id, user_id }, { $set: row });
                 }
                 else {
                     const sync_id = (0, generateSyncId_1.default)(5);
-                    result = yield nodesDb.insertAsync(Object.assign(Object.assign({}, row), { sync_id }));
+                    result = yield this.db.insertAsync(Object.assign(Object.assign({}, row), { sync_id }));
                 }
                 return result;
             }
@@ -68,28 +109,21 @@ const model = {
                 for (let i = 0; i < nodes.length; i++) {
                     yield insert(nodes[i]);
                 }
-                (0, state_1.emit)("nodes-db", constants_1.STATES.RELOAD); // downgrade state to reload database
+                this.stateBridge.emit(Types.Event.Type.nodesDb, Types.System.States.reload); // downgrade state to reload database
                 resolve(true);
             }
             catch (err) {
                 reject(err);
             }
         }));
-    },
-    /**
-     *
-     * @param node_id
-     * @param ip
-     */
+    }
     setNodePublicIPv4(node_id, ip) {
         return __awaiter(this, void 0, void 0, function* () {
-            return nodesDb.updateAsync({ node_id }, { $set: { public_ipv4: ip } });
+            return this.db.updateAsync({ node_id }, { $set: { public_ipv4: ip } });
         });
-    },
+    }
     /**
      * @todo delete _id
-     * @param data
-     * @param from node_id
      */
     sync(data, from) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -100,38 +134,16 @@ const model = {
                         logger_1.default.debug("node", "sync", "unknown sync_id", sync_id);
                         continue;
                     }
-                    yield nodesDb.updateAsync({ $or: [{ $and: [{ user_id }, { node_id }] }, { sync_id }] }, row, { upsert: true });
+                    yield this.db.updateAsync({ $or: [{ $and: [{ user_id }, { node_id }] }, { sync_id }] }, row, { upsert: true });
                 }
-                (0, state_1.emit)("nodes-db", constants_1.STATES.RELOAD); // downgrade state to reload database
-                sync_1.default.confirm("nodes", from);
+                this.stateBridge.emit(Types.Event.Type.nodesDb, Types.System.States.reload); // downgrade state to reload database
+                // Sync.confirm("nodes", from);
                 return true;
             }
             catch (err) {
                 return Promise.reject(err);
             }
         });
-    },
-    /**
-     *
-     * @param node_id
-     * @returns
-     */
-    getSync(node_id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const updated = yield sync_1.default.get("nodes", node_id);
-                const time = updated && updated.time ? updated.time : 1;
-                const nedbTime = new Date(time);
-                return nodesDb.findAsync({
-                    sync_id: { $exists: true },
-                    updatedAt: { $gt: nedbTime },
-                });
-            }
-            catch (err) {
-                return Promise.reject(err);
-            }
-        });
-    },
-};
-exports.default = model;
-module.exports = model;
+    }
+}
+exports.default = NodeModel;

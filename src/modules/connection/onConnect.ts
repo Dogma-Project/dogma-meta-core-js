@@ -1,6 +1,6 @@
 import net from "node:net";
 import logger from "../logger";
-import { Types } from "../../types";
+import * as Types from "../../types";
 import ConnectionClass from "../connections";
 import DogmaSocket from "../socket";
 

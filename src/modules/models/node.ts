@@ -1,42 +1,47 @@
-import { emit } from "../state-old";
 import generateSyncId from "../generateSyncId";
 import logger from "../logger";
-import Sync from "./sync";
-import { Types } from "../../types";
+// import Sync from "./sync";
+import * as Types from "../../types";
 import { nedbDir } from "../datadir";
 import Datastore from "@seald-io/nedb";
+import Model from "./_model";
+import StateManager from "../state";
 
-const model = {
-  nodesDb: new Datastore({
+class NodeModel implements Model {
+  stateBridge: StateManager;
+  db: Datastore = new Datastore({
     filename: nedbDir + "/nodes.db",
     timestampData: true,
-  }),
+  });
+
+  constructor({ state }: { state: StateManager }) {
+    this.stateBridge = state;
+  }
 
   async init() {
     try {
       logger.debug("nedb", "load database", "nodes");
-      await this.nodesDb.loadDatabaseAsync();
-      await this.nodesDb.ensureIndexAsync({
+      await this.db.loadDatabaseAsync();
+      await this.db.ensureIndexAsync({
         fieldName: "param",
         unique: true,
       });
-      emit("nodes-db", Types.System.States.ready);
+      this.stateBridge.emit(
+        Types.Event.Type.nodesDb,
+        Types.System.States.ready
+      );
     } catch (err) {
       logger.error("config.nodes", err);
     }
-  },
+  }
 
   async getAll() {
-    return this.nodesDb.findAsync({});
-  },
+    return this.db.findAsync({});
+  }
 
-  /**
-   *
-   * @param user_id
-   */
   async getByUserId(user_id: Types.User.Id) {
-    return this.nodesDb.findAsync({ user_id });
-  },
+    return this.db.findAsync({ user_id });
+  }
 
   /**
    *
@@ -51,17 +56,17 @@ const model = {
         const { node_id, user_id } = row;
         if (!row.public_ipv4) delete row.public_ipv4;
 
-        const exist = await this.nodesDb.findOneAsync({ node_id, user_id });
+        const exist = await this.db.findOneAsync({ node_id, user_id });
         let result;
         if (exist && exist.node_id) {
           if (!exist.sync_id) row.sync_id = generateSyncId(5);
-          result = await this.nodesDb.updateAsync(
+          result = await this.db.updateAsync(
             { node_id, user_id },
             { $set: row }
           );
         } else {
           const sync_id = generateSyncId(5);
-          result = await this.nodesDb.insertAsync({ ...row, sync_id });
+          result = await this.db.insertAsync({ ...row, sync_id });
         }
         return result;
       } catch (err) {
@@ -74,22 +79,20 @@ const model = {
         for (let i = 0; i < nodes.length; i++) {
           await insert(nodes[i]);
         }
-        emit("nodes-db", Types.System.States.reload); // downgrade state to reload database
+        this.stateBridge.emit(
+          Types.Event.Type.nodesDb,
+          Types.System.States.reload
+        ); // downgrade state to reload database
         resolve(true);
       } catch (err) {
         reject(err);
       }
     });
-  },
+  }
 
-  /**
-   *
-   * @param node_id
-   * @param ip
-   */
   async setNodePublicIPv4(node_id: Types.Node.Id, ip: string) {
-    return this.nodesDb.updateAsync({ node_id }, { $set: { public_ipv4: ip } });
-  },
+    return this.db.updateAsync({ node_id }, { $set: { public_ipv4: ip } });
+  }
 
   /**
    * @todo delete _id
@@ -102,38 +105,38 @@ const model = {
           logger.debug("node", "sync", "unknown sync_id", sync_id);
           continue;
         }
-        await this.nodesDb.updateAsync(
+        await this.db.updateAsync(
           { $or: [{ $and: [{ user_id }, { node_id }] }, { sync_id }] },
           row,
           { upsert: true }
         );
       }
-      emit("nodes-db", Types.System.States.reload); // downgrade state to reload database
-      Sync.confirm("nodes", from);
+      this.stateBridge.emit(
+        Types.Event.Type.nodesDb,
+        Types.System.States.reload
+      ); // downgrade state to reload database
+      // Sync.confirm("nodes", from);
       return true;
     } catch (err) {
       return Promise.reject(err);
     }
-  },
+  }
 
-  /**
-   *
-   * @param node_id
-   * @returns
-   */
+  /*
   async getSync(node_id: Types.Node.Id) {
     try {
       const updated = await Sync.get("nodes", node_id);
       const time = updated && updated.time ? updated.time : 1;
       const nedbTime = new Date(time);
-      return this.nodesDb.findAsync({
+      return this.db.findAsync({
         sync_id: { $exists: true },
         updatedAt: { $gt: nedbTime },
       });
     } catch (err) {
       return Promise.reject(err);
     }
-  },
-};
+  }
+  */
+}
 
-export default model;
+export default NodeModel;

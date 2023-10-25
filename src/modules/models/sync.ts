@@ -1,5 +1,5 @@
 import { sync as syncDb } from "../nedb";
-import { Types } from "../../types";
+import * as Types from "../../types";
 
 const model = {
   async getAll() {

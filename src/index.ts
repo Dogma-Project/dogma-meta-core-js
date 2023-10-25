@@ -4,7 +4,6 @@ import "./modules/server";
 import "./modules/client";
 import "./modules/sync"; // edit
 
-import api from "./modules/api";
-import ee from "./components/eventEmitter";
+// import api from "./modules/api";
 
-export { api, ee };
+// export { api };

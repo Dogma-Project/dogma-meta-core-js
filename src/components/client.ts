@@ -3,7 +3,7 @@ import connections from "./connections";
 import localDiscovery from "./localDiscovery";
 import logger from "../modules/logger";
 import dht from "./dht";
-import { Types } from "../types";
+import * as Types from "../types";
 import storage from "./storage";
 import state from "./state";
 import args from "../modules/arguments";

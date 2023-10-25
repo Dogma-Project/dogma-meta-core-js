@@ -1,5 +1,5 @@
 import { fileTransfer as fileTransferDb } from "../nedb";
-import { Types } from "../../types";
+import * as Types from "../../types";
 
 const model = {
   async permitFileTransfer({

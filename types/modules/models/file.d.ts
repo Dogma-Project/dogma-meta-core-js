@@ -1,37 +1,16 @@
-/**
- *
- * @param {Object} params
- * @param {String} params.user_id
- * @param {Object} params.file file description
- * @param {String} params.file.descriptor
- * @param {Number} params.file.size
- * @param {String} params.file.pathname
- */
-export function permitFileTransfer({ user_id, file }: {
-    user_id: string;
-    file: {
-        descriptor: string;
-        size: number;
-        pathname: string;
-    };
-}): Promise<any>;
-/**
- *
- * @param {Object} params
- * @param {String} params.user_id
- * @param {Number} params.descriptor
- */
-export function forbidFileTransfer({ user_id, descriptor }: {
-    user_id: string;
-    descriptor: number;
-}): Promise<any>;
-/**
- *
- * @param {Object} params
- * @param {String} params.user_id
- * @param {Number} params.descriptor
- */
-export function fileTransferAllowed({ user_id, descriptor }: {
-    user_id: string;
-    descriptor: number;
-}): Promise<any>;
+import * as Types from "../../types";
+declare const model: {
+    permitFileTransfer({ user_id, file, }: {
+        user_id: Types.User.Id;
+        file: Types.File.Description;
+    }): Promise<any>;
+    forbidFileTransfer({ user_id, descriptor, }: {
+        user_id: Types.User.Id;
+        descriptor: number;
+    }): Promise<any>;
+    fileTransferAllowed({ user_id, descriptor, }: {
+        user_id: Types.User.Id;
+        descriptor: number;
+    }): Promise<any>;
+};
+export default model;

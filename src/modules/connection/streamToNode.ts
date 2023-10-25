@@ -1,7 +1,7 @@
 import { Connection } from "../model";
 import logger from "../logger";
 import { EncodeStream } from "../streams";
-import { Types } from "../../types";
+import * as Types from "../../types";
 import ConnectionClass from "../connection";
 
 export default async function stream(

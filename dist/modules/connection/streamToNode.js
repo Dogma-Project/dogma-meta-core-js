@@ -8,29 +8,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const { Connection } = require("../model");
-const logger = require("../../logger");
-const { EncodeStream } = require("../streams");
-/**
-* @param {Object} params
-* @param {String} params.node_id
-* @param {Number} params.descriptor
-* @returns {Promise} with Writable Socket Stream
-*/
-module.exports = function ({ node_id, descriptor }) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const model_1 = require("../model");
+const logger_1 = __importDefault(require("../logger"));
+const streams_1 = require("../streams");
+function stream(node_id, descriptor) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const result = yield Connection.getConnDataByNodeId(node_id);
+            const result = yield model_1.Connection.getConnDataByNodeId(node_id);
             if (!result)
-                return logger.warn("connection", "connection id didn't find", node_id); // edit try catch
+                return logger_1.default.warn("connection", "connection id didn't find", node_id); // edit try catch
             const socket = this.peers[result.connection_id];
-            const encoder = new EncodeStream({ highWaterMark: this.highWaterMark, descriptor });
-            encoder.on("error", (err) => logger.error("connection", "stream encode error", err));
+            const encoder = new streams_1.EncodeStream({
+                highWaterMark: this.highWaterMark,
+                descriptor,
+            });
+            encoder.on("error", (err) => logger_1.default.error("connection", "stream encode error", err));
             encoder.pipe(socket.multiplex.files, { end: false }); // edit
             return encoder;
         }
         catch (err) {
-            logger.error("connection", "stream to node error::", err);
+            logger_1.default.error("connection", "stream to node error::", err);
         }
     });
-};
+}
+exports.default = stream;

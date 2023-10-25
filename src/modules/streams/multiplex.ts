@@ -1,6 +1,6 @@
 import internal, { Transform, TransformCallback } from "node:stream";
 import { SIZES } from "../../constants";
-import { Types } from "../../types";
+import * as Types from "../../types";
 
 type MuxStreamParams = {
   substream: number;

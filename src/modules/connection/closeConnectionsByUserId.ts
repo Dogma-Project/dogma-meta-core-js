@@ -1,6 +1,6 @@
 import logger from "../logger";
 import Connections from "../connections";
-import { Types } from "../../types";
+import * as Types from "../../types";
 
 export default function closeConnecion(
   this: Connections,

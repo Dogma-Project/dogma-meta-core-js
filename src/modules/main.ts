@@ -12,7 +12,7 @@ import {
   createNodesTable as cnodes,
 } from "./createDataBase";
 import { Config, User, Node, Protocol } from "./model";
-import { Types } from "../types";
+import * as Types from "../types";
 
 const keysDir = datadir + "/keys";
 

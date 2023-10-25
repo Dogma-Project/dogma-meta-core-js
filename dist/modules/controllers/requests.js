@@ -1,9 +1,12 @@
 "use strict";
-const logger = require("../../logger");
-//
-const FilesController = require("./files");
-const NodesController = require("./nodes");
-const SyncController = require("../sync");
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const logger_1 = __importDefault(require("../logger"));
+const files_1 = __importDefault(require("./files"));
+const nodes_1 = __importDefault(require("./nodes"));
+const sync_1 = __importDefault(require("../sync"));
 /** @module RequestsController */
 /**
  *
@@ -15,22 +18,22 @@ const SyncController = require("../sync");
  * @param {String} params.request.action
  * @param {Object} params.request.data
  */
-const RequestsController = ({ node_id, user_id, request }) => {
+const RequestsController = (node_id, user_id, request) => {
     if (!request || !request.type || !request.action)
-        return logger.warn("requests.js", "unknown request");
+        return logger_1.default.warn("requests.js", "unknown request");
     switch (request.type) {
         case "file":
-            FilesController.handleRequest({ node_id, user_id, request });
+            files_1.default.handleRequest({ node_id, user_id, request });
             break;
         case "nodes":
-            NodesController.handleRequest({ node_id, user_id, request });
+            nodes_1.default.handleRequest({ node_id, user_id, request });
             break;
         case "sync":
-            SyncController.handleRequest({ node_id, user_id, request });
+            sync_1.default.handleRequest({ node_id, user_id, request });
             break;
         default:
-            logger.warn("requests.js", "unknown request type", request);
+            logger_1.default.warn("requests.js", "unknown request type", request);
             break;
     }
 };
-module.exports = RequestsController;
+exports.default = RequestsController;

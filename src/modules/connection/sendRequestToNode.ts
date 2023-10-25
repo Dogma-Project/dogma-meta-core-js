@@ -1,6 +1,6 @@
 import { MSG_CODE } from "../../constants";
 import logger from "../logger";
-import { Types } from "../../types";
+import * as Types from "../../types";
 import Connections from "../connections";
 import response from "./response";
 

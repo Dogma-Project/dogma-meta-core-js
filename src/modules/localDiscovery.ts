@@ -1,7 +1,7 @@
 import dgram from "node:dgram";
 import EventEmitter from "node:events";
 import os from "node:os";
-import { Types } from "../types";
+import * as Types from "../types";
 
 /** @module LocalDiscovery */
 
@@ -73,6 +73,7 @@ class LocalDiscovery extends EventEmitter {
       reuseAddr: true,
     });
   }
+  ts;
 
   startServer() {
     this.server.on("listening", () => {

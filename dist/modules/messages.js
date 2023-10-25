@@ -8,12 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const EventEmitter = require("./eventEmitter");
-const { Message } = require("./model");
-const generateSyncId = require("./generateSyncId");
-const { emit } = require("./state");
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const eventEmitter_1 = __importDefault(require("../components/eventEmitter"));
+const model_1 = require("./model");
+const generateSyncId_1 = __importDefault(require("./generateSyncId"));
+const state_old_1 = require("./state-old");
 /** @module Messages */
-module.exports = {
+const messages = {
     /**
      *
      * @param {Object} params
@@ -26,13 +30,14 @@ module.exports = {
      */
     commit: ({ id, text, files, direction, format, type }) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const sync_id = generateSyncId(6);
+            const sync_id = (0, generateSyncId_1.default)(6);
             const data = { id, sync_id, text, files, direction, format, type };
-            yield Message.push(data);
+            yield model_1.Message.push(data);
             if (data.type)
-                emit("new-message", data); // check
+                (0, state_old_1.emit)("new-message", data); // check
             const time = new Date().getTime();
-            EventEmitter.emit("messages", {
+            eventEmitter_1.default.emit("messages", {
+                // return to own node
                 code: 1,
                 data: Object.assign({ createdAt: time }, data),
             });
@@ -43,3 +48,4 @@ module.exports = {
         }
     }),
 };
+exports.default = messages;

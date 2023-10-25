@@ -1,18 +1,16 @@
-export = BufferToStream;
-declare class BufferToStream extends Readable {
-    /**
-     *
-     * @param {Object} opt
-     * @param {Buffer} opt.buffer
-     * @param {Number} opt.chunkSize
-     */
-    constructor(opt: {
-        buffer: Buffer;
-        chunkSize: number;
-    });
+/// <reference types="node" />
+/// <reference types="node" />
+import internal, { Readable } from "node:stream";
+type BufferToStreamParams = {
     buffer: Buffer;
     chunkSize: number;
+    opts?: internal.ReadableOptions | undefined;
+};
+declare class BufferToStream extends Readable {
     byte: number;
+    buffer: Buffer;
+    chunkSize: number;
+    constructor(params: BufferToStreamParams);
     _read(): void;
 }
-import { Readable } from "stream";
+export default BufferToStream;

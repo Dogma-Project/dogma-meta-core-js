@@ -1,5 +1,3 @@
-declare function _exports({ node_id, descriptor }: {
-    node_id: string;
-    descriptor: number;
-}): Promise<any>;
-export = _exports;
+import * as Types from "../../types";
+import ConnectionClass from "../connection";
+export default function stream(this: ConnectionClass, node_id: Types.Node.Id, descriptor: number): Promise<any>;

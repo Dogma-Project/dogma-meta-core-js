@@ -1,10 +1,3 @@
-/** @module Constants */
-
-/**
- * @constant
- * @type {Object}
- * @default see sources
- */
 export const API = {
   OK: 1,
   CANNOTGETCERT: 1001,

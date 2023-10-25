@@ -1,6 +1,6 @@
 import EventEmitter from "node:events";
 import logger from "./logger";
-import { Types } from "../types";
+import * as Types from "../types";
 import { Document } from "@seald-io/nedb";
 import Storage from "./storage";
 import DogmaSocket from "./socket";

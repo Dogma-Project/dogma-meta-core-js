@@ -10,7 +10,7 @@ import {
   getConnectionByNodeId,
   getConnectionsByUserId,
 } from "./connection/index";
-import { Types } from "../types";
+import * as Types from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
 

@@ -1,6 +1,3 @@
-declare function _exports(node_id: string, request: {
-    type: string;
-    action: string;
-    data: any;
-}, type?: number): Promise<any>;
-export = _exports;
+import * as Types from "../../types";
+import Connections from "../connections";
+export default function send(this: Connections, request: Types.Request, node_id: Types.Node.Id): Types.Response.Main | undefined;

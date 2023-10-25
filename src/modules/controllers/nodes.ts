@@ -1,7 +1,7 @@
 import { Node } from "../model";
 import logger from "../logger";
 import { MESSAGES } from "../../constants";
-import { Types } from "../../types";
+import * as Types from "../../types";
 
 /** @module NodesController */
 

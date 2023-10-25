@@ -1,23 +1,57 @@
-import { messages as messagesDb } from "../nedb";
-import { MESSAGES } from "../../constants";
-import Sync from "./sync";
+import StateManager from "../state";
+import Model from "./_model";
+import { nedbDir } from "../datadir";
+import Datastore from "@seald-io/nedb";
+import logger from "../logger";
+import * as Types from "../../types";
 
-const model = {
-  async getAll(type: number) {
+class MessageModel implements Model {
+  stateBridge: StateManager;
+  db: Datastore = new Datastore({
+    filename: nedbDir + "/messages.db",
+    timestampData: true,
+  });
+
+  constructor({ state }: { state: StateManager }) {
+    this.stateBridge = state;
+  }
+
+  async init() {
+    try {
+      logger.debug("nedb", "load database", "messages");
+      await this.db.loadDatabaseAsync();
+      await this.db.ensureIndexAsync({
+        fieldName: "sync_id",
+        unique: true,
+      });
+      this.stateBridge.emit(
+        Types.Event.Type.messagesDb,
+        Types.System.States.ready
+      );
+    } catch (err) {
+      logger.error("messages.nedb", err);
+    }
+  }
+
+  async getAll() {
+    return this.db.findAsync({});
+  }
+
+  async getAllByType(type: number) {
     // edit type
-    return messagesDb.findAsync({ type }).sort({ createdAt: 1 });
-  },
+    return this.db.findAsync({ type }).sort({ createdAt: 1 });
+  }
 
   async get({ id, since, type }: { id: string; since: number; type: number }) {
     // edit types
-    return messagesDb.findAsync({ type, id }).sort({ createdAt: 1 });
-  },
+    return this.db.findAsync({ type, id }).sort({ createdAt: 1 });
+  }
 
   async getStatus({ id, type }: { id: string; type: number }) {
     // edit types
     try {
       // return messagesDb.findAsync({ type, id }).sort({ createdAt: -1 }).limit(1);
-      const message = await messagesDb
+      const message = await this.db
         .findOneAsync({ type, id })
         .sort({ createdAt: -1 });
       const text = message ? message.text || (message.files && "File") : "...";
@@ -30,28 +64,19 @@ const model = {
     } catch (err) {
       return Promise.reject(err);
     }
-  },
+  }
 
-  /**
-   *
-   * @param {Object} params
-   * @param {String} params.id
-   * @param {String} params.message
-   * @param {String} params.sync_id
-   * @param {Number} params.direction
-   * @param {Number} params.format
-   * @param {Number} params.type
-   */
-  async push(params) {
-    params.type = params.type || MESSAGES.DIRECT;
-    return messagesDb.insertAsync(params);
-  },
+  async push(params: Types.Message.Model) {
+    params.type = params.type || Types.Message.Type.direct;
+    return this.db.insertAsync(params);
+  }
 
   /**
    *
    * @param {Array} data
    * @param {String} from node_id
    */
+  /*
   async sync(data, from) {
     try {
       for (const row of data) {
@@ -68,13 +93,16 @@ const model = {
     } catch (err) {
       return Promise.reject(err);
     }
-  },
+  }
+  */
 
   /**
    *
    * @param {String} node_id
    * @returns
    */
+
+  /*
   async getSync(node_id) {
     try {
       const updated = await Sync.get("messages", node_id);
@@ -88,7 +116,8 @@ const model = {
     } catch (err) {
       return Promise.reject(err);
     }
-  },
-};
+  }
+  */
+}
 
-export default model;
+export default MessageModel;

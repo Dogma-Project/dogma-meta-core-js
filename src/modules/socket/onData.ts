@@ -1,4 +1,4 @@
-import { Types } from "../../types";
+import * as Types from "../../types";
 import logger from "../logger";
 import DogmaSocket from "../socket";
 

@@ -2,7 +2,7 @@ import Server from "../modules/server";
 import connections from "./connections";
 import stateManager from "./state";
 import storage from "./storage";
-import { Types } from "../types";
+import * as Types from "../types";
 import connectionTester from "../modules/connectionTester";
 
 const server = new Server({ connections, storage, state: stateManager });

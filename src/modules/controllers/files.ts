@@ -6,7 +6,7 @@ import EventEmitter from "../../components/eventEmitter";
 import { datadir } from "../datadir";
 import { DIRECTION, MESSAGES } from "../../constants";
 import generateSyncId from "../generateSyncId";
-import { Types } from "../../types";
+import * as Types from "../../types";
 
 /** @module FilesController */
 

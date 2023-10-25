@@ -3,7 +3,7 @@ import { subscribe } from "./state-old";
 import { Message, User, Node, Connection } from "./model";
 import { store } from "./main";
 import { MESSAGES } from "../constants";
-import { Types } from "../types";
+import * as Types from "../types";
 
 const sync = {
   handled: {

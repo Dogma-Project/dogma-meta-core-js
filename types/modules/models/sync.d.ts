@@ -1,4 +1,4 @@
-import { Types } from "../types";
+import * as Types from "../../types";
 declare const model: {
     getAll(): Promise<any>;
     get(db: string, node_id: Types.Node.Id): Promise<any>;

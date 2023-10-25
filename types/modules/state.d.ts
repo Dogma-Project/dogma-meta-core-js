@@ -1,19 +1,25 @@
-type DogmaEventAction = "update" | "set";
-type DogmaEventPayload = any;
-type DogmaEventType = string;
-type DogmaEventListener = (action: DogmaEventAction, payload: DogmaEventPayload, type: DogmaEventType) => void;
-/** @module State */
-/**
- *
- * @param type array of events
- * @param callback (action, value, type)
- */
-export declare const subscribe: (type: DogmaEventType[], callback: DogmaEventListener) => void;
-/**
- *
- * @param type
- * @param payload Any payload | or Boolean "true" for forced emit
- */
-export declare const emit: (type: DogmaEventType, payload: any | boolean) => void;
-export declare const services: any;
-export {};
+/// <reference types="node" />
+import * as Types from "../types";
+declare class StateManager {
+    private _services;
+    private _servicesHandler;
+    private listeners;
+    state: any[];
+    services: {
+        [index: string]: Types.System.States;
+        [index: symbol]: Types.System.States;
+    };
+    /**
+     *
+     * @param type array of events
+     * @param callback (action, value, type)
+     */
+    subscribe: (type: Types.Event.Type[], callback: Types.Event.Listenter) => void;
+    /**
+     *
+     * @param type
+     * @param payload Any payload | or Boolean "true" for forced emit
+     */
+    emit: (type: Types.Event.Type, payload: any | boolean) => void;
+}
+export default StateManager;

@@ -1,6 +1,6 @@
 import { Config, User, Node, Protocol } from "./model";
 import { PROTOCOL } from "../constants";
-import { Types } from "../types";
+import * as Types from "../types";
 
 /** @module CreateDataBase */
 

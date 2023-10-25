@@ -8,23 +8,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const { protocol: protocolDb } = require("../nedb");
-const model = module.exports = {
+Object.defineProperty(exports, "__esModule", { value: true });
+const nedb_1 = require("../nedb");
+const model = {
     getAll() {
         return __awaiter(this, void 0, void 0, function* () {
-            return protocolDb.findAsync({});
+            return nedb_1.protocol.findAsync({});
         });
     },
-    /**
-     *
-     * @param {Object} protocol { param1: value1, param2: value2... }
-     * @returns {Promise}
-     */
     persistProtocol(protocol) {
         const insert = (row) => {
             return new Promise((resolve, reject) => {
                 const { name } = row;
-                protocolDb.update({ name }, row, { upsert: true }, (err, result) => {
+                nedb_1.protocol.update({ name }, row, { upsert: true }, (err, result) => {
                     if (err)
                         return reject(err);
                     resolve(result);
@@ -34,7 +30,7 @@ const model = module.exports = {
         const newObject = Object.keys(protocol).map((key) => {
             return {
                 name: key,
-                value: protocol[key]
+                value: protocol[key],
             };
         });
         return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
@@ -49,3 +45,4 @@ const model = module.exports = {
         }));
     },
 };
+exports.default = model;

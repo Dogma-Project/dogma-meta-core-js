@@ -1,3 +1,3 @@
-import LocalDiscovery from "../libs/localDiscovery";
+import LocalDiscovery from "../modules/localDiscovery";
 declare const disc: LocalDiscovery;
 export default disc;

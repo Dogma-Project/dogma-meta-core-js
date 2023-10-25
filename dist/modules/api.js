@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,17 +31,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const crypt = require("./crypt");
-const { createDataBase } = require("./routines/createDataBase");
-const { store } = require("./store");
-const generateMasterKeys = require("./routines/generateMasterKeys");
-const generateNodeKeys = require("./routines/generateNodeKeys");
-const { services } = require("./state");
-const { API: c, MESSAGES } = require("./constants"); // edit
-const FilesController = require("./controllers/files");
-const logger = require("../logger");
-const connection = require("./connection");
-const { Connection, Config, User, Message } = require("./model");
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const crypt = __importStar(require("./crypto"));
+const createDataBase_1 = require("./createDataBase");
+const main_1 = require("./main");
+const generateMasterKeys_1 = __importDefault(require("./generateMasterKeys"));
+const generateNodeKeys_1 = __importDefault(require("./generateNodeKeys"));
+const state_old_1 = require("./state-old");
+const constants_1 = require("../constants");
+const files_1 = __importDefault(require("./controllers/files"));
+const logger_1 = __importDefault(require("./logger"));
+const connection = __importStar(require("./connection"));
+const model_1 = require("./model");
 /** @module GeneralApi */
 /**
  *
@@ -30,7 +57,7 @@ const response = (code, data) => {
     data = data || null;
     return {
         code,
-        data
+        data,
     };
 };
 /**
@@ -39,11 +66,12 @@ const response = (code, data) => {
  * @returns {Object}
  */
 const getFriends = (_store) => __awaiter(void 0, void 0, void 0, function* () {
+    // edit
     if (!_store || !_store.users || !_store.nodes)
-        logger.warn("api", "empty store");
+        logger_1.default.warn("api", "empty store");
     let object = [];
     let usersKeys = {};
-    object = store.users.map((user, i) => {
+    object = main_1.store.users.map((user, i) => {
         delete user.cert;
         user.nodes = [];
         usersKeys[user.user_id] = i;
@@ -57,18 +85,21 @@ const getFriends = (_store) => __awaiter(void 0, void 0, void 0, function* () {
             object[i].nodes.push({
                 name: node.name,
                 node_id: node.node_id,
-                online
+                online,
             });
         }
     });
-    object = object.map(item => {
-        const online = item.nodes.filter(x => !!x.online);
+    object = object.map((item) => {
+        const online = item.nodes.filter((x) => !!x.online);
         item.onlineCount = online.length;
         return item;
     });
     for (let friend of object) {
         const { user_id } = friend;
-        friend.messages = yield Message.getStatus({ id: user_id, type: MESSAGES.USER });
+        friend.messages = yield model_1.Message.getStatus({
+            id: user_id,
+            type: constants_1.MESSAGES.USER,
+        });
     }
     return object;
 });
@@ -78,16 +109,16 @@ module.exports.certificate = {
      */
     get: () => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const result = yield crypt.getDogmaCertificate(store);
-            return response(c.OK, result);
+            const result = yield crypt.getDogmaCertificate(main_1.store);
+            return response(constants_1.API.OK, result);
         }
         catch (err) {
-            logger.error("api certificate", "get 2", err);
-            return response(c.CANNOTGETCERT, err);
+            logger_1.default.error("api certificate", "get 2", err);
+            return response(constants_1.API.CANNOTGETCERT, err);
         }
     }),
     set: () => {
-        logger.log("api certificate", "set", "nothing to do");
+        logger_1.default.log("api certificate", "set", "nothing to do");
     },
     /**
      *
@@ -95,24 +126,23 @@ module.exports.certificate = {
      * @returns {Object} result
      */
     push: (cert) => __awaiter(void 0, void 0, void 0, function* () {
-        const parsed = crypt.validateDogmaCertificate(cert, store.user.id);
+        const parsed = crypt.validateDogmaCertificate(cert, main_1.store.user.id);
         if (parsed.result) {
             const result = yield crypt.addDogmaCertificate(parsed);
             if (result) {
-                return response(c.OK, result);
+                return response(constants_1.API.OK, result);
             }
             else {
-                return response(c.ADDCERTERROR); // add message
+                return response(constants_1.API.ADDCERTERROR); // add message
             }
         }
         else {
-            return response(c.INVALIDCERT, parsed.error);
+            return response(constants_1.API.INVALIDCERT, parsed.error);
         }
-    })
+    }),
 };
 module.exports.database = {
-    get: () => {
-    },
+    get: () => { },
     /**
      *
      * @param {Object} store
@@ -130,24 +160,24 @@ module.exports.database = {
      */
     set: (defaults) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const result = yield createDataBase(store, defaults);
-            return response(c.OK, result);
+            const result = yield (0, createDataBase_1.createDataBase)(main_1.store, defaults);
+            return response(constants_1.API.OK, result);
         }
         catch (err) {
-            logger.error("API database", "set", err);
-            return response(c.CREATEDBERROR, err); // edit
+            logger_1.default.error("API database", "set", err);
+            return response(constants_1.API.CREATEDBERROR, err); // edit
         }
-    })
+    }),
 };
 module.exports.config = {
     get: () => {
         try {
-            const result = store.config;
-            return response(c.OK, result);
+            const result = main_1.store.config;
+            return response(constants_1.API.OK, result);
         }
         catch (err) {
-            logger.error("API config", "get", err);
-            return response(c.GETCONFIGERROR, err);
+            logger_1.default.error("API config", "get", err);
+            return response(constants_1.API.GETCONFIGERROR, err);
         }
     },
     /**
@@ -157,14 +187,14 @@ module.exports.config = {
      */
     set: (data) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const result = yield Config.persistConfig(data);
-            return response(c.OK, result);
+            const result = yield model_1.Config.persistConfig(data);
+            return response(constants_1.API.OK, result);
         }
         catch (err) {
-            logger.error("API config", "set", err);
-            return response(c.CONFIGSAVEERROR, err);
+            logger_1.default.error("API config", "set", err);
+            return response(constants_1.API.CONFIGSAVEERROR, err);
         }
-    })
+    }),
 };
 module.exports.messages = {
     /**
@@ -177,11 +207,11 @@ module.exports.messages = {
      */
     get: (params) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const result = yield Message.get(params);
-            return response(c.OK, result);
+            const result = yield model_1.Message.get(params);
+            return response(constants_1.API.OK, result);
         }
         catch (err) {
-            return response(c.CANNOTGETDM, err); // edit
+            return response(constants_1.API.CANNOTGETDM, err); // edit
         }
     }),
     /**
@@ -195,25 +225,25 @@ module.exports.messages = {
         try {
             const { to, message, type } = data;
             const result = yield connection.sendMessage(to, message, type);
-            return response(c.OK, result);
+            return response(constants_1.API.OK, result);
         }
         catch (err) {
-            return response(c.CANNOTPUSHMSG, err);
+            return response(constants_1.API.CANNOTPUSHMSG, err);
         }
-    })
+    }),
 };
 module.exports.friends = {
     get: () => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const result = yield getFriends(store);
-            return response(c.OK, result);
+            const result = yield getFriends(main_1.store);
+            return response(constants_1.API.OK, result);
         }
         catch (err) {
-            return response(c.CANNOTGETFRIENDS, err);
+            return response(constants_1.API.CANNOTGETFRIENDS, err);
         }
     }),
     set: () => {
-        logger.warn("api friends", "set", "do nothing");
+        logger_1.default.warn("api friends", "set", "do nothing");
     },
     /**
      *
@@ -221,49 +251,47 @@ module.exports.friends = {
      */
     delete: (user_id) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            if (store.user.id === user_id)
-                return response(c.CANNOTDELETEITSELF, user_id);
-            const result = yield User.removeUser(user_id);
-            return response(c.OK, result);
+            if (main_1.store.user.id === user_id)
+                return response(constants_1.API.CANNOTDELETEITSELF, user_id);
+            const result = yield model_1.User.removeUser(user_id);
+            return response(constants_1.API.OK, result);
         }
         catch (err) {
-            return response(c.CANNOTDELETEFRIEND, err);
+            return response(constants_1.API.CANNOTDELETEFRIEND, err);
         }
-    })
+    }),
 };
 module.exports.masterKey = {
-    get: () => {
-    },
+    get: () => { },
     /**
      *
      * @param {Object} params
      */
     set: (params) => {
-        const result = generateMasterKeys(store, params);
+        const result = (0, generateMasterKeys_1.default)(main_1.store, params);
         if (result.result) {
-            return response(c.OK);
+            return response(constants_1.API.OK);
         }
         else {
-            return response(c.CANNOTCREATEMK, result.error);
+            return response(constants_1.API.CANNOTCREATEMK, result.error);
         }
-    }
+    },
 };
 module.exports.nodeKey = {
-    get: () => {
-    },
+    get: () => { },
     /**
      *
      * @param {Object} params
      */
     set: (params) => {
-        const result = generateNodeKeys(store, params);
+        const result = (0, generateNodeKeys_1.default)(main_1.store, params);
         if (result.result) {
-            return response(c.OK);
+            return response(constants_1.API.OK);
         }
         else {
-            return response(c.CANNOTCREATENK, result.error);
+            return response(constants_1.API.CANNOTCREATENK, result.error);
         }
-    }
+    },
 };
 module.exports.services = {
     /**
@@ -271,16 +299,15 @@ module.exports.services = {
      */
     get: () => {
         try {
-            const result = JSON.parse(JSON.stringify(services));
-            return response(c.OK, result);
+            const result = JSON.parse(JSON.stringify(state_old_1.services));
+            return response(constants_1.API.OK, result);
         }
         catch (err) {
-            logger.error("API services", "get", err);
-            return response(c.CANNOTGETSERVICES, err);
+            logger_1.default.error("API services", "get", err);
+            return response(constants_1.API.CANNOTGETSERVICES, err);
         }
     },
-    set: () => {
-    }
+    set: () => { },
 };
 module.exports.files = {
     /**
@@ -288,14 +315,20 @@ module.exports.files = {
      * @param {Object} params to, type, request{type, action, [data]}
      */
     get: (params) => __awaiter(void 0, void 0, void 0, function* () {
-        const { to, request, type, request: { data: { descriptor, title, size } } } = params;
+        const { to, request, type, request: { data: { descriptor, title, size }, }, } = params;
         try {
-            yield FilesController.permitFileDownload({ to, type, descriptor, title, size });
+            yield files_1.default.permitFileDownload({
+                to,
+                type,
+                descriptor,
+                title,
+                size,
+            });
             const result = yield connection.sendRequest(to, request, type);
-            return response(c.OK, result);
+            return response(constants_1.API.OK, result);
         }
         catch (err) {
-            return response(c.OK, err); // edit
+            return response(constants_1.API.OK, err); // edit
         }
     }),
     /**
@@ -311,24 +344,23 @@ module.exports.files = {
      * @param {Object} params
      */
     delete: (params) => {
-        logger.debug("api files", "delete", params);
-    }
+        logger_1.default.debug("api files", "delete", params);
+    },
 };
 module.exports.connections = {
     get: () => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const result = yield Connection.getConnections();
-            return response(c.OK, result);
+            const result = yield model_1.Connection.getConnections();
+            return response(constants_1.API.OK, result);
         }
         catch (err) {
-            logger.error("API connections", "get", err);
-            return response(c.CANNOTGETCONNECTIONS, err);
+            logger_1.default.error("API connections", "get", err);
+            return response(constants_1.API.CANNOTGETCONNECTIONS, err);
         }
     }),
     /**
      *
      * @param {String} id connection id
      */
-    delete: (id) => {
-    }
+    delete: (id) => { },
 };

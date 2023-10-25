@@ -8,16 +8,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const logger = require("../logger");
-const { subscribe } = require("./state");
-const { Message, User, Node, Connection } = require("./model");
-const { store } = require("./store");
-const { MESSAGES } = require("./constants");
-const sync = module.exports = {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const logger_1 = __importDefault(require("./logger"));
+const state_old_1 = require("./state-old");
+const model_1 = require("./model");
+const main_1 = require("./main");
+const constants_1 = require("../constants");
+const sync = {
     handled: {
-        messages: Message,
-        users: User,
-        nodes: Node
+        messages: model_1.Message,
+        users: model_1.User,
+        nodes: model_1.Node,
     },
     state: [],
     /**
@@ -38,25 +42,19 @@ const sync = module.exports = {
                         action: "update",
                         data: {
                             type,
-                            payload: result
-                        }
+                            payload: result,
+                        },
                     });
                 }
                 else {
-                    logger.warn("sync", "unhandled type", type);
+                    logger_1.default.warn("sync", "unhandled type", type);
                 }
             }
             catch (err) {
-                logger.error("sync", "get", err);
+                logger_1.default.error("sync", "get", err);
             }
         });
     },
-    /**
-     *
-     * @param {String} node_id
-     * @param {String} type
-     * @param {Object} payload
-     */
     update(node_id, type, payload) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -67,7 +65,7 @@ const sync = module.exports = {
                 }
             }
             catch (err) {
-                logger.error("sync", "update", err);
+                logger_1.default.error("sync", "update", err);
             }
         });
     },
@@ -83,8 +81,8 @@ const sync = module.exports = {
         connection.sendRequest(node_id, {
             type: "sync",
             action,
-            data: data || {}
-        }, MESSAGES.DIRECT);
+            data: data || {},
+        }, constants_1.MESSAGES.DIRECT);
     },
     /**
      *
@@ -98,10 +96,10 @@ const sync = module.exports = {
      * @param {Array} params.request.data.payload
      */
     handleRequest({ node_id, user_id, request }) {
-        if (store.user.id !== user_id)
-            return logger.warn("sync", "handle request", "request from not own user");
+        if (main_1.store.user.id !== user_id)
+            return logger_1.default.warn("sync", "handle request", "request from not own user");
         try {
-            const { action, data: { type, payload } } = request;
+            const { action, data: { type, payload }, } = request;
             switch (action) {
                 case "get":
                     sync.get(node_id, type);
@@ -112,9 +110,9 @@ const sync = module.exports = {
             }
         }
         catch (err) {
-            logger.error("sync", err);
+            logger_1.default.error("sync", err);
         }
-    }
+    },
 };
 // subscribe(["sync-db"], async (action, value, type) => {
 //     if (value < STATES.LIMITED) {
@@ -125,7 +123,7 @@ const sync = module.exports = {
 //     } else if (value === STATES.FULL) {
 //     }
 // });
-subscribe(["online"], (_action, value, _type) => {
+(0, state_old_1.subscribe)(["online"], (_action, value, _type) => {
     const { node_id, own, mySelf } = value;
     if (own && !mySelf) {
         for (const key in sync.handled) {
@@ -133,39 +131,40 @@ subscribe(["online"], (_action, value, _type) => {
                 node_id,
                 action: "get",
                 data: {
-                    type: key
-                }
+                    type: key,
+                },
             });
         }
     }
 });
-subscribe(["nodes", "users"], (_action, _value, type) => __awaiter(void 0, void 0, void 0, function* () {
+(0, state_old_1.subscribe)(["nodes", "users"], (_action, _value, type) => __awaiter(void 0, void 0, void 0, function* () {
     // logger.debug("sync", "resync", action, type);
-    const nodes = yield Connection.getUserOnlineNodes(store.user.id);
+    const nodes = yield model_1.Connection.getUserOnlineNodes(main_1.store.user.id);
     nodes.forEach((node_id) => {
-        if (node_id === store.node.id)
+        if (node_id === main_1.store.node.id)
             return; // don't send to yourself
         sync.get(node_id, type);
     });
 }));
-subscribe(["new-message"], (_action, value, _type) => __awaiter(void 0, void 0, void 0, function* () {
+(0, state_old_1.subscribe)(["new-message"], (_action, value, _type) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // logger.debug("sync", "resync", action, type);
-        const nodes = yield Connection.getUserOnlineNodes(store.user.id);
+        const nodes = yield model_1.Connection.getUserOnlineNodes(main_1.store.user.id);
         nodes.forEach((node_id) => {
-            if (node_id === store.node.id)
+            if (node_id === main_1.store.node.id)
                 return; // don't send to yourself
             sync.request({
                 node_id,
                 action: "update",
                 data: {
                     type: "messages",
-                    payload: [value]
-                }
+                    payload: [value],
+                },
             });
         });
     }
     catch (err) {
-        logger.error("sync", "broadcastUpdate", err);
+        logger_1.default.error("sync", "broadcastUpdate", err);
     }
 }));
+exports.default = sync;

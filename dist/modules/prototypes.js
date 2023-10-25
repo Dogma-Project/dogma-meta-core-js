@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const logger_1 = __importDefault(require("../logger"));
+const logger_1 = __importDefault(require("./logger"));
 String.prototype.toPlainHex = function () {
     try {
         const value = this;
@@ -25,5 +25,4 @@ Array.prototype.unique = function () {
         return [];
     }
 };
-module.exports = { String, Array };
 exports.default = { String, Array };

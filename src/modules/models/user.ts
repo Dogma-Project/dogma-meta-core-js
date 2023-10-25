@@ -1,79 +1,87 @@
-import { emit } from "../state-old";
-// import { users as usersDb, nodes as nodesDb } from "../nedb";
 import generateSyncId from "../generateSyncId";
-import Sync from "./sync";
-import { Types } from "../../types";
+import * as Types from "../../types";
 import logger from "../logger";
 import { nedbDir } from "../datadir";
 import Datastore from "@seald-io/nedb";
+import Model from "./_model";
+import StateManager from "../state";
 
-const model = {
-  usersDb: new Datastore({
+class UserModel implements Model {
+  stateBridge: StateManager;
+  db: Datastore = new Datastore({
     filename: nedbDir + "/users.db",
     timestampData: true,
-  }),
+  });
+
+  constructor({ state }: { state: StateManager }) {
+    this.stateBridge = state;
+  }
 
   async init() {
     try {
       logger.debug("nedb", "load database", "users");
-      await this.usersDb.loadDatabaseAsync();
-      // await this.usersDb.ensureIndexAsync({
-      //   fieldName: "user_id",
-      //   unique: true,
-      // });
-      emit("users-db", Types.System.States.ready);
+      await this.db.loadDatabaseAsync();
+      await this.db.ensureIndexAsync({
+        fieldName: "user_id",
+        unique: true,
+      });
+      this.stateBridge.emit(
+        Types.Event.Type.usersDb,
+        Types.System.States.ready
+      );
     } catch (err) {
       logger.error("users.nedb", err);
     }
-  },
+  }
 
   async getAll() {
-    return this.usersDb.findAsync({});
-  },
+    return this.db.findAsync({});
+  }
 
-  /**
-   *
-   * @param {Object} user
-   * @param {String} user.name
-   * @param {String} user.user_id
-   * @param {String} user.cert
-   * @param {Number} user.type
-   * @returns {Promise}
-   */
   async persistUser(user: Types.User.Model) {
     try {
       const { user_id } = user;
-      emit("update-user", user_id);
-      const exist = await this.usersDb.findOneAsync({ user_id });
+      this.stateBridge.emit(Types.Event.Type.usersDb, user_id);
+      const exist = await this.db.findOneAsync({ user_id });
       const sync_id = generateSyncId(5);
       let result;
       if (exist && exist.user_id) {
         if (!exist.sync_id) user.sync_id = sync_id;
-        result = await this.usersDb.updateAsync({ user_id }, { $set: user });
+        result = await this.db.updateAsync({ user_id }, { $set: user });
       } else {
-        result = await this.usersDb.insertAsync({ ...user, sync_id });
+        result = await this.db.insertAsync({ ...user, sync_id });
       }
-      emit("users-db", Types.System.States.reload); // downgrade state to reload database
+      this.stateBridge.emit(
+        Types.Event.Type.usersDb,
+        Types.System.States.reload
+      ); // downgrade state to reload database
       return result;
     } catch (err) {
       return Promise.reject(err);
     }
-  },
+  }
 
   /**
    * @todo set to deleted state instead of remove
    */
   async removeUser(user_id: Types.User.Id) {
     try {
-      await this.usersDb.removeAsync({ user_id }, { multi: true });
-      emit("users-db", Types.System.States.reload); // downgrade state to reload database
-      // await nodesDb.removeAsync({ user_id }, { multi: true });
-      emit("nodes-db", Types.System.States.reload); // downgrade state to reload database
+      await this.db.removeAsync({ user_id }, { multi: true });
+      this.stateBridge.emit(
+        Types.Event.Type.usersDb,
+        Types.System.States.reload
+      ); // downgrade state to reload database
+
+      /*
+      await nodesDb.removeAsync({ user_id }, { multi: true });
+      this.stateBridge.emit("nodes-db", Types.System.States.reload); // downgrade state to reload database
+      */
+
       return true;
     } catch (err) {
       return Promise.reject(err);
     }
-  },
+  }
 
   /**
    * @todo delete _id
@@ -87,21 +95,20 @@ const model = {
           continue;
         }
         // delete row._id;
-        await this.usersDb.updateAsync(
-          { $or: [{ user_id }, { sync_id }] },
-          row,
-          {
-            upsert: true,
-          }
-        );
+        await this.db.updateAsync({ $or: [{ user_id }, { sync_id }] }, row, {
+          upsert: true,
+        });
       }
-      emit("users-db", Types.System.States.reload); // downgrade state to reload database
-      Sync.confirm("users", from);
+      this.stateBridge.emit(
+        Types.Event.Type.usersDb,
+        Types.System.States.reload
+      ); // downgrade state to reload database
+      // Sync.confirm("users", from);
       return true;
     } catch (err) {
       return Promise.reject(err);
     }
-  },
+  }
 
   //   /**
   //    *
@@ -121,6 +128,6 @@ const model = {
   //       return Promise.reject(err);
   //     }
   //     },
-};
+}
 
-export default model;
+export default UserModel;

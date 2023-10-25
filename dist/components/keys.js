@@ -1,57 +1,83 @@
 "use strict";
-subscribe(["master-key"], () => {
-    services.masterKey = STATES.FULL;
-});
-subscribe(["node-key"], () => {
-    services.nodeKey = STATES.FULL;
-});
-/**
- *
- */
-const getKeys = () => {
-    if (!store.user.key) {
-        try {
-            store.user.key = fs.readFileSync(keysDir + "/key.pem");
-            store.user.cert = fs.readFileSync(keysDir + "/cert.pem");
-            const id = crypt.getPublicCertHash(store.user.cert.toString()); // edit
-            if (id === undefined)
-                throw "unknown cert"; // edit
-            store.user.id = id;
-            emit("master-key", store.user);
-        }
-        catch (e) {
-            logger.log("store", "MASTER KEYS NOT FOUND");
-            services.masterKey = STATES.READY; // edit
-        }
-        /** @todo check result! */
-        if (services.masterKey === STATES.READY && args.auto)
-            generateMasterKeys(store, {
-                name: args.master || DEFAULTS.USER_NAME,
-                keylength: 2048, // edit
-            });
-    }
-    if (!store.node.key) {
-        try {
-            store.node.key = fs.readFileSync(keysDir + "/node-key.pem");
-            store.node.cert = fs.readFileSync(keysDir + "/node-cert.pem");
-            const id = crypt.getPublicCertHash(store.node.cert.toString());
-            if (id === undefined)
-                throw "unknown cert";
-            store.node.id = id;
-            const names = crypt.getNamesFromNodeCert(store.node.cert.toString());
-            store.user.name = names.user_name;
-            store.node.name = names.node_name;
-            emit("node-key", store.node);
-        }
-        catch (e) {
-            logger.log("store", "NODE KEYS NOT FOUND");
-            services.nodeKey = STATES.READY; // edit
-        }
-        /** @todo check result! */
-        if (services.nodeKey === STATES.READY && args.auto)
-            generateNodeKeys(store, {
-                name: args.node || DEFAULTS.NODE_NAME,
-                keylength: 2048,
-            });
-    }
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+Object.defineProperty(exports, "__esModule", { value: true });
+const node_fs_1 = __importDefault(require("node:fs"));
+const node_crypto_1 = __importDefault(require("node:crypto"));
+const state_1 = __importDefault(require("./state"));
+const storage_1 = __importDefault(require("./storage"));
+const datadir_1 = require("../modules/datadir");
+const logger_1 = __importDefault(require("../modules/logger"));
+const arguments_1 = __importDefault(require("../modules/arguments"));
+const keys_1 = require("../modules/keys");
+state_1.default.subscribe([5 /* Event.Type.masterKey */], (action, payload) => {
+    state_1.default.services.masterKey = payload;
+    if (payload === 3 /* System.States.empty */) {
+        if (arguments_1.default.auto) {
+            (0, keys_1.createKeyPair)(1 /* Keys.Type.masterKey */, 4096)
+                .then(() => {
+                state_1.default.emit(5 /* Event.Type.masterKey */, 2 /* System.States.ready */);
+            })
+                .catch((err) => {
+                state_1.default.emit(5 /* Event.Type.masterKey */, 0 /* System.States.error */);
+                logger_1.default.error("keys:master", err);
+            });
+        }
+    }
+    else if (payload === 2 /* System.States.ready */) {
+        try {
+            storage_1.default.user.privateKey = node_fs_1.default.readFileSync(datadir_1.keysDir + "/master-private.pem");
+            storage_1.default.user.publicKey = node_fs_1.default.readFileSync(datadir_1.keysDir + "/master-public.pem");
+            state_1.default.emit(5 /* Event.Type.masterKey */, 7 /* System.States.full */);
+        }
+        catch (e) {
+            logger_1.default.log("store", "MASTER KEYS NOT FOUND");
+            state_1.default.emit(5 /* Event.Type.masterKey */, 3 /* System.States.empty */);
+        }
+    }
+    else if (payload === 7 /* System.States.full */) {
+        if (storage_1.default.user.publicKey) {
+            const hash = node_crypto_1.default.createHash("sha256");
+            hash.update(storage_1.default.user.publicKey);
+            storage_1.default.user.id = hash.digest("hex");
+        }
+    }
+});
+state_1.default.subscribe([6 /* Event.Type.nodeKey */], (action, payload) => {
+    state_1.default.services.nodeKey = payload;
+    if (payload === 3 /* System.States.empty */) {
+        if (arguments_1.default.auto) {
+            (0, keys_1.createKeyPair)(0 /* Keys.Type.nodeKey */, 2048)
+                .then(() => {
+                state_1.default.emit(6 /* Event.Type.nodeKey */, 2 /* System.States.ready */);
+            })
+                .catch((err) => {
+                state_1.default.emit(6 /* Event.Type.nodeKey */, 0 /* System.States.error */);
+                logger_1.default.error("keys:node", err);
+            });
+        }
+    }
+    else if (payload === 2 /* System.States.ready */) {
+        try {
+            storage_1.default.node.privateKey = node_fs_1.default.readFileSync(datadir_1.keysDir + "/node-private.pem");
+            storage_1.default.node.publicKey = node_fs_1.default.readFileSync(datadir_1.keysDir + "/node-public.pem");
+            state_1.default.emit(6 /* Event.Type.nodeKey */, 7 /* System.States.full */);
+        }
+        catch (e) {
+            logger_1.default.log("store", "NODE KEYS NOT FOUND");
+            state_1.default.emit(6 /* Event.Type.nodeKey */, 3 /* System.States.empty */);
+        }
+    }
+    else if (payload === 7 /* System.States.full */) {
+        if (storage_1.default.node.publicKey) {
+            const hash = node_crypto_1.default.createHash("sha256");
+            hash.update(storage_1.default.node.publicKey);
+            storage_1.default.node.id = hash.digest("hex");
+        }
+    }
+});
+state_1.default.subscribe([0 /* Event.Type.start */], () => {
+    state_1.default.emit(5 /* Event.Type.masterKey */, 2 /* System.States.ready */);
+    state_1.default.emit(6 /* Event.Type.nodeKey */, 2 /* System.States.ready */);
+});

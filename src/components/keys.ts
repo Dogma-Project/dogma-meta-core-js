@@ -1,54 +1,88 @@
-subscribe(["master-key"], () => {
-  services.masterKey = STATES.FULL;
-});
-subscribe(["node-key"], () => {
-  services.nodeKey = STATES.FULL;
-});
+import fs from "node:fs";
+import crypto from "node:crypto";
+import stateManager from "./state";
+import { Event, System, Keys } from "../types";
+import storage from "./storage";
+import { keysDir } from "../modules/datadir";
+import logger from "../modules/logger";
+import args from "../modules/arguments";
+import { createKeyPair } from "../modules/keys";
 
-/**
- *
- */
-const getKeys = () => {
-  if (!store.user.key) {
-    try {
-      store.user.key = fs.readFileSync(keysDir + "/key.pem");
-      store.user.cert = fs.readFileSync(keysDir + "/cert.pem");
-      const id = crypt.getPublicCertHash(store.user.cert.toString()); // edit
-      if (id === undefined) throw "unknown cert"; // edit
-      store.user.id = id;
-      emit("master-key", store.user);
-    } catch (e) {
-      logger.log("store", "MASTER KEYS NOT FOUND");
-      services.masterKey = STATES.READY; // edit
+stateManager.subscribe(
+  [Event.Type.masterKey],
+  (action, payload: System.States) => {
+    stateManager.services.masterKey = payload;
+    if (payload === System.States.empty) {
+      if (args.auto) {
+        createKeyPair(Keys.Type.masterKey, 4096)
+          .then(() => {
+            stateManager.emit(Event.Type.masterKey, System.States.ready);
+          })
+          .catch((err) => {
+            stateManager.emit(Event.Type.masterKey, System.States.error);
+            logger.error("keys:master", err);
+          });
+      }
+    } else if (payload === System.States.ready) {
+      try {
+        storage.user.privateKey = fs.readFileSync(
+          keysDir + "/master-private.pem"
+        );
+        storage.user.publicKey = fs.readFileSync(
+          keysDir + "/master-public.pem"
+        );
+        stateManager.emit(Event.Type.masterKey, System.States.full);
+      } catch (e) {
+        logger.log("store", "MASTER KEYS NOT FOUND");
+        stateManager.emit(Event.Type.masterKey, System.States.empty);
+      }
+    } else if (payload === System.States.full) {
+      if (storage.user.publicKey) {
+        const hash = crypto.createHash("sha256");
+        hash.update(storage.user.publicKey);
+        storage.user.id = hash.digest("hex");
+      }
     }
-    /** @todo check result! */
-    if (services.masterKey === STATES.READY && args.auto)
-      generateMasterKeys(store, {
-        name: args.master || DEFAULTS.USER_NAME,
-        keylength: 2048, // edit
-      });
   }
+);
 
-  if (!store.node.key) {
-    try {
-      store.node.key = fs.readFileSync(keysDir + "/node-key.pem");
-      store.node.cert = fs.readFileSync(keysDir + "/node-cert.pem");
-      const id = crypt.getPublicCertHash(store.node.cert.toString());
-      if (id === undefined) throw "unknown cert";
-      store.node.id = id;
-      const names = crypt.getNamesFromNodeCert(store.node.cert.toString());
-      store.user.name = names.user_name;
-      store.node.name = names.node_name;
-      emit("node-key", store.node);
-    } catch (e) {
-      logger.log("store", "NODE KEYS NOT FOUND");
-      services.nodeKey = STATES.READY; // edit
+stateManager.subscribe(
+  [Event.Type.nodeKey],
+  (action, payload: System.States) => {
+    stateManager.services.nodeKey = payload;
+    if (payload === System.States.empty) {
+      if (args.auto) {
+        createKeyPair(Keys.Type.nodeKey, 2048)
+          .then(() => {
+            stateManager.emit(Event.Type.nodeKey, System.States.ready);
+          })
+          .catch((err) => {
+            stateManager.emit(Event.Type.nodeKey, System.States.error);
+            logger.error("keys:node", err);
+          });
+      }
+    } else if (payload === System.States.ready) {
+      try {
+        storage.node.privateKey = fs.readFileSync(
+          keysDir + "/node-private.pem"
+        );
+        storage.node.publicKey = fs.readFileSync(keysDir + "/node-public.pem");
+        stateManager.emit(Event.Type.nodeKey, System.States.full);
+      } catch (e) {
+        logger.log("store", "NODE KEYS NOT FOUND");
+        stateManager.emit(Event.Type.nodeKey, System.States.empty);
+      }
+    } else if (payload === System.States.full) {
+      if (storage.node.publicKey) {
+        const hash = crypto.createHash("sha256");
+        hash.update(storage.node.publicKey);
+        storage.node.id = hash.digest("hex");
+      }
     }
-    /** @todo check result! */
-    if (services.nodeKey === STATES.READY && args.auto)
-      generateNodeKeys(store, {
-        name: args.node || DEFAULTS.NODE_NAME,
-        keylength: 2048,
-      });
   }
-};
+);
+
+stateManager.subscribe([Event.Type.start], () => {
+  stateManager.emit(Event.Type.masterKey, System.States.ready);
+  stateManager.emit(Event.Type.nodeKey, System.States.ready);
+});

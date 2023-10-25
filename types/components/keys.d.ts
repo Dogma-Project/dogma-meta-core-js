@@ -1,4 +1,1 @@
-/**
- *
- */
-declare const getKeys: () => void;
+export {};

@@ -5,6 +5,7 @@ declare namespace Event {
   }
   export type Payload = any;
   export const enum Type {
+    start,
     online,
     offline,
     nodes,

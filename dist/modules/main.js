@@ -22,7 +22,6 @@ const arguments_1 = __importDefault(require("./arguments"));
 const constants_1 = require("../constants");
 const createDataBase_1 = require("./createDataBase");
 const model_1 = require("./model");
-const keysDir = datadir_1.datadir + "/keys";
 /** @module Store */
 /**
  *

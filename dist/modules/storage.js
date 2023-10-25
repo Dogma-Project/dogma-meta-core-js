@@ -49,17 +49,16 @@ class Storage {
         this.users = [];
         this.nodes = [];
         this.node = {
+            id: null,
             name: constants_1.DEFAULTS.NODE_NAME,
-            key: null,
-            cert: null,
-            id: "",
-            public_ipv4: "",
+            privateKey: null,
+            publicKey: null,
         };
         this.user = {
+            id: null,
             name: constants_1.DEFAULTS.USER_NAME,
-            key: null,
-            cert: null,
-            id: "",
+            privateKey: null,
+            publicKey: null,
         };
     }
 }

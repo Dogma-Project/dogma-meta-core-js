@@ -9,15 +9,16 @@ const disc = new LocalDiscovery({
   ip: "",
 });
 
-disc.startServer();
-
-disc.on("ready", (data) => {
-  stateManager.services.localDiscovery = Types.System.States.full;
-  logger.log("Local discovery server", "ready", data);
-});
-disc.on("error", (data) => {
-  stateManager.services.localDiscovery = Types.System.States.error;
-  logger.error("Local discovery server", "error", data);
+stateManager.subscribe([Types.Event.Type.start], () => {
+  disc.startServer();
+  disc.on("ready", (data) => {
+    stateManager.services.localDiscovery = Types.System.States.full;
+    logger.log("Local discovery server", "ready", data);
+  });
+  disc.on("error", (data) => {
+    stateManager.services.localDiscovery = Types.System.States.error;
+    logger.error("Local discovery server", "error", data);
+  });
 });
 
 export default disc;

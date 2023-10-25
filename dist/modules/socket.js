@@ -78,6 +78,7 @@ class DogmaSocket extends node_events_1.default {
         const keypair = node_crypto_1.default.generateKeyPairSync("rsa", {
             modulusLength: 2048,
         });
+        // const publicKey = crypto.createPublicKey(this.st);
         const encryptor = new streams_1.Encryption({ publicKey: keypair.publicKey });
         const decryptor = new streams_1.Decryption({ privateKey: keypair.privateKey });
         this.input.handshake.pipe(encryptor).pipe(this.socket);

@@ -14,8 +14,6 @@ import {
 import { Config, User, Node, Protocol } from "./model";
 import * as Types from "../types";
 
-const keysDir = datadir + "/keys";
-
 /** @module Store */
 
 /**

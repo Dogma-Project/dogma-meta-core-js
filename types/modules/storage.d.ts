@@ -4,18 +4,7 @@ declare class Storage {
     config: Types.Config.Params;
     users: Types.User.Model[];
     nodes: Types.Node.Model[];
-    node: {
-        name: string;
-        key: null;
-        cert: null;
-        id: string;
-        public_ipv4: string;
-    };
-    user: {
-        name: string;
-        key: null;
-        cert: null;
-        id: string;
-    };
+    node: Types.Node.Storage;
+    user: Types.User.Storage;
 }
 export default Storage;

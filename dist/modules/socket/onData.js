@@ -37,10 +37,10 @@ function onData(result) {
             this.handleTest(result.data);
             break;
         case 6 /* Types.Streams.MX.dht */:
-            this.stateBridge.emit(27 /* Types.Event.Type.dataDht */, result.data);
+            this.stateBridge.emit(28 /* Types.Event.Type.dataDht */, result.data);
             break;
         case 4 /* Types.Streams.MX.messages */:
-            this.stateBridge.emit(25 /* Types.Event.Type.dataMessages */, result.data);
+            this.stateBridge.emit(26 /* Types.Event.Type.dataMessages */, result.data);
             break;
         default:
             logger_1.default.warn("onData", "unknown MX", result.mx);

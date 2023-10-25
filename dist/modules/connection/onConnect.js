@@ -35,7 +35,7 @@ direction = 0 /* Types.Connection.Direction.outcoming */) {
     dogmaSocket.on("offline", () => {
         const { node_id } = dogmaSocket;
         if (node_id !== null) {
-            this.stateBridge.emit(1 /* Types.Event.Type.offline */, node_id);
+            this.stateBridge.emit(2 /* Types.Event.Type.offline */, node_id);
             const index = this.online.indexOf(node_id);
             if (index !== -1) {
                 logger_1.default.log("connection", "OFFLINE", node_id);
@@ -46,7 +46,7 @@ direction = 0 /* Types.Connection.Direction.outcoming */) {
     dogmaSocket.on("online", () => {
         const { node_id } = dogmaSocket;
         if (node_id !== null) {
-            this.stateBridge.emit(0 /* Types.Event.Type.online */, node_id);
+            this.stateBridge.emit(1 /* Types.Event.Type.online */, node_id);
             this.online.push(node_id);
         }
     });

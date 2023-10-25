@@ -77,6 +77,9 @@ class DogmaSocket extends EventEmitter {
     const keypair = crypto.generateKeyPairSync("rsa", {
       modulusLength: 2048,
     });
+
+    // const publicKey = crypto.createPublicKey(this.st);
+
     const encryptor = new Encryption({ publicKey: keypair.publicKey });
     const decryptor = new Decryption({ privateKey: keypair.privateKey });
 

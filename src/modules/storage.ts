@@ -23,19 +23,18 @@ class Storage {
 
   users: Types.User.Model[] = [];
   nodes: Types.Node.Model[] = [];
-  node = {
+  node: Types.Node.Storage = {
+    id: null,
     name: DEFAULTS.NODE_NAME,
-    key: null,
-    cert: null,
-    id: "",
-    public_ipv4: "",
+    privateKey: null,
+    publicKey: null,
   };
 
-  user = {
+  user: Types.User.Storage = {
+    id: null,
     name: DEFAULTS.USER_NAME,
-    key: null,
-    cert: null,
-    id: "",
+    privateKey: null,
+    publicKey: null,
   };
 }
 

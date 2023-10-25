@@ -34,9 +34,8 @@ stateManager.subscribe(
 stateManager.subscribe(
   [
     Types.Event.Type.configRouter,
-    Types.Event.Type.users,
     Types.Event.Type.nodeKey,
-    Types.Event.Type.configDhtBootstrap,
+    Types.Event.Type.masterKey,
   ],
   (_action, _value, _type) => {
     const port = storage.config.router;

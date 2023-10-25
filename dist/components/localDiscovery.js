@@ -35,13 +35,15 @@ const disc = new localDiscovery_1.default({
     port: constants_1.DEFAULTS.LOCAL_DISCOVERY_PORT,
     ip: "",
 });
-disc.startServer();
-disc.on("ready", (data) => {
-    state_1.default.services.localDiscovery = 7 /* Types.System.States.full */;
-    logger_1.default.log("Local discovery server", "ready", data);
-});
-disc.on("error", (data) => {
-    state_1.default.services.localDiscovery = 0 /* Types.System.States.error */;
-    logger_1.default.error("Local discovery server", "error", data);
+state_1.default.subscribe([0 /* Types.Event.Type.start */], () => {
+    disc.startServer();
+    disc.on("ready", (data) => {
+        state_1.default.services.localDiscovery = 7 /* Types.System.States.full */;
+        logger_1.default.log("Local discovery server", "ready", data);
+    });
+    disc.on("error", (data) => {
+        state_1.default.services.localDiscovery = 0 /* Types.System.States.error */;
+        logger_1.default.error("Local discovery server", "error", data);
+    });
 });
 exports.default = disc;

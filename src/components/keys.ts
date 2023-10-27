@@ -88,7 +88,7 @@ stateManager.subscribe(
   }
 );
 
-stateManager.subscribe([Event.Type.start], () => {
+stateManager.subscribe([Event.Type.start, Event.Type.homeDir], () => {
   logger.log("KEYS", "starting");
   stateManager.emit(Event.Type.masterKey, System.States.ready);
   stateManager.emit(Event.Type.nodeKey, System.States.ready);

@@ -8,7 +8,7 @@ import logger from "../logger";
 class DHTModel implements Model {
   stateBridge: StateManager;
   db: Datastore = new Datastore({
-    filename: nedbDir + "/config.db",
+    filename: nedbDir + "/dht.db",
   });
 
   constructor({ state }: { state: StateManager }) {

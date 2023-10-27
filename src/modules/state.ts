@@ -52,6 +52,7 @@ class StateManager {
    * @param payload Any payload | or Boolean "true" for forced emit
    */
   public emit = (type: Types.Event.Type, payload: any | boolean) => {
+    logger.info("Event emitted", type, payload);
     let action: Types.Event.Action = Types.Event.Action.update;
     if (this.listeners[type] === undefined)
       return logger.warn("state", "key isn't registered", type);

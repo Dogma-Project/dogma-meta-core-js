@@ -36,6 +36,7 @@ declare namespace Event {
     dataMessages,
     dataMail,
     dataDht,
+    homeDir,
   }
   export type Listenter = (
     action: Action,

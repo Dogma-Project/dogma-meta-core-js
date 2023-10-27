@@ -9,6 +9,7 @@ require("./components/server");
 require("./components/client");
 require("./components/keys");
 require("./components/model");
+require("./components/homedir");
 const state_1 = __importDefault(require("./components/state"));
 node_process_1.default.stdin.resume();
 /*

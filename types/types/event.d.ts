@@ -35,7 +35,8 @@ declare namespace Event {
         dataControl = 27,
         dataMessages = 28,
         dataMail = 29,
-        dataDht = 30
+        dataDht = 30,
+        homeDir = 31
     }
     type Listenter = (action: Action, payload: Payload, type: Type) => void;
     type ArrayOfListeners = [Type[], Listenter] | [];

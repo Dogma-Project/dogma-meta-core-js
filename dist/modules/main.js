@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkHomeDir = exports.readProtocolTable = exports.readNodesTable = exports.readUsersTable = exports.readConfigTable = void 0;
+exports.readProtocolTable = exports.readNodesTable = exports.readUsersTable = exports.readConfigTable = void 0;
 const nedb_1 = require("../components/nedb"); // edit // reorder
 const node_fs_1 = __importDefault(require("node:fs")); // edit
 const state_old_1 = require("./state-old");
@@ -132,37 +132,6 @@ const readProtocolTable = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.readProtocolTable = readProtocolTable;
-/**
- *
- * @returns {Promise}
- */
-const checkHomeDir = () => {
-    // check and test
-    return new Promise((resolve, reject) => {
-        try {
-            const dirs = ["keys", "db", "download", "temp"];
-            if (!arguments_1.default.prefix && !node_fs_1.default.existsSync(datadir_1.datadir))
-                node_fs_1.default.mkdirSync(datadir_1.datadir, { recursive: true });
-            dirs.forEach((dir) => {
-                const oldDir = datadir_1.dogmaDir + "/" + dir;
-                const newDir = datadir_1.datadir + "/" + dir;
-                if (!arguments_1.default.prefix && node_fs_1.default.existsSync(oldDir)) {
-                    // if prefix not exist and there's a dirs in a root
-                    node_fs_1.default.renameSync(oldDir, newDir);
-                }
-                else if (!node_fs_1.default.existsSync(newDir)) {
-                    // if there's no data dir in prefixed space
-                    node_fs_1.default.mkdirSync(newDir, { recursive: true });
-                }
-            });
-            resolve(true);
-        }
-        catch (err) {
-            reject(err);
-        }
-    });
-};
-exports.checkHomeDir = checkHomeDir;
 const defaults = {
     router: constants_1.DEFAULTS.ROUTER,
     bootstrap: DHTPERM.ONLY_FRIENDS,
@@ -243,7 +212,7 @@ const defaults = {
 // INIT POINT
 const init = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield (0, exports.checkHomeDir)();
+        yield checkHomeDir();
         yield (0, nedb_1.initPersistDbs)();
         getKeys();
     }

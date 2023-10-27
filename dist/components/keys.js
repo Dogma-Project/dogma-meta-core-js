@@ -83,7 +83,7 @@ state_1.default.subscribe([6 /* Event.Type.nodeKey */], (action, payload) => {
         }
     }
 });
-state_1.default.subscribe([0 /* Event.Type.start */], () => {
+state_1.default.subscribe([0 /* Event.Type.start */, 31 /* Event.Type.homeDir */], () => {
     logger_1.default.log("KEYS", "starting");
     state_1.default.emit(5 /* Event.Type.masterKey */, 2 /* System.States.ready */);
     state_1.default.emit(6 /* Event.Type.nodeKey */, 2 /* System.States.ready */);

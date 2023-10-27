@@ -42,7 +42,7 @@ const logger_1 = __importDefault(require("../logger"));
 class DHTModel {
     constructor({ state }) {
         this.db = new nedb_1.default({
-            filename: datadir_1.nedbDir + "/config.db",
+            filename: datadir_1.nedbDir + "/dht.db",
         });
         this.stateBridge = state;
     }

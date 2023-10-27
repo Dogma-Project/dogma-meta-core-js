@@ -94,35 +94,6 @@ export const readProtocolTable = async () => {
   }
 };
 
-/**
- *
- * @returns {Promise}
- */
-export const checkHomeDir = () => {
-  // check and test
-  return new Promise((resolve, reject) => {
-    try {
-      const dirs = ["keys", "db", "download", "temp"];
-      if (!args.prefix && !fs.existsSync(datadir))
-        fs.mkdirSync(datadir, { recursive: true });
-      dirs.forEach((dir) => {
-        const oldDir = dogmaDir + "/" + dir;
-        const newDir = datadir + "/" + dir;
-        if (!args.prefix && fs.existsSync(oldDir)) {
-          // if prefix not exist and there's a dirs in a root
-          fs.renameSync(oldDir, newDir);
-        } else if (!fs.existsSync(newDir)) {
-          // if there's no data dir in prefixed space
-          fs.mkdirSync(newDir, { recursive: true });
-        }
-      });
-      resolve(true);
-    } catch (err) {
-      reject(err);
-    }
-  });
-};
-
 const defaults = {
   router: DEFAULTS.ROUTER,
   bootstrap: DHTPERM.ONLY_FRIENDS,

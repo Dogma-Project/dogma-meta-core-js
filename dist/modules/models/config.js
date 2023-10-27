@@ -62,6 +62,27 @@ class ConfigModel {
             }
         });
     }
+    loadConfigTable() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                logger_1.default.log("Config Model", "Load config table");
+                const data = yield this.getAll();
+                if (data.length) {
+                    // add condition
+                    data.forEach((element) => {
+                        const type = element.param;
+                        this.stateBridge.emit(type, element.value);
+                    });
+                }
+                else {
+                    this.stateBridge.emit("CONFIG DB" /* Types.Event.Type.configDb */, 3 /* Types.System.States.empty */);
+                }
+            }
+            catch (err) {
+                logger_1.default.error("config.nedb", err);
+            }
+        });
+    }
     getAll() {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.findAsync({});

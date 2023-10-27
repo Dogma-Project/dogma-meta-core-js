@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -31,56 +8,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.readProtocolTable = exports.readNodesTable = exports.readUsersTable = exports.readConfigTable = void 0;
-const nedb_1 = require("../components/nedb"); // edit // reorder
-const node_fs_1 = __importDefault(require("node:fs")); // edit
-const state_old_1 = require("./state-old");
-const logger_1 = __importDefault(require("./logger"));
-const datadir_1 = require("./datadir");
-const arguments_1 = __importDefault(require("./arguments"));
-const constants_1 = require("../constants");
-const createDataBase_1 = require("./createDataBase");
-const model_1 = require("./model");
-const Types = __importStar(require("../types"));
-/** @module Store */
-/**
- *
- * @returns {Promise}
- */
-const readConfigTable = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const data = yield model_1.Config.getAll();
-        if (!data.length)
-            return Promise.reject(0);
-        data.forEach((element) => {
-            store.config[element.param] = element.value;
-            (0, state_old_1.emit)("config-" + element.param, element.value);
-        });
-        return data;
-    }
-    catch (err) {
-        return Promise.reject(err);
-    }
-});
-exports.readConfigTable = readConfigTable;
+exports.readProtocolTable = exports.readNodesTable = exports.readUsersTable = void 0;
 /**
  *
  * @returns {Promise}
  */
 const readUsersTable = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield model_1.User.getAll();
+        const data = yield User.getAll();
         if (!data.length)
             return Promise.reject(0);
         let caArray = [];
         data.forEach((user) => caArray.push(Buffer.from(user.cert))); // check exception
         store.ca = caArray;
         store.users = data;
-        (0, state_old_1.emit)("users", data);
+        emit("users", data);
         return data;
     }
     catch (err) {
@@ -94,7 +37,7 @@ exports.readUsersTable = readUsersTable;
  */
 const readNodesTable = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield model_1.Node.getAll();
+        const data = yield Node.getAll();
         if (!data.length)
             return Promise.reject(0);
         store.nodes = data;
@@ -104,7 +47,7 @@ const readNodesTable = () => __awaiter(void 0, void 0, void 0, function* () {
         // } else {
         // 	logger.warn("store", "OWN NODE NOT FOUND", store.node);
         // }
-        (0, state_old_1.emit)("nodes", store.nodes);
+        emit("nodes", store.nodes);
         return data;
     }
     catch (err) {
@@ -117,13 +60,13 @@ exports.readNodesTable = readNodesTable;
  */
 const readProtocolTable = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield model_1.Protocol.getAll();
+        const data = yield Protocol.getAll();
         let protocol = {};
-        for (const key in constants_1.PROTOCOL) {
+        for (const key in PROTOCOL) {
             const item = data.find((obj) => obj.name === key);
             const value = !!item ? item.value || 0 : 0;
             protocol[key] = value;
-            (0, state_old_1.emit)("protocol-" + key, value);
+            emit("protocol-" + key, value);
         }
         return protocol;
     }
@@ -133,91 +76,91 @@ const readProtocolTable = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.readProtocolTable = readProtocolTable;
 const defaults = {
-    router: constants_1.DEFAULTS.ROUTER,
+    router: DEFAULTS.ROUTER,
     bootstrap: DHTPERM.ONLY_FRIENDS,
     dhtLookup: DHTPERM.ONLY_FRIENDS,
     dhtAnnounce: DHTPERM.ONLY_FRIENDS,
-    external: constants_1.DEFAULTS.EXTERNAL,
-    autoDefine: constants_1.DEFAULTS.AUTO_DEFINE_IP,
+    external: DEFAULTS.EXTERNAL,
+    autoDefine: DEFAULTS.AUTO_DEFINE_IP,
     public_ipv4: "",
 };
-(0, state_old_1.subscribe)(["master-key", "node-key", "config-db", "protocol-db"], (_action, _value, _type) => {
-    if (state_old_1.state["config-db"] >= STATES.LIMITED)
+subscribe(["master-key", "node-key", "config-db", "protocol-db"], (_action, _value, _type) => {
+    if (state["config-db"] >= STATES.LIMITED)
         return; // don't trigger when status is loaded
-    if (state_old_1.state["protocol-db"] < STATES.FULL)
+    if (state["protocol-db"] < STATES.FULL)
         return;
-    (0, exports.readConfigTable)()
+    readConfigTable()
         .then((_result) => {
-        (0, state_old_1.emit)("config-db", STATES.FULL);
+        emit("config-db", STATES.FULL);
     })
         .catch((err) => {
-        if (arguments_1.default.auto) {
-            logger_1.default.info("STORE", "Creating config table in automatic mode");
-            (0, createDataBase_1.createConfigTable)(defaults);
+        if (args.auto) {
+            logger.info("STORE", "Creating config table in automatic mode");
+            cconfig(defaults);
         }
         else {
-            (0, state_old_1.emit)("config-db", STATES.ERROR); // check
-            logger_1.default.log("store", "read config db error::", err);
+            emit("config-db", STATES.ERROR); // check
+            logger.log("store", "read config db error::", err);
         }
     });
 });
-(0, state_old_1.subscribe)(["master-key", "node-key", "users-db", "protocol-db"], (action, value, type) => {
+subscribe(["master-key", "node-key", "users-db", "protocol-db"], (action, value, type) => {
     // check
-    if (state_old_1.state["users-db"] >= STATES.LIMITED)
+    if (state["users-db"] >= STATES.LIMITED)
         return; // don't trigger when status is loaded
-    if (state_old_1.state["protocol-db"] < STATES.FULL)
+    if (state["protocol-db"] < STATES.FULL)
         return;
     (0, exports.readUsersTable)()
         .then((_result) => {
-        (0, state_old_1.emit)("users-db", STATES.FULL);
+        emit("users-db", STATES.FULL);
     })
         .catch((err) => {
-        if (arguments_1.default.auto) {
-            logger_1.default.info("STORE", "Creating users table in automatic mode");
-            (0, createDataBase_1.createUsersTable)(store);
+        if (args.auto) {
+            logger.info("STORE", "Creating users table in automatic mode");
+            cusers(store);
         }
         else {
-            (0, state_old_1.emit)("users-db", STATES.ERROR); // check
-            logger_1.default.log("store", "read users db error::", err);
+            emit("users-db", STATES.ERROR); // check
+            logger.log("store", "read users db error::", err);
         }
     });
 });
-(0, state_old_1.subscribe)(["master-key", "node-key", "nodes-db", "protocol-db"], (_action, status) => {
-    if (state_old_1.state["nodes-db"] >= STATES.LIMITED)
+subscribe(["master-key", "node-key", "nodes-db", "protocol-db"], (_action, status) => {
+    if (state["nodes-db"] >= STATES.LIMITED)
         return; // don't trigger when status is loaded
-    if (state_old_1.state["protocol-db"] < STATES.FULL)
+    if (state["protocol-db"] < STATES.FULL)
         return;
     (0, exports.readNodesTable)()
         .then((result) => {
-        (0, state_old_1.emit)("nodes-db", STATES.FULL);
+        emit("nodes-db", STATES.FULL);
     })
         .catch((err) => {
-        if (arguments_1.default.auto) {
-            logger_1.default.info("STORE", "Creating nodes table in automatic mode");
-            (0, createDataBase_1.createNodesTable)(store, defaults);
+        if (args.auto) {
+            logger.info("STORE", "Creating nodes table in automatic mode");
+            cnodes(store, defaults);
         }
         else {
-            (0, state_old_1.emit)("nodes-db", STATES.ERROR); // check
-            logger_1.default.log("store", "read nodes db error::", err);
+            emit("nodes-db", STATES.ERROR); // check
+            logger.log("store", "read nodes db error::", err);
         }
     });
 });
-(0, state_old_1.subscribe)(["config-db", "users-db", "nodes-db"], () => {
-    const arr = [state_old_1.state["config-db"], state_old_1.state["users-db"], state_old_1.state["nodes-db"]];
+subscribe(["config-db", "users-db", "nodes-db"], () => {
+    const arr = [state["config-db"], state["users-db"], state["nodes-db"]];
     arr.sort((a, b) => {
         return a > b;
     });
-    state_old_1.services.database = arr[0]; // min value
+    services.database = arr[0]; // min value
 });
 // INIT POINT
 const init = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield checkHomeDir();
-        yield (0, nedb_1.initPersistDbs)();
+        yield initPersistDbs();
         getKeys();
     }
     catch (err) {
-        logger_1.default.error("store.js", "init", err);
+        logger.error("store.js", "init", err);
     }
 });
 init();

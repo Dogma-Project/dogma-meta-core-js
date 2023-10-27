@@ -5,7 +5,7 @@ declare namespace Config {
         [index: string]: string | number;
     };
     interface Params {
-        _router: number;
+        [index: string]: any;
         router: number;
         bootstrap: Connection.Group;
         dhtLookup: Connection.Group;

@@ -36,9 +36,10 @@ declare namespace Event {
         dataMessages = "DATA MESSAGES",
         dataMail = "DATA MAIL",
         dataDht = "DATA DHT",
-        homeDir = "HOME DIR"
+        homeDir = "HOME DIR",
+        services = "SERVICES"
     }
-    type Listenter = (action: Action, payload: Payload, type: Type) => void;
+    type Listenter = (payload: Payload, type?: Type, action?: Action) => void;
     type ArrayOfListeners = [Type[], Listenter] | [];
 }
 export default Event;

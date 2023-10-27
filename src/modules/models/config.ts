@@ -7,6 +7,7 @@ import StateManager from "../state";
 
 class ConfigModel implements Model {
   stateBridge: StateManager;
+
   db: Datastore = new Datastore({
     filename: nedbDir + "/config.db",
   });
@@ -27,6 +28,27 @@ class ConfigModel implements Model {
         Types.Event.Type.configDb,
         Types.System.States.ready
       );
+    } catch (err) {
+      logger.error("config.nedb", err);
+    }
+  }
+
+  async loadConfigTable() {
+    try {
+      logger.log("Config Model", "Load config table");
+      const data = await this.getAll();
+      if (data.length) {
+        // add condition
+        data.forEach((element) => {
+          const type: Types.Event.Type = element.param;
+          this.stateBridge.emit(type, element.value);
+        });
+      } else {
+        this.stateBridge.emit(
+          Types.Event.Type.configDb,
+          Types.System.States.empty
+        );
+      }
     } catch (err) {
       logger.error("config.nedb", err);
     }

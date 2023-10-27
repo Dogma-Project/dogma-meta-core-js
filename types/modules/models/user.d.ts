@@ -1,4 +1,4 @@
-import * as Types from "../../types";
+import { User } from "../../types";
 import Datastore from "@seald-io/nedb";
 import Model from "./_model";
 import StateManager from "../state";
@@ -10,7 +10,8 @@ declare class UserModel implements Model {
     });
     init(): Promise<void>;
     getAll(): Promise<Record<string, any>[]>;
-    persistUser(user: Types.User.Model): Promise<{
+    loadUsersTable(): Promise<void>;
+    persistUser(user: User.Model): Promise<{
         numAffected: number;
         affectedDocuments: import("@seald-io/nedb").Document<Record<string, any>> | import("@seald-io/nedb").Document<Record<string, any>>[] | null;
         upsert: boolean;
@@ -23,10 +24,10 @@ declare class UserModel implements Model {
     /**
      * @todo set to deleted state instead of remove
      */
-    removeUser(user_id: Types.User.Id): Promise<boolean>;
+    removeUser(user_id: User.Id): Promise<boolean>;
     /**
      * @todo delete _id
      */
-    sync(data: Types.User.Model[], from: Types.User.Id): Promise<boolean>;
+    sync(data: User.Model[], from: User.Id): Promise<boolean>;
 }
 export default UserModel;

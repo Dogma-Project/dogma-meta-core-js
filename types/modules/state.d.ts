@@ -13,8 +13,8 @@ declare class StateManager {
     };
     /**
      *
-     * @param type array of events
-     * @param callback (action, value, type)
+     * @param 'array of events'
+     * @param (payload, type?, action?)
      */
     subscribe: (type: Types.Event.Type[], callback: Types.Event.Listenter) => void;
     /**

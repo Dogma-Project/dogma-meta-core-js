@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const generateSyncId_1 = __importDefault(require("../generateSyncId"));
-const Types = __importStar(require("../../types"));
 const logger_1 = __importDefault(require("../logger"));
 const datadir_1 = require("../datadir");
 const nedb_1 = __importDefault(require("@seald-io/nedb"));
@@ -57,7 +33,7 @@ class UserModel {
                     fieldName: "user_id",
                     unique: true,
                 });
-                this.stateBridge.emit("USERS DB" /* Types.Event.Type.usersDb */, 2 /* Types.System.States.ready */);
+                this.stateBridge.emit("USERS DB" /* Event.Type.usersDb */, 2 /* System.States.ready */);
             }
             catch (err) {
                 logger_1.default.error("users.nedb", err);
@@ -69,11 +45,29 @@ class UserModel {
             return this.db.findAsync({});
         });
     }
+    loadUsersTable() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                logger_1.default.log("User Model", "Load user table");
+                const data = yield this.getAll();
+                if (data.length) {
+                    this.stateBridge.emit("USERS DB" /* Event.Type.usersDb */, 7 /* System.States.full */);
+                    this.stateBridge.emit("USERS" /* Event.Type.users */, data);
+                }
+                else {
+                    this.stateBridge.emit("USERS DB" /* Event.Type.usersDb */, 3 /* System.States.empty */);
+                }
+            }
+            catch (err) {
+                logger_1.default.error("user.nedb", err);
+            }
+        });
+    }
     persistUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { user_id } = user;
-                this.stateBridge.emit("USERS DB" /* Types.Event.Type.usersDb */, user_id);
+                this.stateBridge.emit("USERS DB" /* Event.Type.usersDb */, user_id);
                 const exist = yield this.db.findOneAsync({ user_id });
                 const sync_id = (0, generateSyncId_1.default)(5);
                 let result;
@@ -85,7 +79,7 @@ class UserModel {
                 else {
                     result = yield this.db.insertAsync(Object.assign(Object.assign({}, user), { sync_id }));
                 }
-                this.stateBridge.emit("USERS DB" /* Types.Event.Type.usersDb */, 4 /* Types.System.States.reload */); // downgrade state to reload database
+                this.stateBridge.emit("USERS DB" /* Event.Type.usersDb */, 4 /* System.States.reload */); // downgrade state to reload database
                 return result;
             }
             catch (err) {
@@ -100,7 +94,7 @@ class UserModel {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.db.removeAsync({ user_id }, { multi: true });
-                this.stateBridge.emit("USERS DB" /* Types.Event.Type.usersDb */, 4 /* Types.System.States.reload */); // downgrade state to reload database
+                this.stateBridge.emit("USERS DB" /* Event.Type.usersDb */, 4 /* System.States.reload */); // downgrade state to reload database
                 /*
                 await nodesDb.removeAsync({ user_id }, { multi: true });
                 this.stateBridge.emit("nodes-db", Types.System.States.reload); // downgrade state to reload database
@@ -129,7 +123,7 @@ class UserModel {
                         upsert: true,
                     });
                 }
-                this.stateBridge.emit("USERS DB" /* Types.Event.Type.usersDb */, 4 /* Types.System.States.reload */); // downgrade state to reload database
+                this.stateBridge.emit("USERS DB" /* Event.Type.usersDb */, 4 /* System.States.reload */); // downgrade state to reload database
                 // Sync.confirm("users", from);
                 return true;
             }

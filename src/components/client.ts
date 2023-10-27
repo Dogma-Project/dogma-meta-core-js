@@ -56,7 +56,7 @@ state.subscribe(
     // edit
     if (args.discovery) return; // don't lookup in discovery mode
     clearInterval(searchFriendsInterval);
-    if (storage.config.dhtLookup) {
+    if (state.state[Types.Event.Type.configDhtLookup]) {
       client.searchFriends(); // check
       searchFriendsInterval = setInterval(client.searchFriends, 30000); // edit
     }

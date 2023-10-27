@@ -31,10 +31,11 @@ const connections_1 = __importDefault(require("./connections"));
 const state_1 = __importDefault(require("./state"));
 const storage_1 = __importDefault(require("./storage"));
 const Types = __importStar(require("../types"));
+const logger_1 = __importDefault(require("../modules/logger"));
 // import connectionTester from "../modules/connectionTester";
 const server = new server_1.default({ connections: connections_1.default, storage: storage_1.default, state: state_1.default });
-state_1.default.subscribe(["SERVER" /* Types.Event.Type.server */], (_action, state) => {
-    state_1.default.services.router = state;
+state_1.default.subscribe(["SERVER" /* Types.Event.Type.server */], (value) => {
+    state_1.default.services.router = value;
 });
 state_1.default.subscribe([
     "SERVER" /* Types.Event.Type.server */,
@@ -48,7 +49,7 @@ state_1.default.subscribe([
             // connectionTester();
             break;
         case 7 /* Types.System.States.full */:
-            state_1.default.emit("EXTERNAL PORT" /* Types.Event.Type.externalPort */, storage_1.default.config.router);
+            state_1.default.emit("EXTERNAL PORT" /* Types.Event.Type.externalPort */, state_1.default.state["CONFIG ROUTER" /* Types.Event.Type.configRouter */]);
             break;
     }
 });
@@ -56,8 +57,10 @@ state_1.default.subscribe([
     "CONFIG ROUTER" /* Types.Event.Type.configRouter */,
     "NODE KEY" /* Types.Event.Type.nodeKey */,
     "MASTER KEY" /* Types.Event.Type.masterKey */,
-], (_action, _value, _type) => {
-    const port = storage_1.default.config.router;
+], () => {
+    logger_1.default.log("DEBUG", "Server start");
+    const port = state_1.default.state["CONFIG ROUTER" /* Types.Event.Type.configRouter */];
+    // edit
     if (!state_1.default.services.router) {
         server.listen(port);
     }

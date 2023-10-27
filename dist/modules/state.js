@@ -48,7 +48,7 @@ class StateManager {
                 if (obj[prop] === value)
                     return true;
                 obj[prop] = value;
-                // EventEmitter.emit("services", obj);
+                this.emit("SERVICES" /* Types.Event.Type.services */, { service: prop, state: value });
                 return true;
             },
         };
@@ -57,8 +57,8 @@ class StateManager {
         this.services = new Proxy(this._services, this._servicesHandler);
         /**
          *
-         * @param type array of events
-         * @param callback (action, value, type)
+         * @param 'array of events'
+         * @param (payload, type?, action?)
          */
         this.subscribe = (type, callback) => {
             type.forEach((key) => {
@@ -81,15 +81,14 @@ class StateManager {
                 action = 1 /* Types.Event.Action.set */;
             if (payload !== true) {
                 if (JSON.stringify(this.state[type]) === JSON.stringify(payload))
-                    return; // logger.warn("state", "nothing to emit", type);
-                // this.state[type] = payload;
+                    return;
             }
             this.state[type] = payload; // test
             this.listeners[type].forEach((entry) => {
                 if (!entry.length)
                     return;
                 let ready = entry[0].every((val) => this.state[val] !== undefined);
-                ready && entry[1](action, payload, type); // edit
+                ready && entry[1](payload, type, action); // edit
             });
         };
     }

@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -37,8 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const generateSyncId_1 = __importDefault(require("../generateSyncId"));
 const logger_1 = __importDefault(require("../logger"));
-// import Sync from "./sync";
-const Types = __importStar(require("../../types"));
 const datadir_1 = require("../datadir");
 const nedb_1 = __importDefault(require("@seald-io/nedb"));
 class NodeModel {
@@ -58,7 +33,7 @@ class NodeModel {
                     fieldName: "param",
                     unique: true,
                 });
-                this.stateBridge.emit("NODES DB" /* Types.Event.Type.nodesDb */, 2 /* Types.System.States.ready */);
+                this.stateBridge.emit("NODES DB" /* Event.Type.nodesDb */, 2 /* System.States.ready */);
             }
             catch (err) {
                 logger_1.default.error("config.nodes", err);
@@ -68,6 +43,24 @@ class NodeModel {
     getAll() {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.findAsync({});
+        });
+    }
+    loadNodesTable() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                logger_1.default.log("Node Model", "Load node table");
+                const data = yield this.getAll();
+                if (data.length) {
+                    this.stateBridge.emit("NODES DB" /* Event.Type.nodesDb */, 7 /* System.States.full */);
+                    this.stateBridge.emit("NODES" /* Event.Type.nodes */, data);
+                }
+                else {
+                    this.stateBridge.emit("NODES DB" /* Event.Type.nodesDb */, 3 /* System.States.empty */);
+                }
+            }
+            catch (err) {
+                logger_1.default.error("node.nedb", err);
+            }
         });
     }
     getByUserId(user_id) {
@@ -109,7 +102,7 @@ class NodeModel {
                 for (let i = 0; i < nodes.length; i++) {
                     yield insert(nodes[i]);
                 }
-                this.stateBridge.emit("NODES DB" /* Types.Event.Type.nodesDb */, 4 /* Types.System.States.reload */); // downgrade state to reload database
+                this.stateBridge.emit("NODES DB" /* Event.Type.nodesDb */, 4 /* System.States.reload */); // downgrade state to reload database
                 resolve(true);
             }
             catch (err) {
@@ -136,7 +129,7 @@ class NodeModel {
                     }
                     yield this.db.updateAsync({ $or: [{ $and: [{ user_id }, { node_id }] }, { sync_id }] }, row, { upsert: true });
                 }
-                this.stateBridge.emit("NODES DB" /* Types.Event.Type.nodesDb */, 4 /* Types.System.States.reload */); // downgrade state to reload database
+                this.stateBridge.emit("NODES DB" /* Event.Type.nodesDb */, 4 /* System.States.reload */); // downgrade state to reload database
                 // Sync.confirm("nodes", from);
                 return true;
             }

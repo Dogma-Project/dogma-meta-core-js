@@ -37,11 +37,12 @@ declare namespace Event {
     dataMail = "DATA MAIL",
     dataDht = "DATA DHT",
     homeDir = "HOME DIR",
+    services = "SERVICES",
   }
   export type Listenter = (
-    action: Action,
     payload: Payload,
-    type: Type
+    type?: Type,
+    action?: Action
   ) => void;
   export type ArrayOfListeners = [Type[], Listenter] | [];
 }

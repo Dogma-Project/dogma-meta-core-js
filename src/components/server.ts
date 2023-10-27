@@ -3,12 +3,13 @@ import connections from "./connections";
 import stateManager from "./state";
 import storage from "./storage";
 import * as Types from "../types";
+import logger from "../modules/logger";
 // import connectionTester from "../modules/connectionTester";
 
 const server = new Server({ connections, storage, state: stateManager });
 
-stateManager.subscribe([Types.Event.Type.server], (_action, state) => {
-  stateManager.services.router = state;
+stateManager.subscribe([Types.Event.Type.server], (value) => {
+  stateManager.services.router = value;
 });
 
 stateManager.subscribe(
@@ -25,7 +26,10 @@ stateManager.subscribe(
         // connectionTester();
         break;
       case Types.System.States.full:
-        stateManager.emit(Types.Event.Type.externalPort, storage.config.router);
+        stateManager.emit(
+          Types.Event.Type.externalPort,
+          stateManager.state[Types.Event.Type.configRouter]
+        );
         break;
     }
   }
@@ -37,8 +41,10 @@ stateManager.subscribe(
     Types.Event.Type.nodeKey,
     Types.Event.Type.masterKey,
   ],
-  (_action, _value, _type) => {
-    const port = storage.config.router;
+  () => {
+    logger.log("DEBUG", "Server start");
+    const port = stateManager.state[Types.Event.Type.configRouter];
+    // edit
     if (!stateManager.services.router) {
       server.listen(port);
     } else {

@@ -1,7 +1,7 @@
 import generateSyncId from "../generateSyncId";
 import logger from "../logger";
 // import Sync from "./sync";
-import * as Types from "../../types";
+import { Event, System, Node, User } from "../../types";
 import { nedbDir } from "../datadir";
 import Datastore from "@seald-io/nedb";
 import Model from "./_model";
@@ -26,10 +26,7 @@ class NodeModel implements Model {
         fieldName: "param",
         unique: true,
       });
-      this.stateBridge.emit(
-        Types.Event.Type.nodesDb,
-        Types.System.States.ready
-      );
+      this.stateBridge.emit(Event.Type.nodesDb, System.States.ready);
     } catch (err) {
       logger.error("config.nodes", err);
     }
@@ -39,7 +36,22 @@ class NodeModel implements Model {
     return this.db.findAsync({});
   }
 
-  async getByUserId(user_id: Types.User.Id) {
+  async loadNodesTable() {
+    try {
+      logger.log("Node Model", "Load node table");
+      const data = await this.getAll();
+      if (data.length) {
+        this.stateBridge.emit(Event.Type.nodesDb, System.States.full);
+        this.stateBridge.emit(Event.Type.nodes, data);
+      } else {
+        this.stateBridge.emit(Event.Type.nodesDb, System.States.empty);
+      }
+    } catch (err) {
+      logger.error("node.nedb", err);
+    }
+  }
+
+  async getByUserId(user_id: User.Id) {
     return this.db.findAsync({ user_id });
   }
 
@@ -48,10 +60,10 @@ class NodeModel implements Model {
    * @param nodes [{name, node_id, user_id, public_ipv4, router_port}]
    * @returns {Promise}
    */
-  persistNodes(nodes: Types.Node.Model[]) {
+  persistNodes(nodes: Node.Model[]) {
     // add validation
 
-    const insert = async (row: Types.Node.Model) => {
+    const insert = async (row: Node.Model) => {
       try {
         const { node_id, user_id } = row;
         if (!row.public_ipv4) delete row.public_ipv4;
@@ -79,10 +91,7 @@ class NodeModel implements Model {
         for (let i = 0; i < nodes.length; i++) {
           await insert(nodes[i]);
         }
-        this.stateBridge.emit(
-          Types.Event.Type.nodesDb,
-          Types.System.States.reload
-        ); // downgrade state to reload database
+        this.stateBridge.emit(Event.Type.nodesDb, System.States.reload); // downgrade state to reload database
         resolve(true);
       } catch (err) {
         reject(err);
@@ -90,14 +99,14 @@ class NodeModel implements Model {
     });
   }
 
-  async setNodePublicIPv4(node_id: Types.Node.Id, ip: string) {
+  async setNodePublicIPv4(node_id: Node.Id, ip: string) {
     return this.db.updateAsync({ node_id }, { $set: { public_ipv4: ip } });
   }
 
   /**
    * @todo delete _id
    */
-  async sync(data: Types.Node.Model[], from: Types.Node.Id) {
+  async sync(data: Node.Model[], from: Node.Id) {
     try {
       for (const row of data) {
         const { sync_id, user_id, node_id } = row;
@@ -111,10 +120,7 @@ class NodeModel implements Model {
           { upsert: true }
         );
       }
-      this.stateBridge.emit(
-        Types.Event.Type.nodesDb,
-        Types.System.States.reload
-      ); // downgrade state to reload database
+      this.stateBridge.emit(Event.Type.nodesDb, System.States.reload); // downgrade state to reload database
       // Sync.confirm("nodes", from);
       return true;
     } catch (err) {

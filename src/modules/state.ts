@@ -22,7 +22,7 @@ class StateManager {
     set: (obj, prop, value) => {
       if (obj[prop] === value) return true;
       obj[prop] = value;
-      // EventEmitter.emit("services", obj);
+      this.emit(Types.Event.Type.services, { service: prop, state: value });
       return true;
     },
   };
@@ -37,8 +37,8 @@ class StateManager {
 
   /**
    *
-   * @param type array of events
-   * @param callback (action, value, type)
+   * @param 'array of events'
+   * @param (payload, type?, action?)
    */
   public subscribe = (
     type: Types.Event.Type[],
@@ -62,14 +62,13 @@ class StateManager {
       return logger.warn("state", "key isn't registered", type);
     if (this.state[type] === undefined) action = Types.Event.Action.set;
     if (payload !== true) {
-      if (JSON.stringify(this.state[type]) === JSON.stringify(payload)) return; // logger.warn("state", "nothing to emit", type);
-      // this.state[type] = payload;
+      if (JSON.stringify(this.state[type]) === JSON.stringify(payload)) return;
     }
     this.state[type] = payload; // test
     this.listeners[type].forEach((entry) => {
       if (!entry.length) return;
       let ready = entry[0].every((val) => this.state[val] !== undefined);
-      ready && entry[1](action, payload, type); // edit
+      ready && entry[1](payload, type, action); // edit
     });
   };
 }

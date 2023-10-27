@@ -23,6 +23,6 @@ function handle(signal: NodeJS.Signals) {
 process.on("SIGINT", handle);
 process.on("SIGTERM", handle);
 */
-state_1.default.emit(0 /* Event.Type.start */, true);
+state_1.default.emit("START" /* Event.Type.start */, true);
 // import "./components/migration";
 // import "./modules/sync";

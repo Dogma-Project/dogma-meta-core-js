@@ -55,7 +55,7 @@ class ConfigModel {
                     fieldName: "param",
                     unique: true,
                 });
-                this.stateBridge.emit(7 /* Types.Event.Type.configDb */, 2 /* Types.System.States.ready */);
+                this.stateBridge.emit("CONFIG DB" /* Types.Event.Type.configDb */, 2 /* Types.System.States.ready */);
             }
             catch (err) {
                 logger_1.default.error("config.nedb", err);
@@ -75,7 +75,7 @@ class ConfigModel {
             }));
             for (const row of newObject)
                 yield this.db.updateAsync({ param: row.param }, row, { upsert: true });
-            this.stateBridge.emit(7 /* Types.Event.Type.configDb */, 4 /* Types.System.States.reload */); // downgrade state to reload database
+            this.stateBridge.emit("CONFIG DB" /* Types.Event.Type.configDb */, 4 /* Types.System.States.reload */); // downgrade state to reload database
         });
     }
 }

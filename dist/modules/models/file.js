@@ -55,7 +55,7 @@ class FileModel {
                 //   fieldName: "param",
                 //   unique: true,
                 // });
-                this.stateBridge.emit(12 /* Types.Event.Type.filesDb */, 2 /* Types.System.States.ready */);
+                this.stateBridge.emit("FILES DB" /* Types.Event.Type.filesDb */, 2 /* Types.System.States.ready */);
             }
             catch (err) {
                 logger_1.default.error("files.nedb", err);

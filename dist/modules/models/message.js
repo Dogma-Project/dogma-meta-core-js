@@ -56,7 +56,7 @@ class MessageModel {
                     fieldName: "sync_id",
                     unique: true,
                 });
-                this.stateBridge.emit(10 /* Types.Event.Type.messagesDb */, 2 /* Types.System.States.ready */);
+                this.stateBridge.emit("MESSAGES DB" /* Types.Event.Type.messagesDb */, 2 /* Types.System.States.ready */);
             }
             catch (err) {
                 logger_1.default.error("messages.nedb", err);

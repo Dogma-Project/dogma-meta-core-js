@@ -55,7 +55,7 @@ class SyncModel {
                 //   fieldName: "param",
                 //   unique: true,
                 // });
-                this.stateBridge.emit(14 /* Types.Event.Type.syncDb */, 2 /* Types.System.States.ready */);
+                this.stateBridge.emit("SYNC DB" /* Types.Event.Type.syncDb */, 2 /* Types.System.States.ready */);
             }
             catch (err) {
                 logger_1.default.error("sync.nedb", err);

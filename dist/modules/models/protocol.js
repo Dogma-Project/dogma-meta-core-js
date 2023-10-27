@@ -55,7 +55,7 @@ class ProtocolModel {
                 //   fieldName: "param",
                 //   unique: true,
                 // });
-                this.stateBridge.emit(13 /* Types.Event.Type.protocolDb */, 2 /* Types.System.States.ready */);
+                this.stateBridge.emit("PROTOCOL DB" /* Types.Event.Type.protocolDb */, 2 /* Types.System.States.ready */);
             }
             catch (err) {
                 logger_1.default.error("protocol.nedb", err);

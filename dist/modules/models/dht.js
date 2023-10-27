@@ -55,7 +55,7 @@ class DHTModel {
                 //   fieldName: "param",
                 //   unique: true,
                 // });
-                this.stateBridge.emit(11 /* Types.Event.Type.dhtDb */, 2 /* Types.System.States.ready */);
+                this.stateBridge.emit("DHT DB" /* Types.Event.Type.dhtDb */, 2 /* Types.System.States.ready */);
             }
             catch (err) {
                 logger_1.default.error("dht.nedb", err);

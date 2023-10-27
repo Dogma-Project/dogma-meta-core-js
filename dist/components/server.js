@@ -33,14 +33,14 @@ const storage_1 = __importDefault(require("./storage"));
 const Types = __importStar(require("../types"));
 // import connectionTester from "../modules/connectionTester";
 const server = new server_1.default({ connections: connections_1.default, storage: storage_1.default, state: state_1.default });
-state_1.default.subscribe([23 /* Types.Event.Type.server */], (_action, state) => {
+state_1.default.subscribe(["SERVER" /* Types.Event.Type.server */], (_action, state) => {
     state_1.default.services.router = state;
 });
 state_1.default.subscribe([
-    23 /* Types.Event.Type.server */,
-    19 /* Types.Event.Type.configAutoDefine */,
-    20 /* Types.Event.Type.configExternal */,
-    21 /* Types.Event.Type.configPublicIpV4 */,
+    "SERVER" /* Types.Event.Type.server */,
+    "CONFIG AUTO DEFINE" /* Types.Event.Type.configAutoDefine */,
+    "CONFIG EXTERNAL" /* Types.Event.Type.configExternal */,
+    "CONFIG PUBLIC IPV4" /* Types.Event.Type.configPublicIpV4 */,
 ], (_action, _state) => {
     const state = state_1.default.services.router;
     switch (state) {
@@ -48,14 +48,14 @@ state_1.default.subscribe([
             // connectionTester();
             break;
         case 7 /* Types.System.States.full */:
-            state_1.default.emit(22 /* Types.Event.Type.externalPort */, storage_1.default.config.router);
+            state_1.default.emit("EXTERNAL PORT" /* Types.Event.Type.externalPort */, storage_1.default.config.router);
             break;
     }
 });
 state_1.default.subscribe([
-    15 /* Types.Event.Type.configRouter */,
-    6 /* Types.Event.Type.nodeKey */,
-    5 /* Types.Event.Type.masterKey */,
+    "CONFIG ROUTER" /* Types.Event.Type.configRouter */,
+    "NODE KEY" /* Types.Event.Type.nodeKey */,
+    "MASTER KEY" /* Types.Event.Type.masterKey */,
 ], (_action, _value, _type) => {
     const port = storage_1.default.config.router;
     if (!state_1.default.services.router) {

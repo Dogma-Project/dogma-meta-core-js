@@ -35,7 +35,7 @@ const disc = new localDiscovery_1.default({
     port: constants_1.DEFAULTS.LOCAL_DISCOVERY_PORT,
     ip: "",
 });
-state_1.default.subscribe([0 /* Types.Event.Type.start */], () => {
+state_1.default.subscribe(["START" /* Types.Event.Type.start */], () => {
     disc.startServer();
     disc.on("ready", (data) => {
         state_1.default.services.localDiscovery = 7 /* Types.System.States.full */;

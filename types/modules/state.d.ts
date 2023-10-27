@@ -4,7 +4,9 @@ declare class StateManager {
     private _services;
     private _servicesHandler;
     private listeners;
-    state: any[];
+    state: {
+        [index: string]: any;
+    };
     services: {
         [index: string]: Types.System.States;
         [index: symbol]: Types.System.States;

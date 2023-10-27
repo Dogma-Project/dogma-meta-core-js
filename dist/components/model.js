@@ -12,7 +12,7 @@ const nodeModel = new model_1.NodeModel({ state: state_1.default });
 const dhtModel = new model_1.DHTModel({ state: state_1.default });
 exports.dhtModel = dhtModel;
 const userModel = new model_1.UserModel({ state: state_1.default });
-state_2.default.subscribe([0 /* Event.Type.start */, 31 /* Event.Type.homeDir */], () => {
+state_2.default.subscribe(["START" /* Event.Type.start */, "HOME DIR" /* Event.Type.homeDir */], () => {
     configModel.init();
     nodeModel.init();
     dhtModel.init();

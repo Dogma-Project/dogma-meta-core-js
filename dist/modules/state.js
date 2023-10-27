@@ -52,8 +52,8 @@ class StateManager {
                 return true;
             },
         };
-        this.listeners = [];
-        this.state = [];
+        this.listeners = {};
+        this.state = {};
         this.services = new Proxy(this._services, this._servicesHandler);
         /**
          *

@@ -73,10 +73,10 @@ class Server {
               dht.announce(port);
             }, 3000);
             */
-            this.stateBridge.emit(21 /* Types.Event.Type.server */, 5 /* Types.System.States.limited */);
+            this.stateBridge.emit(23 /* Types.Event.Type.server */, 5 /* Types.System.States.limited */);
         });
         this.ss.on("error", (error) => {
-            this.stateBridge.emit(21 /* Types.Event.Type.server */, 0 /* Types.System.States.error */);
+            this.stateBridge.emit(23 /* Types.Event.Type.server */, 0 /* Types.System.States.error */);
             logger_1.default.error("server", "SERVER ERROR", error);
         });
         this.ss.on("close", () => {
@@ -84,7 +84,7 @@ class Server {
         });
     }
     stop(cb) {
-        this.stateBridge.emit(21 /* Types.Event.Type.server */, 1 /* Types.System.States.disabled */);
+        this.stateBridge.emit(23 /* Types.Event.Type.server */, 1 /* Types.System.States.disabled */);
         this.ss && this.ss.close();
         cb();
     }

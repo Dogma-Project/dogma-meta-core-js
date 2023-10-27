@@ -12,7 +12,7 @@ class Connections {
         this.highWaterMark = 200000;
         this.sendRequestToNode = index_1.sendRequestToNode;
         this.sendRequestToUser = index_1.sendRequestToUser;
-        this.streamToNode = index_1.streamToNode;
+        // streamToNode = streamToNode;
         this.onConnect = index_1.onConnect;
         this.getConnectionByNodeId = index_1.getConnectionByNodeId;
         this.getConnectionsByUserId = index_1.getConnectionsByUserId;

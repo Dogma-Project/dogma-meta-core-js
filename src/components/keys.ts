@@ -13,6 +13,7 @@ stateManager.subscribe(
   (action, payload: System.States) => {
     stateManager.services.masterKey = payload;
     if (payload === System.States.empty) {
+      logger.log("KEYS", "master key", "empty");
       if (args.auto) {
         createKeyPair(Keys.Type.masterKey, 4096)
           .then(() => {
@@ -24,6 +25,7 @@ stateManager.subscribe(
           });
       }
     } else if (payload === System.States.ready) {
+      logger.log("KEYS", "master key", "ready");
       try {
         storage.user.privateKey = fs.readFileSync(
           keysDir + "/master-private.pem"
@@ -37,6 +39,7 @@ stateManager.subscribe(
         stateManager.emit(Event.Type.masterKey, System.States.empty);
       }
     } else if (payload === System.States.full) {
+      logger.log("KEYS", "master key", "loaded");
       if (storage.user.publicKey) {
         const hash = crypto.createHash("sha256");
         hash.update(storage.user.publicKey);
@@ -51,6 +54,7 @@ stateManager.subscribe(
   (action, payload: System.States) => {
     stateManager.services.nodeKey = payload;
     if (payload === System.States.empty) {
+      logger.log("KEYS", "node key", "empty");
       if (args.auto) {
         createKeyPair(Keys.Type.nodeKey, 2048)
           .then(() => {
@@ -62,6 +66,7 @@ stateManager.subscribe(
           });
       }
     } else if (payload === System.States.ready) {
+      logger.log("KEYS", "node key", "ready");
       try {
         storage.node.privateKey = fs.readFileSync(
           keysDir + "/node-private.pem"
@@ -73,6 +78,7 @@ stateManager.subscribe(
         stateManager.emit(Event.Type.nodeKey, System.States.empty);
       }
     } else if (payload === System.States.full) {
+      logger.log("KEYS", "node key", "loaded");
       if (storage.node.publicKey) {
         const hash = crypto.createHash("sha256");
         hash.update(storage.node.publicKey);
@@ -83,6 +89,7 @@ stateManager.subscribe(
 );
 
 stateManager.subscribe([Event.Type.start], () => {
+  logger.log("KEYS", "starting");
   stateManager.emit(Event.Type.masterKey, System.States.ready);
   stateManager.emit(Event.Type.nodeKey, System.States.ready);
 });

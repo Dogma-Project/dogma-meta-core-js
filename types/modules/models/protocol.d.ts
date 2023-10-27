@@ -1,6 +1,13 @@
-import { PROTOCOL } from "../../constants";
-declare const model: {
-    getAll(): Promise<any>;
-    persistProtocol(protocol: typeof PROTOCOL): Promise<unknown>;
-};
-export default model;
+import Datastore from "@seald-io/nedb";
+import Model from "./_model";
+import StateManager from "../state";
+declare class ProtocolModel implements Model {
+    stateBridge: StateManager;
+    db: Datastore;
+    constructor({ state }: {
+        state: StateManager;
+    });
+    init(): Promise<void>;
+    getAll(): Promise<Record<string, any>[]>;
+}
+export default ProtocolModel;

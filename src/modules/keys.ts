@@ -37,7 +37,7 @@ export async function createKeyPair(
   try {
     const { publicKey, privateKey } = await _generateKeyPair(length);
     const opts: crypto.KeyExportOptions<"pem"> = {
-      type: "pkcs8",
+      type: "pkcs1",
       format: "pem",
     };
     const publicKeyBuffer = publicKey.export(opts);

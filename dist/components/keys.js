@@ -14,6 +14,7 @@ const keys_1 = require("../modules/keys");
 state_1.default.subscribe([5 /* Event.Type.masterKey */], (action, payload) => {
     state_1.default.services.masterKey = payload;
     if (payload === 3 /* System.States.empty */) {
+        logger_1.default.log("KEYS", "master key", "empty");
         if (arguments_1.default.auto) {
             (0, keys_1.createKeyPair)(1 /* Keys.Type.masterKey */, 4096)
                 .then(() => {
@@ -26,6 +27,7 @@ state_1.default.subscribe([5 /* Event.Type.masterKey */], (action, payload) => {
         }
     }
     else if (payload === 2 /* System.States.ready */) {
+        logger_1.default.log("KEYS", "master key", "ready");
         try {
             storage_1.default.user.privateKey = node_fs_1.default.readFileSync(datadir_1.keysDir + "/master-private.pem");
             storage_1.default.user.publicKey = node_fs_1.default.readFileSync(datadir_1.keysDir + "/master-public.pem");
@@ -37,6 +39,7 @@ state_1.default.subscribe([5 /* Event.Type.masterKey */], (action, payload) => {
         }
     }
     else if (payload === 7 /* System.States.full */) {
+        logger_1.default.log("KEYS", "master key", "loaded");
         if (storage_1.default.user.publicKey) {
             const hash = node_crypto_1.default.createHash("sha256");
             hash.update(storage_1.default.user.publicKey);
@@ -47,6 +50,7 @@ state_1.default.subscribe([5 /* Event.Type.masterKey */], (action, payload) => {
 state_1.default.subscribe([6 /* Event.Type.nodeKey */], (action, payload) => {
     state_1.default.services.nodeKey = payload;
     if (payload === 3 /* System.States.empty */) {
+        logger_1.default.log("KEYS", "node key", "empty");
         if (arguments_1.default.auto) {
             (0, keys_1.createKeyPair)(0 /* Keys.Type.nodeKey */, 2048)
                 .then(() => {
@@ -59,6 +63,7 @@ state_1.default.subscribe([6 /* Event.Type.nodeKey */], (action, payload) => {
         }
     }
     else if (payload === 2 /* System.States.ready */) {
+        logger_1.default.log("KEYS", "node key", "ready");
         try {
             storage_1.default.node.privateKey = node_fs_1.default.readFileSync(datadir_1.keysDir + "/node-private.pem");
             storage_1.default.node.publicKey = node_fs_1.default.readFileSync(datadir_1.keysDir + "/node-public.pem");
@@ -70,6 +75,7 @@ state_1.default.subscribe([6 /* Event.Type.nodeKey */], (action, payload) => {
         }
     }
     else if (payload === 7 /* System.States.full */) {
+        logger_1.default.log("KEYS", "node key", "loaded");
         if (storage_1.default.node.publicKey) {
             const hash = node_crypto_1.default.createHash("sha256");
             hash.update(storage_1.default.node.publicKey);
@@ -78,6 +84,7 @@ state_1.default.subscribe([6 /* Event.Type.nodeKey */], (action, payload) => {
     }
 });
 state_1.default.subscribe([0 /* Event.Type.start */], () => {
+    logger_1.default.log("KEYS", "starting");
     state_1.default.emit(5 /* Event.Type.masterKey */, 2 /* System.States.ready */);
     state_1.default.emit(6 /* Event.Type.nodeKey */, 2 /* System.States.ready */);
 });

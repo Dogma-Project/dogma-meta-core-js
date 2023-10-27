@@ -81,8 +81,9 @@ class StateManager {
             if (payload !== true) {
                 if (JSON.stringify(this.state[type]) === JSON.stringify(payload))
                     return; // logger.warn("state", "nothing to emit", type);
-                this.state[type] = payload;
+                // this.state[type] = payload;
             }
+            this.state[type] = payload; // test
             this.listeners[type].forEach((entry) => {
                 if (!entry.length)
                     return;

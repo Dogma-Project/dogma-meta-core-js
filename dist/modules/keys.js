@@ -34,7 +34,7 @@ function createKeyPair(type, length = 2048) {
         try {
             const { publicKey, privateKey } = yield _generateKeyPair(length);
             const opts = {
-                type: "pkcs8",
+                type: "pkcs1",
                 format: "pem",
             };
             const publicKeyBuffer = publicKey.export(opts);

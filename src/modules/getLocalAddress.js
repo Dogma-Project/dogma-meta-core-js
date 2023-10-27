@@ -1,6 +1,7 @@
-"use strict";
 // import os from "node:os";
+
 // const ifaces = os.networkInterfaces();
+
 // /**
 //  * @todo fix
 //  */

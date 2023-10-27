@@ -1,7 +1,41 @@
-import { fileTransfer as fileTransferDb } from "../nedb";
 import * as Types from "../../types";
+import { nedbDir } from "../datadir";
+import Datastore from "@seald-io/nedb";
+import logger from "../logger";
+import Model from "./_model";
+import StateManager from "../state";
 
-const model = {
+class FileModel implements Model {
+  stateBridge: StateManager;
+  db: Datastore = new Datastore({
+    filename: nedbDir + "/files.db",
+  });
+
+  constructor({ state }: { state: StateManager }) {
+    this.stateBridge = state;
+  }
+
+  async init() {
+    try {
+      logger.debug("nedb", "load database", "files");
+      await this.db.loadDatabaseAsync();
+      // await this.db.ensureIndexAsync({
+      //   fieldName: "param",
+      //   unique: true,
+      // });
+      this.stateBridge.emit(
+        Types.Event.Type.filesDb,
+        Types.System.States.ready
+      );
+    } catch (err) {
+      logger.error("files.nedb", err);
+    }
+  }
+
+  async getAll() {
+    return this.db.findAsync({});
+  }
+
   async permitFileTransfer({
     user_id,
     file,
@@ -10,7 +44,7 @@ const model = {
     file: Types.File.Description;
   }) {
     const { descriptor, size, pathname } = file;
-    return fileTransferDb.updateAsync(
+    return this.db.updateAsync(
       {
         user_id,
         descriptor,
@@ -27,7 +61,7 @@ const model = {
         upsert: true,
       }
     );
-  },
+  }
 
   async forbidFileTransfer({
     user_id,
@@ -36,8 +70,8 @@ const model = {
     user_id: Types.User.Id;
     descriptor: number;
   }) {
-    return fileTransferDb.removeAsync({ user_id, descriptor }, { multi: true });
-  },
+    return this.db.removeAsync({ user_id, descriptor }, { multi: true });
+  }
 
   async fileTransferAllowed({
     user_id,
@@ -46,8 +80,8 @@ const model = {
     user_id: Types.User.Id;
     descriptor: number;
   }) {
-    return fileTransferDb.findOneAsync({ user_id, descriptor });
-  },
-};
+    return this.db.findOneAsync({ user_id, descriptor });
+  }
+}
 
-export default model;
+export default FileModel;

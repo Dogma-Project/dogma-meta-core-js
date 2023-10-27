@@ -4,7 +4,7 @@ import {
   closeConnectionsByUserId,
   sendRequestToNode,
   sendRequestToUser,
-  streamToNode,
+  // streamToNode,
   peerFromIP,
   multicast,
   getConnectionByNodeId,
@@ -35,7 +35,7 @@ class Connections {
 
   sendRequestToNode = sendRequestToNode;
   sendRequestToUser = sendRequestToUser;
-  streamToNode = streamToNode;
+  // streamToNode = streamToNode;
 
   onConnect = onConnect;
 

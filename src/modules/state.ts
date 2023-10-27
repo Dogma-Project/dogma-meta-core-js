@@ -58,8 +58,9 @@ class StateManager {
     if (this.state[type] === undefined) action = Types.Event.Action.set;
     if (payload !== true) {
       if (JSON.stringify(this.state[type]) === JSON.stringify(payload)) return; // logger.warn("state", "nothing to emit", type);
-      this.state[type] = payload;
+      // this.state[type] = payload;
     }
+    this.state[type] = payload; // test
     this.listeners[type].forEach((entry) => {
       if (!entry.length) return;
       let ready = entry[0].every((val) => this.state[val] !== undefined);

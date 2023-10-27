@@ -3,7 +3,7 @@ import closeConnectionByNodeId from "./closeConnectionByNodeId";
 import closeConnectionsByUserId from "./closeConnectionsByUserId";
 import sendRequestToNode from "./sendRequestToNode";
 import sendRequestToUser from "./sendRequestToUser";
-import streamToNode from "./streamToNode";
+// import streamToNode from "./streamToNode";
 import peerFromIP from "./peerFromIP";
 import multicast from "./multicast";
 import getConnectionByNodeId from "./getConnectionByNodeId";
@@ -15,7 +15,7 @@ export {
   closeConnectionsByUserId,
   sendRequestToNode,
   sendRequestToUser,
-  streamToNode,
+  // streamToNode,
   peerFromIP,
   multicast,
   getConnectionByNodeId,

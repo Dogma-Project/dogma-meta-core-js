@@ -1,24 +1,50 @@
-import { sync as syncDb } from "../nedb";
 import * as Types from "../../types";
+import { nedbDir } from "../datadir";
+import Datastore from "@seald-io/nedb";
+import logger from "../logger";
+import Model from "./_model";
+import StateManager from "../state";
 
-const model = {
+class SyncModel implements Model {
+  stateBridge: StateManager;
+  db: Datastore = new Datastore({
+    filename: nedbDir + "/sync.db",
+  });
+
+  constructor({ state }: { state: StateManager }) {
+    this.stateBridge = state;
+  }
+
+  async init() {
+    try {
+      logger.debug("nedb", "load database", "sync");
+      await this.db.loadDatabaseAsync();
+      // await this.db.ensureIndexAsync({
+      //   fieldName: "param",
+      //   unique: true,
+      // });
+      this.stateBridge.emit(Types.Event.Type.syncDb, Types.System.States.ready);
+    } catch (err) {
+      logger.error("sync.nedb", err);
+    }
+  }
+
   async getAll() {
-    return syncDb.findAsync({});
-  },
+    return this.db.findAsync({});
+  }
 
   async get(db: string, node_id: Types.Node.Id) {
-    return syncDb.findOneAsync({ db, node_id });
-  },
+    return this.db.findOneAsync({ db, node_id });
+  }
 
   async confirm(db: string, node_id: Types.Node.Id) {
     const time = new Date().getTime(); // check
-    return syncDb.updateAsync(
+    return this.db.updateAsync(
       { db, node_id },
       { db, node_id, time },
       { upsert: true }
     );
-  },
-};
+  }
+}
 
-module.exports = model;
-export default model;
+export default SyncModel;

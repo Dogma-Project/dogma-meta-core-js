@@ -3,7 +3,7 @@ import connections from "./connections";
 import stateManager from "./state";
 import storage from "./storage";
 import * as Types from "../types";
-import connectionTester from "../modules/connectionTester";
+// import connectionTester from "../modules/connectionTester";
 
 const server = new Server({ connections, storage, state: stateManager });
 
@@ -22,7 +22,7 @@ stateManager.subscribe(
     const state = stateManager.services.router;
     switch (state) {
       case Types.System.States.limited:
-        connectionTester();
+        // connectionTester();
         break;
       case Types.System.States.full:
         stateManager.emit(Types.Event.Type.externalPort, storage.config.router);

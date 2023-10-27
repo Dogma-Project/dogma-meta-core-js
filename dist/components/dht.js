@@ -38,7 +38,7 @@ const dht = new dht_1.default({
     connections: connections_1.default,
     model: model_1.dhtModel,
 });
-state_1.default.subscribe([14 /* Types.Event.Type.configDhtLookup */], (_action, value, _type) => {
+state_1.default.subscribe([16 /* Types.Event.Type.configDhtLookup */], (_action, value, _type) => {
     dht.setPermission(1 /* Types.DHT.Type.dhtLookup */, value);
     if (value > 3 /* Types.Connection.Group.selfUser */) {
         state_1.default.services.dhtLookup = 1 /* Types.System.States.disabled */;
@@ -50,7 +50,7 @@ state_1.default.subscribe([14 /* Types.Event.Type.configDhtLookup */], (_action,
         state_1.default.services.dhtLookup = 6 /* Types.System.States.ok */;
     }
 });
-state_1.default.subscribe([15 /* Types.Event.Type.configDhtAnnounce */], (_action, value, _type) => {
+state_1.default.subscribe([17 /* Types.Event.Type.configDhtAnnounce */], (_action, value, _type) => {
     dht.setPermission(0 /* Types.DHT.Type.dhtAnnounce */, value);
     if (value > 3 /* Types.Connection.Group.selfUser */) {
         state_1.default.services.dhtAnnounce = 1 /* Types.System.States.disabled */;
@@ -62,7 +62,7 @@ state_1.default.subscribe([15 /* Types.Event.Type.configDhtAnnounce */], (_actio
         state_1.default.services.dhtAnnounce = 6 /* Types.System.States.ok */;
     }
 });
-state_1.default.subscribe([16 /* Types.Event.Type.configDhtBootstrap */], (_action, value, _type) => {
+state_1.default.subscribe([18 /* Types.Event.Type.configDhtBootstrap */], (_action, value, _type) => {
     dht.setPermission(2 /* Types.DHT.Type.dhtBootstrap */, value);
     if (value > 3 /* Types.Connection.Group.selfUser */) {
         state_1.default.services.dhtBootstrap = 1 /* Types.System.States.disabled */;

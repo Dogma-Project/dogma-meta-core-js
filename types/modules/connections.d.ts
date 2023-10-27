@@ -18,7 +18,6 @@ declare class Connections {
     highWaterMark: number;
     sendRequestToNode: typeof sendRequestToNode;
     sendRequestToUser: typeof sendRequestToUser;
-    streamToNode: any;
     onConnect: typeof onConnect;
     getConnectionByNodeId: typeof getConnectionByNodeId;
     getConnectionsByUserId: typeof getConnectionsByUserId;

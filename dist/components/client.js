@@ -54,8 +54,8 @@ dht_1.default.on("peers", (data) => {
 });
 let connectFriendsInterval;
 let searchFriendsInterval;
-state_1.default.subscribe([22 /* Types.Event.Type.updateUser */, 4 /* Types.Event.Type.users */], () => {
-    const user_id = state_1.default.state[22 /* Types.Event.Type.updateUser */];
+state_1.default.subscribe([24 /* Types.Event.Type.updateUser */, 4 /* Types.Event.Type.users */], () => {
+    const user_id = state_1.default.state[24 /* Types.Event.Type.updateUser */];
     connections_1.default.closeConnectionsByUserId(user_id);
 });
 state_1.default.subscribe([3 /* Types.Event.Type.nodes */, 4 /* Types.Event.Type.users */, 6 /* Types.Event.Type.nodeKey */], () => {
@@ -67,7 +67,7 @@ state_1.default.subscribe([3 /* Types.Event.Type.nodes */, 4 /* Types.Event.Type
     connectFriendsInterval = setInterval(client.connectFriends, 60000); // edit
 });
 state_1.default.subscribe([
-    14 /* Types.Event.Type.configDhtLookup */,
+    16 /* Types.Event.Type.configDhtLookup */,
     4 /* Types.Event.Type.users */,
     6 /* Types.Event.Type.nodeKey */,
 ], () => {

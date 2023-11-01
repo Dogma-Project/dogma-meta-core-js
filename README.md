@@ -1,15 +1,29 @@
-# Dogma Project
+# Dogma Project Meta
 
-Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package
+**Dogma Meta** is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in TypeScript.
+
+## You can use Dogma Meta platform to:
+
+- Build private networks through secure TLS connections between own nodes and nodes of your friends.
+- Communicate with friends with Dogma's text, voice or video chats.
+- Send and receive files between connected nodes.
+- Synchronize important data between own nodes to keep it safe.
+
+## Inspired by:
+
+- Retroshare
+- Syncthing
+- Tox
+- Tor
 
 ## Attention!
 
-This package is a dependency for Dogma Application. If you want to try app, switch to "dogma-headless" package.
+This package is a dependency for Dogma Meta Application, which is currently in active development.
 
 ## Installation
 
 ```
-git clone https://gitlab.com/dogma-project/dogma-core.git
+git clone git@github.com:Dogma-Project/dogma-core-js.git
 ```
 
 or

@@ -74,7 +74,7 @@ class LocalDiscovery extends EventEmitter {
     });
   }
 
-  startServer() {
+  public startServer() {
     this.server.on("listening", () => {
       const address = this.server.address();
       this.emit("ready", {
@@ -114,7 +114,7 @@ class LocalDiscovery extends EventEmitter {
     return this;
   }
 
-  announce(card: Types.Discovery.Card) {
+  public announce(card: Types.Discovery.Card) {
     const message = JSON.stringify(card);
     this.server.send(
       message,

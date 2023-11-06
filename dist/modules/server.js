@@ -46,14 +46,14 @@ class Server {
             const peer = {
                 host,
                 port,
-                address: host + port,
+                address: host + ":" + port,
                 version: 4,
             };
             this.connectionsBridge.onConnect(socket, peer);
         });
         const host = "0.0.0.0"; // temp
         this.ss.listen(port, host, () => {
-            logger_1.default.info("server", `TLS socket is listening on ${host}:${port}`);
+            logger_1.default.info("server", `TCP socket is listening on ${host}:${port}`);
             /**
              * @todo move from here
              */

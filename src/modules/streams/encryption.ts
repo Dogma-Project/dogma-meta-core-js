@@ -1,5 +1,6 @@
 import internal, { Transform, TransformCallback } from "node:stream";
 import crypto from "node:crypto";
+import logger from "../logger";
 
 type EncryptionStreamParams = {
   publicKey: crypto.KeyLike;
@@ -28,33 +29,10 @@ class Encryption extends Transform {
       const result = crypto.publicEncrypt(this.publicKey, chunk);
       callback(null, result);
     } catch (err) {
-      console.error(err);
+      logger.error("encryption streamer", err);
       callback(null, null);
     }
   }
 }
 
-class Decryption extends Transform {
-  privateKey: crypto.KeyLike;
-
-  constructor(params: DecryptionStreamParams) {
-    super(params.opts);
-    this.privateKey = params.privateKey;
-  }
-
-  _transform(
-    chunk: Buffer,
-    encoding: BufferEncoding,
-    callback: TransformCallback
-  ) {
-    try {
-      const result = crypto.privateDecrypt(this.privateKey, chunk);
-      callback(null, result);
-    } catch (err) {
-      console.error(err);
-      callback(null, null);
-    }
-  }
-}
-
-export { Encryption, Decryption };
+export default Encryption;

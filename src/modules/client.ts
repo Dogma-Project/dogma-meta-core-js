@@ -50,9 +50,11 @@ export default class Client {
     const connectNonFriends = true;
 
     if (!connectNonFriends) {
-      const inFriends = this.storageBridge.users.find(
-        (user) => user.user_id === user_id
-      );
+      const users = this.stateBridge.state[Types.Event.Type.users] as
+        | Types.User.Model[]
+        | undefined;
+      if (!users || !Array.isArray(users)) return;
+      const inFriends = users.find((user) => user.user_id === user_id);
       if (!inFriends)
         return logger.log(
           "client",
@@ -88,27 +90,37 @@ export default class Client {
    * DHT Lookup all friends
    */
   searchFriends() {
-    this.storageBridge.users.forEach((user) => this.dhtLookup(user.user_id));
+    const users = this.stateBridge.state[Types.Event.Type.users] as
+      | Types.User.Model[]
+      | undefined;
+    if (users && Array.isArray(users)) {
+      users.forEach((user) => this.dhtLookup(user.user_id));
+    }
   }
 
   /**
    * @todo move to connections
    */
   connectFriends() {
-    this.storageBridge.nodes.forEach((node) => {
-      const { public_ipv4, local_ipv4, user_id, node_id } = node;
-      if (public_ipv4) {
-        // add validation
-        const [host, port] = public_ipv4;
-        const peer: Types.Connection.Peer = {
-          address: public_ipv4,
-          host,
-          port: Number(port),
-          version: 4,
-        };
-        this.tryPeer(peer, { user_id, node_id });
-      }
-    });
+    const nodes = this.stateBridge.state[Types.Event.Type.nodes] as
+      | Types.Node.Model[]
+      | undefined;
+    if (nodes && Array.isArray(nodes)) {
+      nodes.forEach((node) => {
+        const { public_ipv4, local_ipv4, user_id, node_id } = node;
+        if (public_ipv4) {
+          // add validation
+          const [host, port] = public_ipv4;
+          const peer: Types.Connection.Peer = {
+            address: public_ipv4,
+            host,
+            port: Number(port),
+            version: 4,
+          };
+          this.tryPeer(peer, { user_id, node_id });
+        }
+      });
+    }
   }
 
   /**

@@ -31,6 +31,7 @@ const logger_1 = __importDefault(require("../modules/logger"));
 const state_1 = __importDefault(require("./state"));
 const constants_1 = require("../constants");
 const Types = __importStar(require("../types"));
+const storage_1 = __importDefault(require("./storage"));
 const disc = new localDiscovery_1.default({
     port: constants_1.DEFAULTS.LOCAL_DISCOVERY_PORT,
     ip: "",
@@ -45,5 +46,18 @@ state_1.default.subscribe(["START" /* Types.Event.Type.start */], () => {
         state_1.default.services.localDiscovery = 0 /* Types.System.States.error */;
         logger_1.default.error("Local discovery server", "error", data);
     });
+});
+state_1.default.subscribe(["SERVER" /* Types.Event.Type.server */], (payload) => {
+    if (payload >= 5 /* Types.System.States.limited */) {
+        const port = state_1.default.state["CONFIG ROUTER" /* Types.Event.Type.configRouter */];
+        if (!port)
+            return logger_1.default.warn("Local discovery", "Unknown port");
+        disc.announce({
+            type: "dogma-router",
+            user_id: storage_1.default.user.id || "unk",
+            node_id: storage_1.default.node.id || "unk",
+            port,
+        });
+    }
 });
 exports.default = disc;

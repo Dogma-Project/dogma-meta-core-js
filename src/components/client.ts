@@ -42,7 +42,7 @@ state.subscribe(
     if (args.discovery) return; // don't lookup in discovery mode
     clearInterval(connectFriendsInterval);
     client.connectFriends(); // check
-    connectFriendsInterval = setInterval(client.connectFriends, 60000); // edit
+    connectFriendsInterval = setInterval(() => client.connectFriends(), 60000); // edit
   }
 );
 
@@ -58,7 +58,7 @@ state.subscribe(
     clearInterval(searchFriendsInterval);
     if (state.state[Types.Event.Type.configDhtLookup]) {
       client.searchFriends(); // check
-      searchFriendsInterval = setInterval(client.searchFriends, 30000); // edit
+      searchFriendsInterval = setInterval(() => client.searchFriends(), 30000); // edit
     }
   }
 );

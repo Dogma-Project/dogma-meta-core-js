@@ -94,8 +94,9 @@ class ConfigModel {
                 param: key,
                 value: config[key],
             }));
-            for (const row of newObject)
+            for (const row of newObject) {
                 yield this.db.updateAsync({ param: row.param }, row, { upsert: true });
+            }
             this.stateBridge.emit("CONFIG DB" /* Types.Event.Type.configDb */, 4 /* Types.System.States.reload */); // downgrade state to reload database
         });
     }

@@ -64,7 +64,7 @@ state_1.default.subscribe(["NODES" /* Types.Event.Type.nodes */, "USERS" /* Type
         return; // don't lookup in discovery mode
     clearInterval(connectFriendsInterval);
     client.connectFriends(); // check
-    connectFriendsInterval = setInterval(client.connectFriends, 60000); // edit
+    connectFriendsInterval = setInterval(() => client.connectFriends(), 60000); // edit
 });
 state_1.default.subscribe([
     "CONFIG DHT LOOKUP" /* Types.Event.Type.configDhtLookup */,
@@ -77,6 +77,6 @@ state_1.default.subscribe([
     clearInterval(searchFriendsInterval);
     if (state_1.default.state["CONFIG DHT LOOKUP" /* Types.Event.Type.configDhtLookup */]) {
         client.searchFriends(); // check
-        searchFriendsInterval = setInterval(client.searchFriends, 30000); // edit
+        searchFriendsInterval = setInterval(() => client.searchFriends(), 30000); // edit
     }
 });

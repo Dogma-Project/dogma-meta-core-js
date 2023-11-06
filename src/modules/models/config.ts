@@ -63,8 +63,9 @@ class ConfigModel implements Model {
       param: key,
       value: config[key],
     }));
-    for (const row of newObject)
+    for (const row of newObject) {
       await this.db.updateAsync({ param: row.param }, row, { upsert: true });
+    }
     this.stateBridge.emit(
       Types.Event.Type.configDb,
       Types.System.States.reload

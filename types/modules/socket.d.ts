@@ -23,7 +23,6 @@ declare class DogmaSocket extends EventEmitter {
         mail: MuxStream;
         dht: MuxStream;
     };
-    private readonly output;
     readonly direction: Types.Connection.Direction;
     status: Types.Connection.Status;
     group: Types.Connection.Group;
@@ -38,9 +37,9 @@ declare class DogmaSocket extends EventEmitter {
     onDisconnect?: Function;
     tested: boolean;
     constructor(socket: net.Socket, direction: Types.Connection.Direction, state: StateManager, storage: Storage);
-    private setDecryptor;
-    private setHandshakeSubStream;
     private setEncryptor;
+    private _decrypt;
+    private _demux;
     private _onData;
     private _onClose;
     private onError;

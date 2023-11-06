@@ -6,10 +6,11 @@ import crypto from "node:crypto";
 import * as Types from "../types";
 import generateSyncId from "./generateSyncId";
 import logger from "./logger";
-import { DemuxStream, MuxStream, Encryption, Decryption } from "./streams";
+import { MuxStream, Encryption } from "./streams";
 import { onData } from "./socket/index";
 import StateManager from "./state";
 import Storage from "./storage";
+import { SIZES } from "../constants";
 
 /**
  * @todo add online event
@@ -30,7 +31,6 @@ class DogmaSocket extends EventEmitter {
     mail: MuxStream;
     dht: MuxStream;
   };
-  private readonly output: DemuxStream;
 
   public readonly direction: Types.Connection.Direction;
   status: Types.Connection.Status = Types.Connection.Status.notConnected;
@@ -70,30 +70,13 @@ class DogmaSocket extends EventEmitter {
       mail: new MuxStream({ substream: Types.Streams.MX.mail }),
       dht: new MuxStream({ substream: Types.Streams.MX.dht }),
     };
-    this.output = new DemuxStream({});
-    this.setDecryptor();
-    this.setHandshakeSubStream();
+    this.input.handshake.pipe(this.socket); // the one unencrypted substream
+    this.socket.on("data", (data) => this._onData(data));
     this.socket.on("close", this._onClose);
     this.socket.on("error", this.onError);
-    this.output.on("data", this._onData);
-    this.sendHandshake(Types.Connection.Handshake.Stage.init); // edit
-  }
-
-  private setDecryptor() {
-    if (!this.storageBridge.node.privateKey) {
-      return; // edit
-    }
-    const privateNodeKey = crypto.createPrivateKey({
-      key: this.storageBridge.node.privateKey,
-      type: "pkcs1",
-      format: "pem",
-    });
-    const decryptor = new Decryption({ privateKey: privateNodeKey });
-    this.socket.pipe(decryptor).pipe(this.output);
-  }
-
-  private setHandshakeSubStream() {
-    this.input.handshake.pipe(this.socket); // the one unencrypted substream
+    setTimeout(() => {
+      this.sendHandshake(Types.Connection.Handshake.Stage.init); // edit
+    }, 50);
   }
 
   private setEncryptor() {
@@ -108,7 +91,38 @@ class DogmaSocket extends EventEmitter {
     this.input.dht.pipe(encryptor).pipe(this.socket);
   }
 
-  private _onData = onData;
+  private _decrypt(chunk: Buffer) {
+    if (!this.storageBridge.node.privateKey) {
+      return; // edit
+    }
+    const privateNodeKey = crypto.createPrivateKey({
+      key: this.storageBridge.node.privateKey,
+      type: "pkcs1",
+      format: "pem",
+    });
+    const result = crypto.privateDecrypt(privateNodeKey, chunk);
+    return result;
+  }
+
+  private _demux(chunk: Buffer) {
+    const mx = chunk.subarray(0, SIZES.MX).readUInt8(0);
+    const data = chunk.subarray(SIZES.MX, chunk.length);
+    const result: Types.Streams.DemuxedResult = {
+      mx,
+      data,
+    };
+    return result;
+  }
+
+  private _onData(chunk: Buffer) {
+    const demuxed = this._demux(chunk);
+    if (demuxed.mx > Types.Streams.MX.handshake) {
+      const decrypted = this._decrypt(demuxed.data);
+      if (!decrypted) return logger.warn("on data", "empty decrypted");
+      demuxed.data = decrypted;
+    }
+    onData.call(this, demuxed);
+  }
 
   private async _onClose(hadError: boolean) {
     // edit
@@ -161,55 +175,67 @@ class DogmaSocket extends EventEmitter {
    * @todo add verification
    */
   protected handleHandshake(data: Buffer) {
-    const json = data.toString();
-    const parsed = JSON.parse(json) as
-      | Types.Connection.Handshake.StageInitRequest
-      | Types.Connection.Handshake.StageVerificationRequest;
-    console.log("HS", parsed);
-    if (parsed.stage === undefined) return; // edit
-    if (parsed.stage === Types.Connection.Handshake.Stage.init) {
-      this.inSession = parsed.session;
-      this.unverified_user_id = parsed.user_id;
-      this.unverified_node_id = parsed.node_id;
-    } else if (parsed.stage === Types.Connection.Handshake.Stage.verification) {
-      try {
-        const publicUserKey = crypto.createPublicKey(parsed.userKey); // edit
-        const publicNodeKey = crypto.createPublicKey(parsed.nodeKey); // edit
+    try {
+      const json = data.toString();
+      console.log("json", json);
+      const parsed = JSON.parse(json) as
+        | Types.Connection.Handshake.StageInitRequest
+        | Types.Connection.Handshake.StageVerificationRequest;
+      console.log("HS", parsed);
+      if (parsed.stage === undefined) return; // edit
+      if (parsed.stage === Types.Connection.Handshake.Stage.init) {
+        this.inSession = parsed.session;
+        this.unverified_user_id = parsed.user_id;
+        this.unverified_node_id = parsed.node_id;
+        setTimeout(() => {
+          this.sendHandshake(Types.Connection.Handshake.Stage.verification);
+        }, 50);
+      } else if (
+        parsed.stage === Types.Connection.Handshake.Stage.verification
+      ) {
+        try {
+          const publicUserKey = crypto.createPublicKey(parsed.userKey); // edit
+          const publicNodeKey = crypto.createPublicKey(parsed.nodeKey); // edit
 
-        const verifyUser = crypto.createVerify("SHA256");
-        verifyUser.update(parsed.userKey);
-        verifyUser.end();
-        const verifyUserResult = verifyUser.verify(
-          publicUserKey,
-          parsed.userSign
-        );
-        if (!verifyUserResult) return; //edit
+          const verifyUser = crypto.createVerify("SHA256");
+          verifyUser.update(parsed.userKey);
+          verifyUser.end();
+          const verifyUserResult = verifyUser.verify(
+            publicUserKey,
+            parsed.userSign
+          );
+          if (!verifyUserResult)
+            return logger.log("Socket", "User not verified", this.id);
 
-        const verifyNode = crypto.createVerify("SHA256");
-        verifyNode.update(parsed.userKey);
-        verifyNode.end();
-        const verifyNodeResult = verifyNode.verify(
-          publicNodeKey,
-          parsed.nodeSign
-        );
-        if (!verifyNodeResult) return; //edit
-        this.publicUserKey = publicUserKey;
-        this.publicNodeKey = publicNodeKey;
+          const verifyNode = crypto.createVerify("SHA256");
+          verifyNode.update(parsed.userKey);
+          verifyNode.end();
+          const verifyNodeResult = verifyNode.verify(
+            publicNodeKey,
+            parsed.nodeSign
+          );
+          if (!verifyNodeResult)
+            return logger.log("Socket", "Node not verified", this.id);
+          this.publicUserKey = publicUserKey;
+          this.publicNodeKey = publicNodeKey;
 
-        const user_id = crypto.createHash("SHA256");
-        user_id.update(parsed.userKey);
-        this.user_id = user_id.digest("hex");
-        if (this.unverified_user_id !== this.user_id) return; // edit ban
+          const user_id = crypto.createHash("SHA256");
+          user_id.update(parsed.userKey);
+          this.user_id = user_id.digest("hex");
+          if (this.unverified_user_id !== this.user_id) return; // edit ban
 
-        const node_id = crypto.createHash("SHA256");
-        node_id.update(parsed.nodeKey);
-        this.node_id = node_id.digest("hex");
-        if (this.unverified_node_id !== this.node_id) return; // edit ban
-
-        this.setEncryptor(); // if all's right
-      } catch (err) {
-        logger.error("HS Verification", err);
+          const node_id = crypto.createHash("SHA256");
+          node_id.update(parsed.nodeKey);
+          this.node_id = node_id.digest("hex");
+          if (this.unverified_node_id !== this.node_id) return; // edit ban
+          logger.log("Socker", this.id, "verified");
+          this.setEncryptor(); // if all's right
+        } catch (err) {
+          logger.error("HS Verification", err);
+        }
       }
+    } catch (err) {
+      logger.error("handle handshake", err);
     }
   }
 

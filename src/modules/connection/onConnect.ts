@@ -10,10 +10,15 @@ export default function onConnect(
   peer: Types.Connection.Peer, // check
   direction: Types.Connection.Direction = Types.Connection.Direction.outcoming
 ) {
-  const dogmaSocket = new DogmaSocket(socket, direction, this.stateBridge);
+  const dogmaSocket = new DogmaSocket(
+    socket,
+    direction,
+    this.stateBridge,
+    this.storageBridge
+  );
   dogmaSocket.on("offline", () => {
     const { node_id } = dogmaSocket;
-    if (node_id !== null) {
+    if (!!node_id) {
       this.stateBridge.emit(Types.Event.Type.offline, node_id);
       const index = this.online.indexOf(node_id);
       if (index !== -1) {
@@ -24,7 +29,7 @@ export default function onConnect(
   });
   dogmaSocket.on("online", () => {
     const { node_id } = dogmaSocket;
-    if (node_id !== null) {
+    if (!!node_id) {
       this.stateBridge.emit(Types.Event.Type.online, node_id);
       this.online.push(node_id);
     }

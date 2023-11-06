@@ -1,4 +1,4 @@
-import crypto, { RSAKeyPairKeyObjectOptions } from "node:crypto";
+import crypto, { KeyObject, RSAKeyPairKeyObjectOptions } from "node:crypto";
 import { Keys } from "../types";
 import logger from "./logger";
 import fs from "node:fs";

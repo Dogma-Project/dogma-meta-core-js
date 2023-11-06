@@ -41,5 +41,25 @@ declare namespace Connection {
         public?: boolean;
         version?: 4 | 6;
     };
+    namespace Handshake {
+        type StageInitRequest = {
+            stage: Stage.init;
+            protocol: 1;
+            session: string;
+            user_id: User.Id;
+            node_id: Node.Id;
+        };
+        type StageVerificationRequest = {
+            stage: Stage.verification;
+            userKey: string;
+            userSign: string;
+            nodeKey: string;
+            nodeSign: string;
+        };
+        const enum Stage {
+            init = 0,
+            verification = 1
+        }
+    }
 }
 export default Connection;

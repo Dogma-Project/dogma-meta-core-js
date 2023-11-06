@@ -31,10 +31,10 @@ const Types = __importStar(require("../../types"));
 const socket_1 = __importDefault(require("../socket"));
 function onConnect(socket, peer, // check
 direction = 0 /* Types.Connection.Direction.outcoming */) {
-    const dogmaSocket = new socket_1.default(socket, direction, this.stateBridge);
+    const dogmaSocket = new socket_1.default(socket, direction, this.stateBridge, this.storageBridge);
     dogmaSocket.on("offline", () => {
         const { node_id } = dogmaSocket;
-        if (node_id !== null) {
+        if (!!node_id) {
             this.stateBridge.emit("OFFLINE" /* Types.Event.Type.offline */, node_id);
             const index = this.online.indexOf(node_id);
             if (index !== -1) {
@@ -45,7 +45,7 @@ direction = 0 /* Types.Connection.Direction.outcoming */) {
     });
     dogmaSocket.on("online", () => {
         const { node_id } = dogmaSocket;
-        if (node_id !== null) {
+        if (!!node_id) {
             this.stateBridge.emit("ONLINE" /* Types.Event.Type.online */, node_id);
             this.online.push(node_id);
         }

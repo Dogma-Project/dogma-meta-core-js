@@ -15,11 +15,11 @@ export default function send(
     switch (request.class) {
       case Types.Streams.MX.dht:
         var str = JSON.stringify(request.body);
-        socket.input.dht.write(str);
+        socket.input.dht && socket.input.dht.write(str);
         return response(1, MSG_CODE.SUCCESS);
       case Types.Streams.MX.messages:
         var str = JSON.stringify(request.body);
-        socket.input.messages.write(str);
+        socket.input.messages && socket.input.messages.write(str);
         return response(1, MSG_CODE.SUCCESS);
       default:
         request; // dummy

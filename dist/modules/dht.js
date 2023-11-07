@@ -136,7 +136,7 @@ class DHT extends node_events_1.default {
                                     type: 1 /* Types.DHT.Request.lookup */,
                                     data: peers,
                                 };
-                                socket.input.dht.write(JSON.stringify(card)); // edit
+                                socket.input.dht && socket.input.dht.write(JSON.stringify(card)); // edit
                             }
                         }
                         else if (params.request.action === 1 /* Types.DHT.Action.set */) {

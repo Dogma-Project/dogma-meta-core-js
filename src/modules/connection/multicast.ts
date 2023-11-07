@@ -9,10 +9,12 @@ export default function multicast(
   if (destination === Types.Connection.Group.unknown) return;
   if (destination > Types.Connection.Group.selfNode) return;
   for (const cid in this.peers) {
-    if (this.peers[cid].group >= destination) {
+    const socket = this.peers[cid];
+    if (socket.group >= destination) {
       switch (request.class) {
         case Types.Streams.MX.dht:
-          this.peers[cid].input.dht.write(JSON.stringify(request.body));
+          socket.input.dht &&
+            socket.input.dht.write(JSON.stringify(request.body));
           break;
         default:
           request; // dummy

@@ -30,10 +30,12 @@ function multicast(request, destination) {
     if (destination > 4 /* Types.Connection.Group.selfNode */)
         return;
     for (const cid in this.peers) {
-        if (this.peers[cid].group >= destination) {
+        const socket = this.peers[cid];
+        if (socket.group >= destination) {
             switch (request.class) {
                 case 6 /* Types.Streams.MX.dht */:
-                    this.peers[cid].input.dht.write(JSON.stringify(request.body));
+                    socket.input.dht &&
+                        socket.input.dht.write(JSON.stringify(request.body));
                     break;
                 default:
                     request; // dummy

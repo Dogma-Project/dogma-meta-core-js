@@ -4,7 +4,7 @@
 import net from "node:net";
 import EventEmitter from "node:events";
 import * as Types from "../types";
-import { MuxStream } from "./streams";
+import { Encoder } from "./streams";
 import StateManager from "./state";
 import Storage from "./storage";
 /**
@@ -16,12 +16,12 @@ declare class DogmaSocket extends EventEmitter {
     readonly id: Types.Connection.Id;
     private readonly socket;
     input: {
-        handshake: MuxStream;
-        test: MuxStream;
-        control: MuxStream;
-        messages: MuxStream;
-        mail: MuxStream;
-        dht: MuxStream;
+        handshake: Encoder;
+        test?: Encoder;
+        control?: Encoder;
+        messages?: Encoder;
+        mail?: Encoder;
+        dht?: Encoder;
     };
     readonly direction: Types.Connection.Direction;
     status: Types.Connection.Status;
@@ -37,16 +37,18 @@ declare class DogmaSocket extends EventEmitter {
     onDisconnect?: Function;
     tested: boolean;
     constructor(socket: net.Socket, direction: Types.Connection.Direction, state: StateManager, storage: Storage);
-    private setEncryptor;
-    private _decrypt;
-    private _demux;
+    private setDecoder;
+    private setEncoder;
     private _onData;
+    private _test;
     private _onClose;
     private onError;
+    private _sign;
+    private _verify;
     private sendHandshake;
     /**
      *
-     * @todo add verification
+     * @todo add data verification
      */
     protected handleHandshake(data: Buffer): void;
     protected handleTest(data: Buffer): void;

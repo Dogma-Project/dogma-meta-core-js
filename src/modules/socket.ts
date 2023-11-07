@@ -153,12 +153,17 @@ class DogmaSocket extends EventEmitter {
       };
       this.input.handshake.write(JSON.stringify(request));
     } else if (stage === Types.Connection.Handshake.Stage.verification) {
+      if (this.inSession === undefined)
+        return logger.warn("Socket", "unknown inSession");
+
       const userSign = crypto.createSign("SHA256");
-      userSign.update(this.storageBridge.user.publicKey);
+      userSign.update(this.inSession);
       userSign.end();
+
       const nodeSign = crypto.createSign("SHA256");
-      nodeSign.update(this.storageBridge.node.publicKey);
+      nodeSign.update(this.inSession);
       nodeSign.end();
+
       const request: Types.Connection.Handshake.StageVerificationRequest = {
         stage,
         userKey: this.storageBridge.user.publicKey.toString(),
@@ -177,11 +182,10 @@ class DogmaSocket extends EventEmitter {
   protected handleHandshake(data: Buffer) {
     try {
       const json = data.toString();
-      console.log("json", json);
       const parsed = JSON.parse(json) as
         | Types.Connection.Handshake.StageInitRequest
         | Types.Connection.Handshake.StageVerificationRequest;
-      console.log("HS", parsed);
+      // console.log("HS", parsed);
       if (parsed.stage === undefined) return; // edit
       if (parsed.stage === Types.Connection.Handshake.Stage.init) {
         this.inSession = parsed.session;
@@ -198,24 +202,27 @@ class DogmaSocket extends EventEmitter {
           const publicNodeKey = crypto.createPublicKey(parsed.nodeKey); // edit
 
           const verifyUser = crypto.createVerify("SHA256");
-          verifyUser.update(parsed.userKey);
+          verifyUser.update(this.outSession);
           verifyUser.end();
           const verifyUserResult = verifyUser.verify(
             publicUserKey,
-            parsed.userSign
+            parsed.userSign,
+            "hex"
           );
           if (!verifyUserResult)
             return logger.log("Socket", "User not verified", this.id);
 
           const verifyNode = crypto.createVerify("SHA256");
-          verifyNode.update(parsed.userKey);
+          verifyNode.update(this.outSession);
           verifyNode.end();
           const verifyNodeResult = verifyNode.verify(
             publicNodeKey,
-            parsed.nodeSign
+            parsed.nodeSign,
+            "hex"
           );
           if (!verifyNodeResult)
             return logger.log("Socket", "Node not verified", this.id);
+
           this.publicUserKey = publicUserKey;
           this.publicNodeKey = publicNodeKey;
 
@@ -228,7 +235,8 @@ class DogmaSocket extends EventEmitter {
           node_id.update(parsed.nodeKey);
           this.node_id = node_id.digest("hex");
           if (this.unverified_node_id !== this.node_id) return; // edit ban
-          logger.log("Socker", this.id, "verified");
+
+          logger.log("Socket", this.id, "verified");
           this.setEncryptor(); // if all's right
         } catch (err) {
           logger.error("HS Verification", err);

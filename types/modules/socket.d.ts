@@ -7,9 +7,6 @@ import * as Types from "../types";
 import { Encoder } from "./streams";
 import StateManager from "./state";
 import Storage from "./storage";
-/**
- * @todo add online event
- */
 declare class DogmaSocket extends EventEmitter {
     protected stateBridge: StateManager;
     protected storageBridge: Storage;
@@ -37,15 +34,16 @@ declare class DogmaSocket extends EventEmitter {
     onDisconnect?: Function;
     tested: boolean;
     constructor(socket: net.Socket, direction: Types.Connection.Direction, state: StateManager, storage: Storage);
-    private setDecoder;
-    private setEncoder;
+    private _setDecoder;
+    private _setEncoder;
+    private _setGroup;
     private _onData;
     private _test;
     private _onClose;
-    private onError;
+    private _onError;
     private _sign;
     private _verify;
-    private sendHandshake;
+    private _sendHandshake;
     /**
      *
      * @todo add data verification

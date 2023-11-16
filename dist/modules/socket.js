@@ -35,16 +35,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const node_events_1 = __importDefault(require("node:events"));
 const node_crypto_1 = __importDefault(require("node:crypto"));
+const node_events_1 = __importDefault(require("node:events"));
 const Types = __importStar(require("../types"));
 const generateSyncId_1 = __importDefault(require("./generateSyncId"));
 const logger_1 = __importDefault(require("./logger"));
 const streams_1 = require("./streams");
 const index_1 = require("./socket/index");
-/**
- * @todo add online event
- */
 class DogmaSocket extends node_events_1.default {
     constructor(socket, direction, state, storage) {
         super();
@@ -52,25 +49,25 @@ class DogmaSocket extends node_events_1.default {
         this.group = 0 /* Types.Connection.Group.unknown */;
         this.tested = false;
         this._onData = index_1.onData;
-        this.socket = socket;
         this.id = (0, generateSyncId_1.default)(6);
         this.outSession = (0, generateSyncId_1.default)(12);
         this.direction = direction;
         this.stateBridge = state;
         this.storageBridge = storage;
-        // this.socket.on("data", (data) => this._onData(data));
+        this.socket = socket;
         this.socket.on("close", this._onClose);
-        this.socket.on("error", this.onError);
+        this.socket.on("error", this._onError);
         this.input = {
             handshake: new streams_1.Encoder({
                 id: 1 /* Types.Streams.MX.handshake */,
             }),
         };
         this.input.handshake.pipe(this.socket); // unencrypted
-        this.setDecoder();
-        this.sendHandshake(0 /* Types.Connection.Handshake.Stage.init */);
+        this.status = 1 /* Types.Connection.Status.connected */;
+        this._setDecoder();
+        this._sendHandshake(0 /* Types.Connection.Handshake.Stage.init */);
     }
-    setDecoder() {
+    _setDecoder() {
         if (!this.storageBridge.node.privateKey)
             return; // edit
         const privateNodeKey = node_crypto_1.default.createPrivateKey({
@@ -82,7 +79,7 @@ class DogmaSocket extends node_events_1.default {
         decoder.on("data", (data) => this._onData(data));
         this.socket.on("data", (data) => decoder.decode(data));
     }
-    setEncoder() {
+    _setEncoder() {
         this.input.test = new streams_1.Encoder({
             id: 2 /* Types.Streams.MX.test */,
             publicKey: this.publicNodeKey,
@@ -109,6 +106,34 @@ class DogmaSocket extends node_events_1.default {
         });
         this.input.dht.pipe(this.socket);
     }
+    _setGroup() {
+        if (!this.user_id)
+            return; // edit
+        if (!this.node_id)
+            return; // edit
+        if (this.user_id === this.storageBridge.user.id) {
+            // own user
+            if (this.node_id === this.storageBridge.node.id) {
+                // own node
+                this.group = 4 /* Types.Connection.Group.selfNode */;
+            }
+            else {
+                this.group = 3 /* Types.Connection.Group.selfUser */;
+            }
+        }
+        else {
+            const users = this.stateBridge.state["USERS" /* Types.Event.Type.users */];
+            if (!users || !Array.isArray(users))
+                return; // edit
+            const inFriends = users.find((user) => user.user_id === this.user_id);
+            if (inFriends) {
+                this.group = 2 /* Types.Connection.Group.friends */;
+            }
+            else {
+                this.group = 1 /* Types.Connection.Group.all */;
+            }
+        }
+    }
     _test() {
         this.input.test && this.input.test.write("ok");
     }
@@ -116,11 +141,10 @@ class DogmaSocket extends node_events_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             // edit
             this.emit("offline", this.node_id);
-            // this._offline(node_id); // move to component
             logger_1.default.info("connection", "closed", this.id);
         });
     }
-    onError(err) {
+    _onError(err) {
         logger_1.default.error("connection", this.id, err.name, err.message);
     }
     _sign(data, privateKey) {
@@ -135,7 +159,7 @@ class DogmaSocket extends node_events_1.default {
         verification.end();
         return verification.verify(publicKey, sign, "hex");
     }
-    sendHandshake(stage) {
+    _sendHandshake(stage) {
         if (!this.input)
             return logger_1.default.warn("Socket", "Input is not defined"); // edit
         if (!this.storageBridge.user.privateKey)
@@ -189,7 +213,7 @@ class DogmaSocket extends node_events_1.default {
                 this.inSession = parsed.session;
                 this.unverified_user_id = parsed.user_id;
                 this.unverified_node_id = parsed.node_id;
-                this.sendHandshake(1 /* Types.Connection.Handshake.Stage.verification */);
+                this._sendHandshake(1 /* Types.Connection.Handshake.Stage.verification */);
             }
             else if (parsed.stage === 1 /* Types.Connection.Handshake.Stage.verification */) {
                 try {
@@ -214,7 +238,8 @@ class DogmaSocket extends node_events_1.default {
                     if (this.unverified_node_id !== this.node_id)
                         return; // edit ban
                     logger_1.default.log("Socket", this.id, "verified");
-                    this.setEncoder();
+                    this._setEncoder();
+                    this._setGroup();
                     this._test();
                 }
                 catch (err) {
@@ -231,8 +256,11 @@ class DogmaSocket extends node_events_1.default {
     }
     handleTest(data) {
         this.tested = true;
+        this.emit("online", this.node_id);
+        logger_1.default.info("Socket", "Connection tested", this.id);
     }
     destroy() {
+        // edit
         return this.socket.destroy();
     }
 }

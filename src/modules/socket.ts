@@ -1,7 +1,6 @@
 import net from "node:net";
-import EventEmitter from "node:events";
-
 import crypto from "node:crypto";
+import EventEmitter from "node:events";
 
 import * as Types from "../types";
 import generateSyncId from "./generateSyncId";
@@ -10,10 +9,6 @@ import { Decoder, Encoder } from "./streams";
 import { onData } from "./socket/index";
 import StateManager from "./state";
 import Storage from "./storage";
-
-/**
- * @todo add online event
- */
 
 class DogmaSocket extends EventEmitter {
   protected stateBridge: StateManager;
@@ -55,28 +50,27 @@ class DogmaSocket extends EventEmitter {
     storage: Storage
   ) {
     super();
-    this.socket = socket;
     this.id = generateSyncId(6);
     this.outSession = generateSyncId(12);
     this.direction = direction;
     this.stateBridge = state;
     this.storageBridge = storage;
 
-    // this.socket.on("data", (data) => this._onData(data));
+    this.socket = socket;
     this.socket.on("close", this._onClose);
-    this.socket.on("error", this.onError);
-
+    this.socket.on("error", this._onError);
     this.input = {
       handshake: new Encoder({
         id: Types.Streams.MX.handshake,
       }),
     };
     this.input.handshake.pipe(this.socket); // unencrypted
-    this.setDecoder();
-    this.sendHandshake(Types.Connection.Handshake.Stage.init);
+    this.status = Types.Connection.Status.connected;
+    this._setDecoder();
+    this._sendHandshake(Types.Connection.Handshake.Stage.init);
   }
 
-  private setDecoder() {
+  private _setDecoder() {
     if (!this.storageBridge.node.privateKey) return; // edit
     const privateNodeKey = crypto.createPrivateKey({
       key: this.storageBridge.node.privateKey,
@@ -88,7 +82,7 @@ class DogmaSocket extends EventEmitter {
     this.socket.on("data", (data) => decoder.decode(data));
   }
 
-  private setEncoder() {
+  private _setEncoder() {
     this.input.test = new Encoder({
       id: Types.Streams.MX.test,
       publicKey: this.publicNodeKey,
@@ -120,6 +114,31 @@ class DogmaSocket extends EventEmitter {
     this.input.dht.pipe(this.socket);
   }
 
+  private _setGroup() {
+    if (!this.user_id) return; // edit
+    if (!this.node_id) return; // edit
+    if (this.user_id === this.storageBridge.user.id) {
+      // own user
+      if (this.node_id === this.storageBridge.node.id) {
+        // own node
+        this.group = Types.Connection.Group.selfNode;
+      } else {
+        this.group = Types.Connection.Group.selfUser;
+      }
+    } else {
+      const users = this.stateBridge.state[Types.Event.Type.users] as
+        | Types.User.Model[]
+        | undefined;
+      if (!users || !Array.isArray(users)) return; // edit
+      const inFriends = users.find((user) => user.user_id === this.user_id);
+      if (inFriends) {
+        this.group = Types.Connection.Group.friends;
+      } else {
+        this.group = Types.Connection.Group.all;
+      }
+    }
+  }
+
   private _onData = onData;
 
   private _test() {
@@ -129,11 +148,10 @@ class DogmaSocket extends EventEmitter {
   private async _onClose(hadError: boolean) {
     // edit
     this.emit("offline", this.node_id);
-    // this._offline(node_id); // move to component
     logger.info("connection", "closed", this.id);
   }
 
-  private onError(err: Error) {
+  private _onError(err: Error) {
     logger.error("connection", this.id, err.name, err.message);
   }
 
@@ -151,7 +169,7 @@ class DogmaSocket extends EventEmitter {
     return verification.verify(publicKey, sign, "hex");
   }
 
-  private sendHandshake(stage: Types.Connection.Handshake.Stage) {
+  private _sendHandshake(stage: Types.Connection.Handshake.Stage) {
     if (!this.input) return logger.warn("Socket", "Input is not defined"); // edit
     if (!this.storageBridge.user.privateKey) return;
     if (!this.storageBridge.node.privateKey) return;
@@ -210,7 +228,7 @@ class DogmaSocket extends EventEmitter {
         this.inSession = parsed.session;
         this.unverified_user_id = parsed.user_id;
         this.unverified_node_id = parsed.node_id;
-        this.sendHandshake(Types.Connection.Handshake.Stage.verification);
+        this._sendHandshake(Types.Connection.Handshake.Stage.verification);
       } else if (
         parsed.stage === Types.Connection.Handshake.Stage.verification
       ) {
@@ -247,8 +265,10 @@ class DogmaSocket extends EventEmitter {
           node_id.update(parsed.nodeKey);
           this.node_id = node_id.digest("hex");
           if (this.unverified_node_id !== this.node_id) return; // edit ban
+
           logger.log("Socket", this.id, "verified");
-          this.setEncoder();
+          this._setEncoder();
+          this._setGroup();
           this._test();
         } catch (err) {
           logger.error("HS Verification", err);
@@ -263,9 +283,12 @@ class DogmaSocket extends EventEmitter {
 
   protected handleTest(data: Buffer) {
     this.tested = true;
+    this.emit("online", this.node_id);
+    logger.info("Socket", "Connection tested", this.id);
   }
 
   public destroy() {
+    // edit
     return this.socket.destroy();
   }
 }

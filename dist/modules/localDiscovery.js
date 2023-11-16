@@ -5,57 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_dgram_1 = __importDefault(require("node:dgram"));
 const node_events_1 = __importDefault(require("node:events"));
-const node_os_1 = __importDefault(require("node:os"));
+const getLocalAddress_1 = require("./getLocalAddress");
 /** @module LocalDiscovery */
-/**
- *
- * @param {String} ip "192.168.0.2"
- */
-const convertToBroadcast = (ip) => {
-    if (ip === "0.0.0.0")
-        return "255.255.255.0"; // fallback
-    const iparr = ip.split(".");
-    iparr[3] = "255"; // broadcast
-    return iparr.join(".");
-};
-/**
- *
- * @param {String} ip "192.168.0.2"
- */
-const getLocalAddress = (ip = "") => {
-    const ifaces = node_os_1.default.networkInterfaces();
-    const pattern = "192.168.";
-    let address, broadcast;
-    if (ip.indexOf(pattern) === -1) {
-        for (const ifname in ifaces) {
-            const iface = ifaces[ifname];
-            if (iface) {
-                for (const ifname in iface) {
-                    const inner = iface[ifname];
-                    if (inner.family !== "IPv4" ||
-                        inner.internal !== false ||
-                        inner.address.indexOf(pattern) === -1) {
-                        continue;
-                    }
-                    address = inner.address;
-                }
-            }
-        }
-        if (!address) {
-            console.warn("Local Discovery Lib", "can't determine local address. fallback to 0.0.0.0");
-            address = "0.0.0.0";
-        }
-    }
-    else {
-        address = ip;
-    }
-    broadcast = convertToBroadcast(address);
-    return { address, broadcast };
-};
 class LocalDiscovery extends node_events_1.default {
     constructor({ port = 45432, ip = "0.0.0.0" }) {
         super();
-        const { address, broadcast } = getLocalAddress(ip);
+        const { address, broadcast } = (0, getLocalAddress_1.getLocalAddress)(ip);
         // this.ip = address;
         this.ip = "0.0.0.0";
         this.port = port;

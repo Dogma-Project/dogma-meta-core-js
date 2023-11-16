@@ -57,6 +57,7 @@ export declare const DESCRIPTOR: {
 };
 export declare const SIZES: {
     MX: number;
+    LEN: number;
 };
 export declare const ATTACHMENTS: {
     FILE: number;

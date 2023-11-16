@@ -38,7 +38,16 @@ class Decoder extends node_stream_1.EventEmitter {
     decode(chunk) {
         try {
             const mx = chunk.subarray(0, constants_1.SIZES.MX).readUInt8(0);
-            let data = chunk.subarray(constants_1.SIZES.MX, chunk.length);
+            const len = chunk
+                .subarray(constants_1.SIZES.MX, constants_1.SIZES.MX + constants_1.SIZES.LEN)
+                .readUInt16BE(0);
+            const offset = constants_1.SIZES.MX + constants_1.SIZES.LEN;
+            let data = chunk.subarray(offset, len + offset);
+            if (len + offset !== chunk.length) {
+                setTimeout(() => {
+                    this.decode(chunk.subarray(len + offset, chunk.length));
+                }, 10);
+            }
             if (mx !== 1 /* Types.Streams.MX.handshake */) {
                 if (!this.privateKey)
                     return;

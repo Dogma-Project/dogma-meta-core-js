@@ -73,9 +73,7 @@ class DogmaSocket extends EventEmitter {
     };
     this.input.handshake.pipe(this.socket); // unencrypted
     this.setDecoder();
-    setTimeout(() => {
-      this.sendHandshake(Types.Connection.Handshake.Stage.init); // edit
-    }, 50);
+    this.sendHandshake(Types.Connection.Handshake.Stage.init);
   }
 
   private setDecoder() {
@@ -125,8 +123,7 @@ class DogmaSocket extends EventEmitter {
   private _onData = onData;
 
   private _test() {
-    // edit
-    this.input.test && this.input.test.write("okokok");
+    this.input.test && this.input.test.write("ok");
   }
 
   private async _onClose(hadError: boolean) {
@@ -213,9 +210,7 @@ class DogmaSocket extends EventEmitter {
         this.inSession = parsed.session;
         this.unverified_user_id = parsed.user_id;
         this.unverified_node_id = parsed.node_id;
-        setTimeout(() => {
-          this.sendHandshake(Types.Connection.Handshake.Stage.verification);
-        }, 50);
+        this.sendHandshake(Types.Connection.Handshake.Stage.verification);
       } else if (
         parsed.stage === Types.Connection.Handshake.Stage.verification
       ) {
@@ -254,9 +249,7 @@ class DogmaSocket extends EventEmitter {
           if (this.unverified_node_id !== this.node_id) return; // edit ban
           logger.log("Socket", this.id, "verified");
           this.setEncoder();
-          setTimeout(() => {
-            this._test();
-          }, 50);
+          this._test();
         } catch (err) {
           logger.error("HS Verification", err);
         }

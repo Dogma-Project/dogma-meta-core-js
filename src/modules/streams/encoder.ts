@@ -2,6 +2,7 @@ import internal, { Transform, TransformCallback } from "node:stream";
 import crypto from "node:crypto";
 import logger from "../logger";
 import * as Types from "../../types";
+import { SIZES } from "../../constants";
 
 type StreamEncoderParams = {
   id: number;
@@ -17,7 +18,7 @@ class Encoder extends Transform {
   constructor(params: StreamEncoderParams) {
     // add out of range exception
     super(params.opts);
-    this.ss = Buffer.alloc(1, params.id);
+    this.ss = Buffer.alloc(SIZES.MX, params.id);
     this.id = params.id;
     this.publicKey = params.publicKey;
   }
@@ -36,9 +37,11 @@ class Encoder extends Transform {
           );
         chunk = crypto.publicEncrypt(this.publicKey, chunk);
       }
+      const len = Buffer.alloc(SIZES.LEN, 0);
+      len.writeUInt16BE(chunk.length);
       const result = Buffer.concat(
-        [this.ss, chunk],
-        this.ss.length + chunk.length
+        [this.ss, len, chunk],
+        this.ss.length + len.length + chunk.length
       );
       callback(null, result);
     } catch (err: any) {

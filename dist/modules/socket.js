@@ -68,9 +68,7 @@ class DogmaSocket extends node_events_1.default {
         };
         this.input.handshake.pipe(this.socket); // unencrypted
         this.setDecoder();
-        setTimeout(() => {
-            this.sendHandshake(0 /* Types.Connection.Handshake.Stage.init */); // edit
-        }, 50);
+        this.sendHandshake(0 /* Types.Connection.Handshake.Stage.init */);
     }
     setDecoder() {
         if (!this.storageBridge.node.privateKey)
@@ -112,8 +110,7 @@ class DogmaSocket extends node_events_1.default {
         this.input.dht.pipe(this.socket);
     }
     _test() {
-        // edit
-        this.input.test && this.input.test.write("okokok");
+        this.input.test && this.input.test.write("ok");
     }
     _onClose(hadError) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -192,9 +189,7 @@ class DogmaSocket extends node_events_1.default {
                 this.inSession = parsed.session;
                 this.unverified_user_id = parsed.user_id;
                 this.unverified_node_id = parsed.node_id;
-                setTimeout(() => {
-                    this.sendHandshake(1 /* Types.Connection.Handshake.Stage.verification */);
-                }, 50);
+                this.sendHandshake(1 /* Types.Connection.Handshake.Stage.verification */);
             }
             else if (parsed.stage === 1 /* Types.Connection.Handshake.Stage.verification */) {
                 try {
@@ -220,9 +215,7 @@ class DogmaSocket extends node_events_1.default {
                         return; // edit ban
                     logger_1.default.log("Socket", this.id, "verified");
                     this.setEncoder();
-                    setTimeout(() => {
-                        this._test();
-                    }, 50);
+                    this._test();
                 }
                 catch (err) {
                     logger_1.default.error("HS Verification", err);

@@ -60,6 +60,7 @@ exports.DESCRIPTOR = {
 };
 exports.SIZES = {
     MX: 1,
+    LEN: 2,
 };
 exports.ATTACHMENTS = {
     FILE: 0,

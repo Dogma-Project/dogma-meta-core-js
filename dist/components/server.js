@@ -44,8 +44,7 @@ state_1.default.subscribe([
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", state);
     switch (state) {
         case 5 /* Types.System.States.limited */:
-            const ipv4 = state_1.default.state["CONFIG PUBLIC IPV4" /* Types.Event.Type.configPublicIpV4 */] ||
-                "145.145.145.145"; // edit
+            const ipv4 = state_1.default.state["CONFIG PUBLIC IPV4" /* Types.Event.Type.configPublicIpV4 */] || "8.8.8.8"; // edit
             const port = state_1.default.state["CONFIG ROUTER" /* Types.Event.Type.configRouter */] || 12345; // edit
             const peer = {
                 host: ipv4,

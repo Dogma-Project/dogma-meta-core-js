@@ -64,6 +64,7 @@ export const DESCRIPTOR = {
 
 export const SIZES = {
   MX: 1,
+  LEN: 2,
 };
 
 export const ATTACHMENTS = {

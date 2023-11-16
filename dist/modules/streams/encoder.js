@@ -30,11 +30,12 @@ const node_stream_1 = require("node:stream");
 const node_crypto_1 = __importDefault(require("node:crypto"));
 const logger_1 = __importDefault(require("../logger"));
 const Types = __importStar(require("../../types"));
+const constants_1 = require("../../constants");
 class Encoder extends node_stream_1.Transform {
     constructor(params) {
         // add out of range exception
         super(params.opts);
-        this.ss = Buffer.alloc(1, params.id);
+        this.ss = Buffer.alloc(constants_1.SIZES.MX, params.id);
         this.id = params.id;
         this.publicKey = params.publicKey;
     }
@@ -45,7 +46,9 @@ class Encoder extends node_stream_1.Transform {
                     return callback(Error("Public key not specified. Can't encrypt"), null);
                 chunk = node_crypto_1.default.publicEncrypt(this.publicKey, chunk);
             }
-            const result = Buffer.concat([this.ss, chunk], this.ss.length + chunk.length);
+            const len = Buffer.alloc(constants_1.SIZES.LEN, 0);
+            len.writeUInt16BE(chunk.length);
+            const result = Buffer.concat([this.ss, len, chunk], this.ss.length + len.length + chunk.length);
             callback(null, result);
         }
         catch (err) {

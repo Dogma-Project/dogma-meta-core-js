@@ -15,7 +15,7 @@ export default class Server {
         state: StateManager;
         storage: Storage;
     });
-    listen(port: number): void;
-    stop(cb: Function): void;
-    refresh(port: number): void;
+    private listen;
+    private refresh;
+    start(port: number): void;
 }

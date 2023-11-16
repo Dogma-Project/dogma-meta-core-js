@@ -40,38 +40,32 @@ const dht = new dht_1.default({
 });
 state_1.default.subscribe(["CONFIG DHT LOOKUP" /* Types.Event.Type.configDhtLookup */], (value) => {
     dht.setPermission(1 /* Types.DHT.Type.dhtLookup */, value);
-    if (value > 3 /* Types.Connection.Group.selfUser */) {
-        state_1.default.services.dhtLookup = 1 /* Types.System.States.disabled */;
-    }
-    else if (value === 1 /* Types.Connection.Group.all */) {
-        state_1.default.services.dhtLookup = 7 /* Types.System.States.full */;
-    }
-    else {
-        state_1.default.services.dhtLookup = 6 /* Types.System.States.ok */;
-    }
+    // if (value > Types.Connection.Group.selfUser) {
+    //   stateManager.services.dhtLookup = Types.System.States.disabled;
+    // } else if (value === Types.Connection.Group.all) {
+    //   stateManager.services.dhtLookup = Types.System.States.full;
+    // } else {
+    //   stateManager.services.dhtLookup = Types.System.States.ok;
+    // }
 });
 state_1.default.subscribe(["CONFIG DHT ANNOUNCE" /* Types.Event.Type.configDhtAnnounce */], (value) => {
     dht.setPermission(0 /* Types.DHT.Type.dhtAnnounce */, value);
-    if (value > 3 /* Types.Connection.Group.selfUser */) {
-        state_1.default.services.dhtAnnounce = 1 /* Types.System.States.disabled */;
-    }
-    else if (value === 1 /* Types.Connection.Group.all */) {
-        state_1.default.services.dhtAnnounce = 7 /* Types.System.States.full */;
-    }
-    else {
-        state_1.default.services.dhtAnnounce = 6 /* Types.System.States.ok */;
-    }
+    // if (value > Types.Connection.Group.selfUser) {
+    //   stateManager.services.dhtAnnounce = Types.System.States.disabled;
+    // } else if (value === Types.Connection.Group.all) {
+    //   stateManager.services.dhtAnnounce = Types.System.States.full;
+    // } else {
+    //   stateManager.services.dhtAnnounce = Types.System.States.ok;
+    // }
 });
 state_1.default.subscribe(["CONFIG DHT BOOTSTRAP" /* Types.Event.Type.configDhtBootstrap */], (value) => {
     dht.setPermission(2 /* Types.DHT.Type.dhtBootstrap */, value);
-    if (value > 3 /* Types.Connection.Group.selfUser */) {
-        state_1.default.services.dhtBootstrap = 1 /* Types.System.States.disabled */;
-    }
-    else if (value === 1 /* Types.Connection.Group.all */) {
-        state_1.default.services.dhtBootstrap = 7 /* Types.System.States.full */;
-    }
-    else {
-        state_1.default.services.dhtBootstrap = 6 /* Types.System.States.ok */;
-    }
+    // if (value > Types.Connection.Group.selfUser) {
+    //   stateManager.services.dhtBootstrap = Types.System.States.disabled;
+    // } else if (value === Types.Connection.Group.all) {
+    //   stateManager.services.dhtBootstrap = Types.System.States.full;
+    // } else {
+    //   stateManager.services.dhtBootstrap = Types.System.States.ok;
+    // }
 });
 exports.default = dht;

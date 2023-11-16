@@ -12,7 +12,7 @@ const client = new Client({ connections, state, storage });
 
 localDiscovery.on("candidate", (data: Types.Discovery.Candidate) => {
   const { type, user_id, node_id, local_ipv4 } = data;
-  logger.log("client", "Local discovery candidate", data);
+  logger.log("client", "Local discovery candidate", data.local_ipv4); // edit
   if (type && type == "dogma-router" && user_id && node_id) {
     logger.log("nodes", "trying to connect local service", local_ipv4);
     const peer = connections.peerFromIP(local_ipv4);
@@ -62,3 +62,5 @@ state.subscribe(
     }
   }
 );
+
+export default client;

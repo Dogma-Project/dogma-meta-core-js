@@ -32,21 +32,39 @@ const state_1 = __importDefault(require("./state"));
 const storage_1 = __importDefault(require("./storage"));
 const Types = __importStar(require("../types"));
 const logger_1 = __importDefault(require("../modules/logger"));
-// import connectionTester from "../modules/connectionTester";
+const client_1 = __importDefault(require("./client"));
 const server = new server_1.default({ connections: connections_1.default, storage: storage_1.default, state: state_1.default });
-state_1.default.subscribe(["SERVER" /* Types.Event.Type.server */], (value) => {
-    state_1.default.services.router = value;
-});
 state_1.default.subscribe([
     "SERVER" /* Types.Event.Type.server */,
     "CONFIG AUTO DEFINE" /* Types.Event.Type.configAutoDefine */,
     "CONFIG EXTERNAL" /* Types.Event.Type.configExternal */,
-    "CONFIG PUBLIC IPV4" /* Types.Event.Type.configPublicIpV4 */,
-], (_action, _state) => {
-    const state = state_1.default.services.router;
+    // Types.Event.Type.configPublicIpV4,
+], () => {
+    const state = state_1.default.state["SERVER" /* Types.Event.Type.server */];
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", state);
     switch (state) {
         case 5 /* Types.System.States.limited */:
-            // connectionTester();
+            const ipv4 = state_1.default.state["CONFIG PUBLIC IPV4" /* Types.Event.Type.configPublicIpV4 */] ||
+                "145.145.145.145"; // edit
+            const port = state_1.default.state["CONFIG ROUTER" /* Types.Event.Type.configRouter */] || 12345; // edit
+            const peer = {
+                host: ipv4,
+                port,
+                address: `${ipv4}:${port}`,
+                public: true,
+                version: 4,
+            };
+            client_1.default.test(peer, (res) => {
+                if (res) {
+                    state_1.default.emit("SERVER" /* Types.Event.Type.server */, 7 /* Types.System.States.full */);
+                }
+                else {
+                    state_1.default.emit("SERVER" /* Types.Event.Type.server */, 6 /* Types.System.States.ok */);
+                }
+            });
+            break;
+        case 6 /* Types.System.States.ok */:
+            logger_1.default.debug("Server", "!!!!!", "server is under NAT");
             break;
         case 7 /* Types.System.States.full */:
             state_1.default.emit("EXTERNAL PORT" /* Types.Event.Type.externalPort */, state_1.default.state["CONFIG ROUTER" /* Types.Event.Type.configRouter */]);
@@ -60,11 +78,5 @@ state_1.default.subscribe([
 ], () => {
     logger_1.default.log("DEBUG", "Server start");
     const port = state_1.default.state["CONFIG ROUTER" /* Types.Event.Type.configRouter */];
-    // edit
-    if (!state_1.default.services.router) {
-        server.listen(port);
-    }
-    else {
-        server.refresh(port);
-    }
+    server.start(port);
 });

@@ -69,17 +69,33 @@ export default class Client {
 
   test(peer: Types.Connection.Peer, cb: (result: boolean) => void) {
     try {
-      const socket = net.connect(peer.port, peer.host, () => {
+      logger.debug("client", "TEST OWN SERVER", peer.address);
+
+      const socket = net.connect({
+        port: peer.port,
+        host: peer.host,
+        allowHalfOpen: false,
+        noDelay: true,
+        keepAlive: false,
+      });
+
+      socket.setTimeout(5000);
+      socket.on("timeout", () => {
+        console.log("socket timeout");
+        if (socket.connecting) {
+          logger.debug("client", "TEST CONNECTION TIMEOUT");
+          socket.destroy();
+          return cb(false);
+        }
+      });
+      socket.on("error", (error) => {
+        logger.debug("client", "TEST CONNECTION ERROR");
+        cb(false);
+      });
+      socket.on("connect", () => {
         logger.log("client", "TEST CONNECTION SUCCESSFUL");
         socket.destroy();
         cb(true);
-      });
-      socket.on("close", () => {
-        logger.log("client", "TEST CONNECTION CLOSED");
-      });
-      socket.on("error", (error) => {
-        logger.log("client", "TEST CONNECTION ERROR");
-        cb(false);
       });
     } catch (e) {
       logger.error("client.js", "test", "Can't establish connection", e);
@@ -94,6 +110,7 @@ export default class Client {
       | Types.User.Model[]
       | undefined;
     if (users && Array.isArray(users)) {
+      logger.log("CLIENT", "Trying to search friends", users.length);
       users.forEach((user) => this.dhtLookup(user.user_id));
     }
   }
@@ -106,11 +123,12 @@ export default class Client {
       | Types.Node.Model[]
       | undefined;
     if (nodes && Array.isArray(nodes)) {
+      logger.log("CLIENT", "Trying to connect friends", nodes.length);
       nodes.forEach((node) => {
         const { public_ipv4, local_ipv4, user_id, node_id } = node;
         if (public_ipv4) {
           // add validation
-          const [host, port] = public_ipv4;
+          const [host, port] = public_ipv4; // edit!!!
           const peer: Types.Connection.Peer = {
             address: public_ipv4,
             host,

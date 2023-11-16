@@ -59,7 +59,7 @@ const dogmaError = (type: string, ...message: any) => {
 };
 
 /**
- *
+ * Green messages in chat. Loglevel: 2 System.LogLevel.debug
  * @param type
  * @param message
  */
@@ -92,7 +92,7 @@ const dogmaWarning = (type: string, ...message: any) => {
 };
 
 /**
- *
+ * Black messages in chat. Loglevel: 5 System.LogLevel.logs
  * @param type
  * @param message
  */

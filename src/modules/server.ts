@@ -29,7 +29,7 @@ export default class Server {
     this.storageBridge = storage;
   }
 
-  listen(port: number) {
+  private listen(port: number) {
     this.port = port;
 
     this.ss = net.createServer({}, (socket) => {
@@ -82,23 +82,22 @@ export default class Server {
     });
   }
 
-  stop(cb: Function) {
+  private refresh(port: number) {
     this.stateBridge.emit(
       Types.Event.Type.server,
       Types.System.States.disabled
     );
     this.ss && this.ss.close();
-    cb();
+    return this.listen(port);
   }
 
-  refresh(port: number) {
-    if (port !== this.port) {
-      this.stop(() => {
-        this.listen(port);
-      });
+  start(port: number) {
+    if (this.ss === null) {
+      this.listen(port);
+    } else if (port !== this.port) {
+      this.refresh(port);
     } else {
-      console.log("do nothing");
-      // this.ss && this.ss.setSecureContext(getOptions());
+      logger.info("Server", "start", "nothing to do");
     }
   }
 }

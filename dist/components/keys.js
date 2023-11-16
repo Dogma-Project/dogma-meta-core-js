@@ -12,7 +12,7 @@ const logger_1 = __importDefault(require("../modules/logger"));
 const arguments_1 = __importDefault(require("../modules/arguments"));
 const keys_1 = require("../modules/keys");
 state_1.default.subscribe(["MASTER KEY" /* Event.Type.masterKey */], (payload) => {
-    state_1.default.services.masterKey = payload;
+    // stateManager.services.masterKey = payload;
     if (payload === 3 /* System.States.empty */) {
         logger_1.default.log("KEYS", "master key", "empty");
         if (arguments_1.default.auto) {
@@ -48,7 +48,7 @@ state_1.default.subscribe(["MASTER KEY" /* Event.Type.masterKey */], (payload) =
     }
 });
 state_1.default.subscribe(["NODE KEY" /* Event.Type.nodeKey */], (payload) => {
-    state_1.default.services.nodeKey = payload;
+    // stateManager.services.nodeKey = payload;
     if (payload === 3 /* System.States.empty */) {
         logger_1.default.log("KEYS", "node key", "empty");
         if (arguments_1.default.auto) {

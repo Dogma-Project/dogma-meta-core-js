@@ -38,7 +38,7 @@ const arguments_1 = __importDefault(require("../modules/arguments"));
 const client = new client_1.default({ connections: connections_1.default, state: state_1.default, storage: storage_1.default });
 localDiscovery_1.default.on("candidate", (data) => {
     const { type, user_id, node_id, local_ipv4 } = data;
-    logger_1.default.log("client", "Local discovery candidate", data);
+    logger_1.default.log("client", "Local discovery candidate", data.local_ipv4); // edit
     if (type && type == "dogma-router" && user_id && node_id) {
         logger_1.default.log("nodes", "trying to connect local service", local_ipv4);
         const peer = connections_1.default.peerFromIP(local_ipv4);
@@ -80,3 +80,4 @@ state_1.default.subscribe([
         searchFriendsInterval = setInterval(() => client.searchFriends(), 30000); // edit
     }
 });
+exports.default = client;

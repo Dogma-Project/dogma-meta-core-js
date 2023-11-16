@@ -39,11 +39,11 @@ const disc = new localDiscovery_1.default({
 state_1.default.subscribe(["START" /* Types.Event.Type.start */], () => {
     disc.startServer();
     disc.on("ready", (data) => {
-        state_1.default.services.localDiscovery = 7 /* Types.System.States.full */;
+        // stateManager.services.localDiscovery = Types.System.States.full;
         logger_1.default.log("Local discovery server", "ready", data);
     });
     disc.on("error", (data) => {
-        state_1.default.services.localDiscovery = 0 /* Types.System.States.error */;
+        // stateManager.services.localDiscovery = Types.System.States.error;
         logger_1.default.error("Local discovery server", "error", data);
     });
 });

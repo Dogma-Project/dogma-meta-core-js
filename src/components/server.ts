@@ -4,26 +4,48 @@ import stateManager from "./state";
 import storage from "./storage";
 import * as Types from "../types";
 import logger from "../modules/logger";
-// import connectionTester from "../modules/connectionTester";
+import client from "./client";
 
 const server = new Server({ connections, storage, state: stateManager });
-
-stateManager.subscribe([Types.Event.Type.server], (value) => {
-  stateManager.services.router = value;
-});
 
 stateManager.subscribe(
   [
     Types.Event.Type.server,
     Types.Event.Type.configAutoDefine,
     Types.Event.Type.configExternal,
-    Types.Event.Type.configPublicIpV4,
+    // Types.Event.Type.configPublicIpV4,
   ],
-  (_action, _state) => {
-    const state = stateManager.services.router;
+  () => {
+    const state = stateManager.state[Types.Event.Type.server];
+    console.log(
+      ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",
+      state
+    );
     switch (state) {
       case Types.System.States.limited:
-        // connectionTester();
+        const ipv4 =
+          stateManager.state[Types.Event.Type.configPublicIpV4] || "8.8.8.8"; // edit
+        const port = stateManager.state[Types.Event.Type.configRouter] || 12345; // edit
+        const peer: Types.Connection.Peer = {
+          host: ipv4,
+          port,
+          address: `${ipv4}:${port}`,
+          public: true,
+          version: 4,
+        };
+        client.test(peer, (res) => {
+          if (res) {
+            stateManager.emit(
+              Types.Event.Type.server,
+              Types.System.States.full
+            );
+          } else {
+            stateManager.emit(Types.Event.Type.server, Types.System.States.ok);
+          }
+        });
+        break;
+      case Types.System.States.ok:
+        logger.debug("Server", "!!!!!", "server is under NAT");
         break;
       case Types.System.States.full:
         stateManager.emit(
@@ -44,11 +66,6 @@ stateManager.subscribe(
   () => {
     logger.log("DEBUG", "Server start");
     const port = stateManager.state[Types.Event.Type.configRouter];
-    // edit
-    if (!stateManager.services.router) {
-      server.listen(port);
-    } else {
-      server.refresh(port);
-    }
+    server.start(port);
   }
 );

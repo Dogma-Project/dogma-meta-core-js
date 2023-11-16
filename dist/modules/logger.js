@@ -79,7 +79,7 @@ const dogmaError = (type, ...message) => {
     console.error(`\x1b[31m[${type}]\x1b[0m`, ...message); // red
 };
 /**
- *
+ * Green messages in chat. Loglevel: 2 System.LogLevel.debug
  * @param type
  * @param message
  */
@@ -112,7 +112,7 @@ const dogmaWarning = (type, ...message) => {
     console.warn(`\x1b[33m[${type}]\x1b[0m`, ...message); // yellow
 };
 /**
- *
+ * Black messages in chat. Loglevel: 5 System.LogLevel.logs
  * @param type
  * @param message
  */

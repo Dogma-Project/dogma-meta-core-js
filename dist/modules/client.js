@@ -67,17 +67,31 @@ class Client {
     }
     test(peer, cb) {
         try {
-            const socket = node_net_1.default.connect(peer.port, peer.host, () => {
+            logger_1.default.debug("client", "TEST OWN SERVER", peer.address);
+            const socket = node_net_1.default.connect({
+                port: peer.port,
+                host: peer.host,
+                allowHalfOpen: false,
+                noDelay: true,
+                keepAlive: false,
+            });
+            socket.setTimeout(5000);
+            socket.on("timeout", () => {
+                console.log("socket timeout");
+                if (socket.connecting) {
+                    logger_1.default.debug("client", "TEST CONNECTION TIMEOUT");
+                    socket.destroy();
+                    return cb(false);
+                }
+            });
+            socket.on("error", (error) => {
+                logger_1.default.debug("client", "TEST CONNECTION ERROR");
+                cb(false);
+            });
+            socket.on("connect", () => {
                 logger_1.default.log("client", "TEST CONNECTION SUCCESSFUL");
                 socket.destroy();
                 cb(true);
-            });
-            socket.on("close", () => {
-                logger_1.default.log("client", "TEST CONNECTION CLOSED");
-            });
-            socket.on("error", (error) => {
-                logger_1.default.log("client", "TEST CONNECTION ERROR");
-                cb(false);
             });
         }
         catch (e) {
@@ -90,6 +104,7 @@ class Client {
     searchFriends() {
         const users = this.stateBridge.state["USERS" /* Types.Event.Type.users */];
         if (users && Array.isArray(users)) {
+            logger_1.default.log("CLIENT", "Trying to search friends", users.length);
             users.forEach((user) => this.dhtLookup(user.user_id));
         }
     }
@@ -99,11 +114,12 @@ class Client {
     connectFriends() {
         const nodes = this.stateBridge.state["NODES" /* Types.Event.Type.nodes */];
         if (nodes && Array.isArray(nodes)) {
+            logger_1.default.log("CLIENT", "Trying to connect friends", nodes.length);
             nodes.forEach((node) => {
                 const { public_ipv4, local_ipv4, user_id, node_id } = node;
                 if (public_ipv4) {
                     // add validation
-                    const [host, port] = public_ipv4;
+                    const [host, port] = public_ipv4; // edit!!!
                     const peer = {
                         address: public_ipv4,
                         host,

@@ -83,20 +83,20 @@ class Server {
             logger_1.default.log("server", "SOCKET SERVER CLOSED");
         });
     }
-    stop(cb) {
+    refresh(port) {
         this.stateBridge.emit("SERVER" /* Types.Event.Type.server */, 1 /* Types.System.States.disabled */);
         this.ss && this.ss.close();
-        cb();
+        return this.listen(port);
     }
-    refresh(port) {
-        if (port !== this.port) {
-            this.stop(() => {
-                this.listen(port);
-            });
+    start(port) {
+        if (this.ss === null) {
+            this.listen(port);
+        }
+        else if (port !== this.port) {
+            this.refresh(port);
         }
         else {
-            console.log("do nothing");
-            // this.ss && this.ss.setSecureContext(getOptions());
+            logger_1.default.info("Server", "start", "nothing to do");
         }
     }
 }

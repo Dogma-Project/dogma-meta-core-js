@@ -62,73 +62,63 @@ stateManager.subscribe([Event.Type.configDb], async (value: System.States) => {
   }
 });
 
-stateManager.subscribe(
-  [Event.Type.usersDb, Event.Type.masterKey],
-  async (value: System.States) => {
-    switch (value) {
-      case System.States.ready:
-      case System.States.reload:
-        userModel.loadUsersTable();
-        break;
-      case System.States.empty:
-        logger.log("USER MODEL", "is empty");
-        if (
-          args.auto &&
-          stateManager.state[Event.Type.masterKey] === System.States.full
-        ) {
-          logger.log("USER MODEL", "auto generation with default");
-          await userModel.persistUser({
-            user_id: storage.user.id || "",
-            name: DEFAULTS.USER_NAME,
-          });
-        }
-        break;
-      case System.States.limited:
-      case System.States.ok:
-      case System.States.full:
-        // ok
-        break;
-      default:
-        // not ok
-        break;
-    }
+stateManager.subscribe([Event.Type.usersDb, Event.Type.masterKey], async () => {
+  const value = stateManager.state[Event.Type.usersDb] as System.States; // edit
+  switch (value) {
+    case System.States.ready:
+    case System.States.reload:
+      userModel.loadUsersTable();
+      break;
+    case System.States.empty:
+      logger.log("USER MODEL", "is empty");
+      if (stateManager.state[Event.Type.masterKey] === System.States.full) {
+        logger.log("USER MODEL", "insert own user into database");
+        await userModel.persistUser({
+          user_id: storage.user.id || "",
+          name: storage.user.name,
+        });
+      }
+      break;
+    case System.States.limited:
+    case System.States.ok:
+    case System.States.full:
+      // ok
+      break;
+    default:
+      // not ok
+      break;
   }
-);
+});
 
-stateManager.subscribe(
-  [Event.Type.nodesDb, Event.Type.nodeKey],
-  async (value: System.States) => {
-    switch (value) {
-      case System.States.ready:
-      case System.States.reload:
-        nodeModel.loadNodesTable();
-        break;
-      case System.States.empty:
-        logger.log("NODE MODEL", "is empty");
-        if (
-          args.auto &&
-          stateManager.state[Event.Type.nodeKey] === System.States.full
-        ) {
-          logger.log("NODE MODEL", "auto generation with default");
-          await nodeModel.persistNodes([
-            {
-              user_id: storage.user.id || "",
-              node_id: storage.node.id || "",
-              name: DEFAULTS.NODE_NAME,
-            },
-          ]);
-        }
-        break;
-      case System.States.limited:
-      case System.States.ok:
-      case System.States.full:
-        // ok
-        break;
-      default:
-        // not ok
-        break;
-    }
+stateManager.subscribe([Event.Type.nodesDb, Event.Type.nodeKey], async () => {
+  const value = stateManager.state[Event.Type.nodesDb] as System.States; // edit
+  switch (value) {
+    case System.States.ready:
+    case System.States.reload:
+      nodeModel.loadNodesTable();
+      break;
+    case System.States.empty:
+      logger.log("NODE MODEL", "is empty");
+      if (stateManager.state[Event.Type.nodeKey] === System.States.full) {
+        logger.log("NODE MODEL", "insert own node into database");
+        await nodeModel.persistNodes([
+          {
+            user_id: storage.user.id || "",
+            node_id: storage.node.id || "",
+            name: storage.node.name,
+          },
+        ]);
+      }
+      break;
+    case System.States.limited:
+    case System.States.ok:
+    case System.States.full:
+      // ok
+      break;
+    default:
+      // not ok
+      break;
   }
-);
+});
 
 export { dhtModel, nodeModel, userModel, configModel };

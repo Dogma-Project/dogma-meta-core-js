@@ -1,8 +1,13 @@
 import fs from "node:fs";
-import { nedbDir, keysDir } from "./datadir";
+import { nedbDir, keysDir, datadir } from "./datadir";
+import args from "./arguments";
 
 export default function checkHomeDir() {
   try {
+    if (args.prefix === "empty") {
+      // edit test
+      fs.rmSync(datadir, { recursive: true, force: true });
+    }
     if (!fs.existsSync(nedbDir)) fs.mkdirSync(nedbDir, { recursive: true });
     if (!fs.existsSync(keysDir)) fs.mkdirSync(keysDir, { recursive: true });
     return Promise.resolve(true);

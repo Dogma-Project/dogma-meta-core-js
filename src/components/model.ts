@@ -39,7 +39,7 @@ stateManager.subscribe([Event.Type.configDb], async (value: System.States) => {
         if (args.auto) {
           logger.log("CONFIG MODEL", "auto generation with defaults");
           await configModel.persistConfig({
-            [Event.Type.configRouter]: DEFAULTS.ROUTER,
+            [Event.Type.configRouter]: args.port || DEFAULTS.ROUTER,
             [Event.Type.configAutoDefine]: DEFAULTS.AUTO_DEFINE_IP,
             [Event.Type.configDhtAnnounce]: Connection.Group.friends,
             [Event.Type.configDhtLookup]: Connection.Group.friends,

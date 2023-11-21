@@ -5,6 +5,7 @@ import storage from "./storage";
 import * as Types from "../types";
 import logger from "../modules/logger";
 import client from "./client";
+import args from "../modules/arguments";
 
 const server = new Server({ connections, storage, state: stateManager });
 
@@ -66,6 +67,7 @@ stateManager.subscribe(
   () => {
     logger.log("DEBUG", "Server start");
     const port = stateManager.state[Types.Event.Type.configRouter];
-    server.start(port);
+    if (args.port) logger.log("SERVER", "forced to port", args.port);
+    server.start(args.port || port);
   }
 );

@@ -145,15 +145,15 @@ class DogmaSocket extends EventEmitter {
     this.input.test && this.input.test.write("ok");
   }
 
-  private async _onClose(hadError: boolean) {
+  private _onClose = async (hadError: boolean) => {
     // edit
     this.emit("offline", this.node_id);
     logger.info("connection", "closed", this.id);
-  }
+  };
 
-  private _onError(err: Error) {
+  private _onError = (err: Error) => {
     logger.error("connection", this.id, err.name, err.message);
-  }
+  };
 
   private _sign(data: string, privateKey: crypto.KeyLike) {
     const signature = crypto.createSign("SHA256");

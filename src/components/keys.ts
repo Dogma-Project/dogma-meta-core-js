@@ -9,7 +9,6 @@ import args from "../modules/arguments";
 import { createKeyPair } from "../modules/keys";
 
 stateManager.subscribe([Event.Type.masterKey], ([payload]) => {
-  // stateManager.services.masterKey = payload;
   if (payload === System.States.empty) {
     logger.log("KEYS", "master key", "empty");
     if (args.auto) {
@@ -45,7 +44,6 @@ stateManager.subscribe([Event.Type.masterKey], ([payload]) => {
 });
 
 stateManager.subscribe([Event.Type.nodeKey], ([payload]) => {
-  // stateManager.services.nodeKey = payload;
   if (payload === System.States.empty) {
     logger.log("KEYS", "node key", "empty");
     if (args.auto) {

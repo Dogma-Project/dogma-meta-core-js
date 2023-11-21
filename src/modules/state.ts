@@ -1,49 +1,22 @@
-import * as Types from "../types";
+import { Event, System } from "../types";
 import logger from "./logger";
 
 class StateManager {
-  private _services: {
-    [index: string | symbol]: Types.System.States;
-  } = {
-    router: Types.System.States.disabled,
-    masterKey: Types.System.States.disabled,
-    nodeKey: Types.System.States.disabled,
-    database: Types.System.States.disabled,
-    dhtBootstrap: Types.System.States.disabled,
-    dhtLookup: Types.System.States.disabled,
-    dhtAnnounce: Types.System.States.disabled,
-    localDiscovery: Types.System.States.disabled,
-  };
-
-  private _servicesHandler: ProxyHandler<typeof this._services> = {
-    get: (obj, prop) => {
-      return obj[prop];
-    },
-    set: (obj, prop, value) => {
-      if (obj[prop] === value) return true;
-      obj[prop] = value;
-      this.emit(Types.Event.Type.services, { service: prop, state: value });
-      return true;
-    },
-  };
+  constructor(private services: Event.Type[] = []) {}
 
   private listeners: {
-    [index: string]: Types.Event.ArrayOfListeners[];
+    [index: string]: Event.ArrayOfListeners[];
   } = {};
   public state: {
     [index: string]: any;
   } = {};
-  public services = new Proxy(this._services, this._servicesHandler);
 
   /**
    *
    * @param '[array of events]'
    * @param '([array of payloads], type?, action?)'
    */
-  public subscribe = (
-    type: Types.Event.Type[],
-    callback: Types.Event.Listenter
-  ) => {
+  public subscribe = (type: Event.Type[], callback: Event.Listenter) => {
     type.forEach((key) => {
       if (this.listeners[key] === undefined) this.listeners[key] = [];
       this.listeners[key].push([type, callback]);
@@ -55,19 +28,28 @@ class StateManager {
    * @param type
    * @param payload Any payload | or Boolean "true" for forced emit
    */
-  public emit = (type: Types.Event.Type, payload: any | boolean) => {
+  public emit = (type: Event.Type, payload: any | boolean) => {
     logger.info("Event emitted", type, payload);
-    let action: Types.Event.Action = Types.Event.Action.update;
+    let action: Event.Action = Event.Action.update;
     if (this.listeners[type] === undefined) {
       return logger.warn("state", "key isn't registered", type);
     }
     if (this.state[type] === undefined) {
-      action = Types.Event.Action.set;
+      action = Event.Action.set;
     }
     if (payload !== true) {
       if (JSON.stringify(this.state[type]) === JSON.stringify(payload)) return;
     }
     this.state[type] = payload; // test
+    if (this.services.indexOf(type) > -1) {
+      const services = this.services.map((type) => {
+        return {
+          service: type,
+          state: this.state[type] || System.States.disabled,
+        };
+      });
+      this.emit(Event.Type.services, services);
+    }
     this.listeners[type].forEach((entry) => {
       if (!entry.length) return;
       let ready = true;

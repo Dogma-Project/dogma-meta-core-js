@@ -6,39 +6,45 @@ declare namespace Event {
   export type Payload = any[];
 
   export const enum Type {
-    start = "START",
+    start = "START", // init event
+
     online = "ONLINE",
     offline = "OFFLINE",
-    nodes = "NODES",
-    users = "USERS",
-    masterKey = "MASTER KEY",
-    nodeKey = "NODE KEY",
-    configDb = "CONFIG DB",
-    nodesDb = "NODES DB",
-    usersDb = "USERS DB",
-    messagesDb = "MESSAGES DB",
+    externalPort = "EXTERNAL PORT",
+    updateUser = "UPDATE USER",
+    sendRequest = "SEND REQUEST",
+
+    dataDummy = "DATA DUMMY", // stream
+    dataControl = "DATA CONTROL", // stream
+    dataMessages = "DATA MESSAGES", // stream
+    dataMail = "DATA MAIL", // stream
+    dataDht = "DATA DHT", // stream
+
+    nodes = "NODES", // storage
+    users = "USERS", // storage
+
+    services = "SERVICES",
+    masterKey = "MASTER KEY", // service
+    nodeKey = "NODE KEY", // service
+    configDb = "CONFIG DB", // service
+    nodesDb = "NODES DB", // service
+    usersDb = "USERS DB", // service
+    messagesDb = "MESSAGES DB", // service
     dhtDb = "DHT DB",
     filesDb = "FILES DB",
     protocolDb = "PROTOCOL DB",
     syncDb = "SYNC DB",
-    externalPort = "EXTERNAL PORT",
-    server = "SERVER",
-    updateUser = "UPDATE USER",
-    sendRequest = "SEND REQUEST",
-    dataDummy = "DATA DUMMY",
-    dataControl = "DATA CONTROL",
-    dataMessages = "DATA MESSAGES",
-    dataMail = "DATA MAIL",
-    dataDht = "DATA DHT",
-    homeDir = "HOME DIR",
-    services = "SERVICES",
-    configRouter = "CONFIG ROUTER",
-    configDhtLookup = "CONFIG DHT LOOKUP",
-    configDhtAnnounce = "CONFIG DHT ANNOUNCE",
-    configDhtBootstrap = "CONFIG DHT BOOTSTRAP",
-    configAutoDefine = "CONFIG AUTO DEFINE",
-    configExternal = "CONFIG EXTERNAL",
-    configPublicIpV4 = "CONFIG PUBLIC IPV4",
+    server = "SERVER", // service
+    localDiscovery = "LOCAL DISCOVERY", // service
+    homeDir = "HOME DIR", // service
+
+    configRouter = "CONFIG ROUTER", // config
+    configDhtLookup = "CONFIG DHT LOOKUP", // config
+    configDhtAnnounce = "CONFIG DHT ANNOUNCE", // config
+    configDhtBootstrap = "CONFIG DHT BOOTSTRAP", // config
+    configAutoDefine = "CONFIG AUTO DEFINE", // config
+    configExternal = "CONFIG EXTERNAL", // config
+    configPublicIpV4 = "CONFIG PUBLIC IPV4", // config
   }
 
   export type Listenter = (

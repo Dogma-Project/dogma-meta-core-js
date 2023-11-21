@@ -13,11 +13,17 @@ const disc = new LocalDiscovery({
 stateManager.subscribe([Types.Event.Type.start], () => {
   disc.startServer();
   disc.on("ready", (data) => {
-    // stateManager.services.localDiscovery = Types.System.States.full;
+    stateManager.emit(
+      Types.Event.Type.localDiscovery,
+      Types.System.States.full
+    );
     logger.log("Local discovery server", "ready", data);
   });
   disc.on("error", (data) => {
-    // stateManager.services.localDiscovery = Types.System.States.error;
+    stateManager.emit(
+      Types.Event.Type.localDiscovery,
+      Types.System.States.error
+    );
     logger.error("Local discovery server", "error", data);
   });
 });

@@ -17,11 +17,6 @@ stateManager.subscribe(
     // Types.Event.Type.configPublicIpV4,
   ],
   ([server]) => {
-    // const state = stateManager.state[Types.Event.Type.server];
-    console.log(
-      ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",
-      server
-    );
     switch (server) {
       case Types.System.States.limited:
         const ipv4 =
@@ -46,13 +41,13 @@ stateManager.subscribe(
         });
         break;
       case Types.System.States.ok:
-        logger.debug("Server", "!!!!!", "server is under NAT");
+        logger.log("Server", "server is under NAT");
         break;
       case Types.System.States.full:
-        stateManager.emit(
-          Types.Event.Type.externalPort,
-          stateManager.state[Types.Event.Type.configRouter]
-        );
+        /**
+         * @todo save port to db
+         */
+        logger.log("Server", "port is open");
         break;
     }
   }

@@ -37,12 +37,20 @@ class ConfigModel implements Model {
     try {
       logger.log("Config Model", "Load config table");
       const data = await this.getAll();
+      logger.debug("!!CONFIG", data, data.length);
       if (data.length) {
         // add condition
         data.forEach((element) => {
           const type: Types.Event.Type = element.param;
           this.stateBridge.emit(type, element.value);
         });
+        /**
+         * @todo edit empty fields check
+         */
+        this.stateBridge.emit(
+          Types.Event.Type.configDb,
+          Types.System.States.full
+        );
       } else {
         this.stateBridge.emit(
           Types.Event.Type.configDb,

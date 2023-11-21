@@ -22,17 +22,19 @@ stateManager.subscribe([Types.Event.Type.start], () => {
   });
 });
 
-stateManager.subscribe([Types.Event.Type.server], (payload) => {
-  if (payload >= Types.System.States.limited) {
-    const port = stateManager.state[Types.Event.Type.configRouter] as number;
-    if (!port) return logger.warn("Local discovery", "Unknown port");
-    disc.announce({
-      type: "dogma-router",
-      user_id: storage.user.id || "unk",
-      node_id: storage.node.id || "unk",
-      port,
-    });
+stateManager.subscribe(
+  [Types.Event.Type.server, Types.Event.Type.configRouter],
+  ([server, configRouter]) => {
+    if (server >= Types.System.States.limited) {
+      if (!configRouter) return logger.warn("Local discovery", "Unknown port");
+      disc.announce({
+        type: "dogma-router",
+        user_id: storage.user.id || "unk",
+        node_id: storage.node.id || "unk",
+        port: configRouter,
+      });
+    }
   }
-});
+);
 
 export default disc;

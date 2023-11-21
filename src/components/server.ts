@@ -16,13 +16,13 @@ stateManager.subscribe(
     Types.Event.Type.configExternal,
     // Types.Event.Type.configPublicIpV4,
   ],
-  () => {
-    const state = stateManager.state[Types.Event.Type.server];
+  ([server]) => {
+    // const state = stateManager.state[Types.Event.Type.server];
     console.log(
       ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",
-      state
+      server
     );
-    switch (state) {
+    switch (server) {
       case Types.System.States.limited:
         const ipv4 =
           stateManager.state[Types.Event.Type.configPublicIpV4] || "8.8.8.8"; // edit
@@ -64,10 +64,9 @@ stateManager.subscribe(
     Types.Event.Type.nodeKey,
     Types.Event.Type.masterKey,
   ],
-  () => {
+  ([configRouter]) => {
     logger.log("DEBUG", "Server start");
-    const port = stateManager.state[Types.Event.Type.configRouter];
     if (args.port) logger.log("SERVER", "forced to port", args.port);
-    server.start(args.port || port);
+    server.start(args.port || configRouter);
   }
 );

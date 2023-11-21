@@ -30,6 +30,9 @@ dht.on("peers", (data: Types.DHT.LookUp.Answer.Data[]) => {
 let connectFriendsInterval: NodeJS.Timer | undefined;
 let searchFriendsInterval: NodeJS.Timer | undefined;
 
+/**
+ * @todo deprecated CHECK!!!
+ */
 state.subscribe([Types.Event.Type.updateUser, Types.Event.Type.users], () => {
   const user_id = state.state[Types.Event.Type.updateUser];
   connections.closeConnectionsByUserId(user_id);
@@ -52,11 +55,11 @@ state.subscribe(
     Types.Event.Type.users,
     Types.Event.Type.nodeKey,
   ],
-  () => {
+  ([configDhtLookup]) => {
     // edit
     if (args.discovery) return; // don't lookup in discovery mode
     clearInterval(searchFriendsInterval);
-    if (state.state[Types.Event.Type.configDhtLookup]) {
+    if (configDhtLookup) {
       client.searchFriends(); // check
       searchFriendsInterval = setInterval(() => client.searchFriends(), 30000); // edit
     }

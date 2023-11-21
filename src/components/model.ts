@@ -27,9 +27,9 @@ stateManager.subscribe([Event.Type.start, Event.Type.homeDir], () => {
   userModel.init();
 });
 
-stateManager.subscribe([Event.Type.configDb], async (value: System.States) => {
+stateManager.subscribe([Event.Type.configDb], async ([configDb]) => {
   try {
-    switch (value) {
+    switch (configDb) {
       case System.States.ready:
       case System.States.reload:
         await configModel.loadConfigTable();
@@ -62,63 +62,67 @@ stateManager.subscribe([Event.Type.configDb], async (value: System.States) => {
   }
 });
 
-stateManager.subscribe([Event.Type.usersDb, Event.Type.masterKey], async () => {
-  const value = stateManager.state[Event.Type.usersDb] as System.States; // edit
-  switch (value) {
-    case System.States.ready:
-    case System.States.reload:
-      userModel.loadUsersTable();
-      break;
-    case System.States.empty:
-      logger.log("USER MODEL", "is empty");
-      if (stateManager.state[Event.Type.masterKey] === System.States.full) {
-        logger.log("USER MODEL", "insert own user into database");
-        await userModel.persistUser({
-          user_id: storage.user.id || "",
-          name: storage.user.name,
-        });
-      }
-      break;
-    case System.States.limited:
-    case System.States.ok:
-    case System.States.full:
-      // ok
-      break;
-    default:
-      // not ok
-      break;
-  }
-});
-
-stateManager.subscribe([Event.Type.nodesDb, Event.Type.nodeKey], async () => {
-  const value = stateManager.state[Event.Type.nodesDb] as System.States; // edit
-  switch (value) {
-    case System.States.ready:
-    case System.States.reload:
-      nodeModel.loadNodesTable();
-      break;
-    case System.States.empty:
-      logger.log("NODE MODEL", "is empty");
-      if (stateManager.state[Event.Type.nodeKey] === System.States.full) {
-        logger.log("NODE MODEL", "insert own node into database");
-        await nodeModel.persistNodes([
-          {
+stateManager.subscribe(
+  [Event.Type.usersDb, Event.Type.masterKey],
+  async ([usersDb]) => {
+    switch (usersDb) {
+      case System.States.ready:
+      case System.States.reload:
+        userModel.loadUsersTable();
+        break;
+      case System.States.empty:
+        logger.log("USER MODEL", "is empty");
+        if (stateManager.state[Event.Type.masterKey] === System.States.full) {
+          logger.log("USER MODEL", "insert own user into database");
+          await userModel.persistUser({
             user_id: storage.user.id || "",
-            node_id: storage.node.id || "",
-            name: storage.node.name,
-          },
-        ]);
-      }
-      break;
-    case System.States.limited:
-    case System.States.ok:
-    case System.States.full:
-      // ok
-      break;
-    default:
-      // not ok
-      break;
+            name: storage.user.name,
+          });
+        }
+        break;
+      case System.States.limited:
+      case System.States.ok:
+      case System.States.full:
+        // ok
+        break;
+      default:
+        // not ok
+        break;
+    }
   }
-});
+);
+
+stateManager.subscribe(
+  [Event.Type.nodesDb, Event.Type.nodeKey],
+  async ([nodesDb]) => {
+    switch (nodesDb) {
+      case System.States.ready:
+      case System.States.reload:
+        nodeModel.loadNodesTable();
+        break;
+      case System.States.empty:
+        logger.log("NODE MODEL", "is empty");
+        if (stateManager.state[Event.Type.nodeKey] === System.States.full) {
+          logger.log("NODE MODEL", "insert own node into database");
+          await nodeModel.persistNodes([
+            {
+              user_id: storage.user.id || "",
+              node_id: storage.node.id || "",
+              name: storage.node.name,
+            },
+          ]);
+        }
+        break;
+      case System.States.limited:
+      case System.States.ok:
+      case System.States.full:
+        // ok
+        break;
+      default:
+        // not ok
+        break;
+    }
+  }
+);
 
 export { dhtModel, nodeModel, userModel, configModel };

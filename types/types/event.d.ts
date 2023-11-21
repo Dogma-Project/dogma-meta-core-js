@@ -3,7 +3,7 @@ declare namespace Event {
         update = 0,
         set = 1
     }
-    type Payload = any;
+    type Payload = any[];
     const enum Type {
         start = "START",
         online = "ONLINE",
@@ -20,13 +20,6 @@ declare namespace Event {
         filesDb = "FILES DB",
         protocolDb = "PROTOCOL DB",
         syncDb = "SYNC DB",
-        configRouter = "CONFIG ROUTER",
-        configDhtLookup = "CONFIG DHT LOOKUP",
-        configDhtAnnounce = "CONFIG DHT ANNOUNCE",
-        configDhtBootstrap = "CONFIG DHT BOOTSTRAP",
-        configAutoDefine = "CONFIG AUTO DEFINE",
-        configExternal = "CONFIG EXTERNAL",
-        configPublicIpV4 = "CONFIG PUBLIC IPV4",
         externalPort = "EXTERNAL PORT",
         server = "SERVER",
         updateUser = "UPDATE USER",
@@ -37,7 +30,14 @@ declare namespace Event {
         dataMail = "DATA MAIL",
         dataDht = "DATA DHT",
         homeDir = "HOME DIR",
-        services = "SERVICES"
+        services = "SERVICES",
+        configRouter = "CONFIG ROUTER",
+        configDhtLookup = "CONFIG DHT LOOKUP",
+        configDhtAnnounce = "CONFIG DHT ANNOUNCE",
+        configDhtBootstrap = "CONFIG DHT BOOTSTRAP",
+        configAutoDefine = "CONFIG AUTO DEFINE",
+        configExternal = "CONFIG EXTERNAL",
+        configPublicIpV4 = "CONFIG PUBLIC IPV4"
     }
     type Listenter = (payload: Payload, type?: Type, action?: Action) => void;
     type ArrayOfListeners = [Type[], Listenter] | [];

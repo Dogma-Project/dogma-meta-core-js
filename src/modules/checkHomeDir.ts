@@ -4,8 +4,7 @@ import args from "./arguments";
 
 export default function checkHomeDir() {
   try {
-    if (args.prefix === "empty") {
-      // edit test
+    if (args.prefix === "empty" || args.prefix === "test") {
       fs.rmSync(datadir, { recursive: true, force: true });
     }
     if (!fs.existsSync(nedbDir)) fs.mkdirSync(nedbDir, { recursive: true });

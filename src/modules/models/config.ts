@@ -71,6 +71,7 @@ class ConfigModel implements Model {
       await this.db.updateAsync({ param: row.param }, row, { upsert: true });
       this.stateBridge.emit(row.param, row.value);
     }
+    this.stateBridge.emit(Types.Event.Type.configDb, Types.System.States.full);
   }
 }
 

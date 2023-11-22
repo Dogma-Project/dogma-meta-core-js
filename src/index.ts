@@ -4,6 +4,7 @@ import { createKeyPair } from "./modules/keys";
 import stateManager from "./components/state";
 import storage from "./components/storage";
 import * as Model from "./components/model"; // check
+import * as Types from "./types";
 
 const Keys = {
   createKeyPair,
@@ -13,4 +14,4 @@ const State = {
   storage,
 };
 
-export { Keys, State, Model };
+export { Keys, State, Model, Types };

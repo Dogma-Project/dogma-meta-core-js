@@ -3,7 +3,6 @@ import { Keys } from "../types";
 import logger from "./logger";
 import fs from "node:fs";
 import { keysDir } from "./datadir";
-import { KEYS } from "../constants";
 
 type result = {
   publicKey: crypto.KeyObject;
@@ -38,8 +37,8 @@ export async function createKeyPair(
   try {
     const { publicKey, privateKey } = await _generateKeyPair(length);
     const opts: crypto.KeyExportOptions<"pem"> = {
-      type: KEYS.TYPE,
-      format: KEYS.FORMAT,
+      type: Keys.FORMATS.TYPE,
+      format: Keys.FORMATS.FORMAT,
     };
     const publicKeyBuffer = publicKey.export(opts);
     const privateKeyBuffer = privateKey.export(opts);

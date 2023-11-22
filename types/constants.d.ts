@@ -31,10 +31,6 @@ export declare const DEFAULTS: {
     NODE_NAME: string;
     LOCAL_DISCOVERY_PORT: number;
 };
-export declare const enum KEYS {
-    TYPE = "pkcs1",
-    FORMAT = "pem"
-}
 /**
  * @constant
  * @type {Object}
@@ -58,10 +54,6 @@ export declare const MSG_CODE: {
 };
 export declare const DESCRIPTOR: {
     SIZE: number;
-};
-export declare const SIZES: {
-    MX: number;
-    LEN: number;
 };
 export declare const ATTACHMENTS: {
     FILE: number;

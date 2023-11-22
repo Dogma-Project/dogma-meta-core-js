@@ -71,12 +71,3 @@ export const ATTACHMENTS = {
   VOICE: 5,
   VIDEO_MSG: 6,
 };
-
-export const enum KEYS {
-  TYPE = "pkcs1",
-  FORMAT = "pem",
-}
-export const enum SIZES {
-  MX = 1,
-  LEN = 2,
-}

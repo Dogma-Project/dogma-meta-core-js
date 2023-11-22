@@ -14,5 +14,9 @@ declare namespace Streams {
         data: Buffer;
         descriptor?: string;
     };
+    const enum SIZES {
+        MX = 1,
+        LEN = 2
+    }
 }
 export default Streams;

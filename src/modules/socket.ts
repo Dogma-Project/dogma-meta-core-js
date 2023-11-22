@@ -9,7 +9,6 @@ import { Decoder, Encoder } from "./streams";
 import { onData } from "./socket/index";
 import StateManager from "./state";
 import Storage from "./storage";
-import { KEYS } from "../constants";
 import { createSha256Hash } from "./hash";
 
 class DogmaSocket extends EventEmitter {
@@ -76,8 +75,8 @@ class DogmaSocket extends EventEmitter {
     if (!this.storageBridge.node.privateKey) return; // edit
     const privateNodeKey = crypto.createPrivateKey({
       key: this.storageBridge.node.privateKey,
-      type: KEYS.TYPE,
-      format: KEYS.FORMAT,
+      type: Types.Keys.FORMATS.TYPE,
+      format: Types.Keys.FORMATS.FORMAT,
     });
     const decoder = new Decoder(privateNodeKey);
     decoder.on("data", (data) => this.onData(data));

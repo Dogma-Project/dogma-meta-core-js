@@ -9,6 +9,7 @@ const stateManager = new StateManager([
   Event.Type.nodesDb,
   Event.Type.usersDb,
   Event.Type.messagesDb,
+  Event.Type.localDiscovery,
 ]);
 
 export default stateManager;

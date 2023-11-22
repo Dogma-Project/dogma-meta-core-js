@@ -4,26 +4,23 @@ import StateManager from "./state";
 import Storage from "./storage";
 /** @module Connections */
 declare class Connections {
-    stateBridge: StateManager;
-    storageBridge: Storage;
+    protected stateBridge: StateManager;
+    protected storageBridge: Storage;
     constructor({ state, storage }: {
         state: StateManager;
         storage: Storage;
     });
-    peers: Types.Connection.SocketArray;
-    online: Types.Node.Id[];
-    encodedStream: null;
-    decodedStream: null;
-    messageEncoder: null;
-    highWaterMark: number;
+    protected peers: Types.Connection.SocketArray;
+    protected online: Types.Node.Id[];
+    protected getConnectionByNodeId: typeof getConnectionByNodeId;
+    protected getConnectionsByUserId: typeof getConnectionsByUserId;
+    closeConnectionByNodeId: typeof closeConnectionByNodeId;
+    closeConnectionsByUserId: typeof closeConnectionsByUserId;
     sendRequestToNode: typeof sendRequestToNode;
     sendRequestToUser: typeof sendRequestToUser;
     onConnect: typeof onConnect;
-    getConnectionByNodeId: typeof getConnectionByNodeId;
-    getConnectionsByUserId: typeof getConnectionsByUserId;
-    closeConnectionByNodeId: typeof closeConnectionByNodeId;
-    closeConnectionsByUserId: typeof closeConnectionsByUserId;
     peerFromIP: typeof peerFromIP;
     multicast: typeof multicast;
+    isNodeOnline: (node_id: Types.Node.Id) => boolean;
 }
 export default Connections;

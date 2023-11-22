@@ -45,7 +45,7 @@ export default class Client {
     node: { user_id: Types.User.Id; node_id: Types.Node.Id }
   ) {
     const { user_id, node_id } = node;
-    if (this.connectionsBridge.online.indexOf(node_id) > -1) return; // add to logs
+    if (this.connectionsBridge.isNodeOnline(node_id)) return; // add to logs
 
     const connectNonFriends = true;
 

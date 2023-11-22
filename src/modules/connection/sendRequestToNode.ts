@@ -10,6 +10,7 @@ export default function send(
   node_id: Types.Node.Id
 ) {
   try {
+    logger.log("Connection", "Sending request to node", node_id);
     const socket = this.getConnectionByNodeId(node_id);
     if (!socket) return response(1, MSG_CODE.UNKNOWN, "user is offline"); // edit
     switch (request.class) {

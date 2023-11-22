@@ -17,35 +17,31 @@ import Storage from "./storage";
 /** @module Connections */
 
 class Connections {
-  stateBridge: StateManager;
-  storageBridge: Storage;
+  protected stateBridge: StateManager;
+  protected storageBridge: Storage;
 
   constructor({ state, storage }: { state: StateManager; storage: Storage }) {
     this.stateBridge = state;
     this.storageBridge = storage;
   }
 
-  peers: Types.Connection.SocketArray = {};
-  online: Types.Node.Id[] = [];
+  protected peers: Types.Connection.SocketArray = {};
+  protected online: Types.Node.Id[] = [];
 
-  encodedStream: null = null;
-  decodedStream: null = null;
-  messageEncoder: null = null;
-  highWaterMark: number = 200000;
-
-  sendRequestToNode = sendRequestToNode;
-  sendRequestToUser = sendRequestToUser;
-  // streamToNode = streamToNode;
-
-  onConnect = onConnect;
-
-  getConnectionByNodeId = getConnectionByNodeId;
-  getConnectionsByUserId = getConnectionsByUserId;
+  protected getConnectionByNodeId = getConnectionByNodeId;
+  protected getConnectionsByUserId = getConnectionsByUserId;
   closeConnectionByNodeId = closeConnectionByNodeId;
   closeConnectionsByUserId = closeConnectionsByUserId;
 
-  peerFromIP = peerFromIP;
-  multicast = multicast;
+  // streamToNode = streamToNode;
+  public sendRequestToNode = sendRequestToNode;
+  public sendRequestToUser = sendRequestToUser;
+  public onConnect = onConnect;
+  public peerFromIP = peerFromIP;
+  public multicast = multicast;
+  public isNodeOnline = (node_id: Types.Node.Id) => {
+    return this.online.indexOf(node_id) > -1;
+  };
 }
 
 /*

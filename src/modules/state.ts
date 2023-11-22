@@ -31,9 +31,6 @@ class StateManager {
   public emit = (type: Event.Type, payload: any | boolean) => {
     // logger.info("Event emitted", type, payload);
     let action: Event.Action = Event.Action.update;
-    if (this.listeners[type] === undefined) {
-      return logger.warn("state", "key isn't registered", type);
-    }
     if (this.state[type] === undefined) {
       action = Event.Action.set;
     }
@@ -41,6 +38,9 @@ class StateManager {
       if (JSON.stringify(this.state[type]) === JSON.stringify(payload)) return;
     }
     this.state[type] = payload; // test
+    if (this.listeners[type] === undefined) {
+      return logger.warn("state", "key isn't registered", type);
+    }
     if (this.services.indexOf(type) > -1) {
       const services = this.services.map((type) => {
         return {

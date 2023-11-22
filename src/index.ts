@@ -1,10 +1,9 @@
+import "./start";
 import { createKeyPair } from "./modules/keys";
 
 import stateManager from "./components/state";
 import storage from "./components/storage";
-import { configModel } from "./components/model";
-
-const { persistConfig } = configModel;
+import * as Model from "./components/model"; // check
 
 const Keys = {
   createKeyPair,
@@ -12,9 +11,6 @@ const Keys = {
 const State = {
   stateManager,
   storage,
-};
-const Model = {
-  persistConfig,
 };
 
 export { Keys, State, Model };

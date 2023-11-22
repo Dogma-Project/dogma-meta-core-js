@@ -7,7 +7,9 @@ declare namespace Streams {
         control = 3,
         messages = 4,
         mail = 5,
-        dht = 6
+        dht = 6,
+        web = 7,
+        file = 8
     }
     type DemuxedResult = {
         mx: MX;

@@ -81,8 +81,8 @@ stateManager.subscribe([Event.Type.configDb], async ([configDb]) => {
 });
 
 stateManager.subscribe(
-  [Event.Type.usersDb, Event.Type.masterKey],
-  async ([usersDb, masterKey]) => {
+  [Event.Type.usersDb, Event.Type.storageUser],
+  async ([usersDb, storageUser]) => {
     switch (usersDb) {
       case System.States.ready:
       case System.States.reload:
@@ -90,12 +90,14 @@ stateManager.subscribe(
         break;
       case System.States.empty:
         logger.log("USER MODEL", "is empty");
-        if (masterKey === System.States.full) {
+        if (storageUser === System.States.full) {
           logger.log("USER MODEL", "insert own user into database");
-          await userModel.persistUser({
-            user_id: storage.user.id || "",
-            name: storage.user.name,
-          });
+          await userModel.persistUsers([
+            {
+              user_id: storage.user.id || "",
+              name: storage.user.name,
+            },
+          ]);
         }
         break;
       case System.States.limited:
@@ -111,8 +113,8 @@ stateManager.subscribe(
 );
 
 stateManager.subscribe(
-  [Event.Type.nodesDb, Event.Type.nodeKey],
-  async ([nodesDb, nodeKey]) => {
+  [Event.Type.nodesDb, Event.Type.storageNode, Event.Type.storageUser],
+  async ([nodesDb, storageNode, storageUser]) => {
     switch (nodesDb) {
       case System.States.ready:
       case System.States.reload:
@@ -120,7 +122,10 @@ stateManager.subscribe(
         break;
       case System.States.empty:
         logger.log("NODE MODEL", "is empty");
-        if (nodeKey === System.States.full) {
+        if (
+          storageNode === System.States.full &&
+          storageUser === System.States.full
+        ) {
           logger.log("NODE MODEL", "insert own node into database");
           await nodeModel.persistNodes([
             {

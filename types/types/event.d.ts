@@ -32,6 +32,8 @@ declare namespace Event {
         server = "SERVER",
         localDiscovery = "LOCAL DISCOVERY",
         homeDir = "HOME DIR",
+        storageUser = "STORAGE USER",
+        storageNode = "STORAGE NODE",
         configRouter = "CONFIG ROUTER",
         configDhtLookup = "CONFIG DHT LOOKUP",
         configDhtAnnounce = "CONFIG DHT ANNOUNCE",

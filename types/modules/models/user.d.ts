@@ -11,16 +11,12 @@ declare class UserModel implements Model {
     init(): Promise<void>;
     getAll(): Promise<Record<string, any>[]>;
     loadUsersTable(): Promise<void>;
-    persistUser(user: User.Model): Promise<{
-        numAffected: number;
-        affectedDocuments: import("@seald-io/nedb").Document<Record<string, any>> | import("@seald-io/nedb").Document<Record<string, any>>[] | null;
-        upsert: boolean;
-    } | import("@seald-io/nedb").Document<{
-        sync_id: string;
-        user_id: string;
-        name: string;
-        avatar?: string | undefined;
-    }>>;
+    /**
+     *
+     * @param users array of users to persist
+     * @returns {Promise}
+     */
+    persistUsers(users: User.Model[]): Promise<unknown>;
     /**
      * @todo set to deleted state instead of remove
      */

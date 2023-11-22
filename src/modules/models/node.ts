@@ -1,7 +1,7 @@
 import generateSyncId from "../generateSyncId";
 import logger from "../logger";
 // import Sync from "./sync";
-import { Event, System, Node, User } from "../../types";
+import { Event, System, Node, User, Sync } from "../../types";
 import { nedbDir } from "../datadir";
 import Datastore from "@seald-io/nedb";
 import Model from "./_model";
@@ -66,19 +66,27 @@ class NodeModel implements Model {
     const insert = async (row: Node.Model) => {
       try {
         const { node_id, user_id } = row;
-        if (!row.public_ipv4) delete row.public_ipv4;
-
-        const exist = await this.db.findOneAsync({ node_id, user_id });
-        let result;
-        if (exist && exist.node_id) {
-          if (!exist.sync_id) row.sync_id = generateSyncId(5);
-          result = await this.db.updateAsync(
-            { node_id, user_id },
-            { $set: row }
-          );
-        } else {
-          const sync_id = generateSyncId(5);
-          result = await this.db.insertAsync({ ...row, sync_id });
+        const result = await this.db.updateAsync(
+          { node_id, user_id },
+          { $set: row },
+          { upsert: true }
+        );
+        if (result.affectedDocuments) {
+          if (!Array.isArray(result.affectedDocuments)) {
+            if (!("sync_id" in result.affectedDocuments)) {
+              const sync_id = generateSyncId(Sync.SIZES.NODE_ID);
+              const res = await this.db.updateAsync(
+                { node_id, user_id },
+                { $set: { sync_id } }
+              );
+            }
+          } else {
+            logger.warn(
+              "Nodes model",
+              "upsert multiple",
+              result.affectedDocuments
+            );
+          }
         }
         return result;
       } catch (err) {

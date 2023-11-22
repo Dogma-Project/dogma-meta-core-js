@@ -7,6 +7,8 @@ declare namespace Streams {
     messages,
     mail,
     dht,
+    web,
+    file,
   }
   export type DemuxedResult = {
     mx: MX;

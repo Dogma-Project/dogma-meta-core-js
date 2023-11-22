@@ -37,7 +37,6 @@ class ConfigModel implements Model {
     try {
       logger.log("Config Model", "Load config table");
       const data = await this.getAll();
-      logger.debug("!!CONFIG", data, data.length);
       if (data.length) {
         // add condition
         data.forEach((element) => {

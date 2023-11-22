@@ -1,5 +1,5 @@
 import generateSyncId from "../generateSyncId";
-import { Event, System, User } from "../../types";
+import { Event, System, User, Sync } from "../../types";
 import logger from "../logger";
 import { nedbDir } from "../datadir";
 import Datastore from "@seald-io/nedb";
@@ -50,24 +50,52 @@ class UserModel implements Model {
     }
   }
 
-  async persistUser(user: User.Model) {
-    try {
-      const { user_id } = user;
-      this.stateBridge.emit(Event.Type.usersDb, user_id);
-      const exist = await this.db.findOneAsync({ user_id });
-      const sync_id = generateSyncId(5);
-      let result;
-      if (exist && exist.user_id) {
-        if (!exist.sync_id) user.sync_id = sync_id;
-        result = await this.db.updateAsync({ user_id }, { $set: user });
-      } else {
-        result = await this.db.insertAsync({ ...user, sync_id });
+  /**
+   *
+   * @param users array of users to persist
+   * @returns {Promise}
+   */
+  persistUsers(users: User.Model[]) {
+    // add validation
+    const insert = async (row: User.Model) => {
+      try {
+        const { user_id } = row;
+        const result = await this.db.updateAsync(
+          { user_id },
+          { $set: row },
+          { upsert: true }
+        );
+        if (result.affectedDocuments) {
+          if (!Array.isArray(result.affectedDocuments)) {
+            if (!("sync_id" in result.affectedDocuments)) {
+              const sync_id = generateSyncId(Sync.SIZES.USER_ID);
+              await this.db.updateAsync({ user_id }, { $set: { sync_id } });
+            }
+          } else {
+            logger.warn(
+              "Users model",
+              "upsert multiple",
+              result.affectedDocuments
+            );
+          }
+        }
+        return result;
+      } catch (err) {
+        return Promise.reject(err);
       }
-      this.stateBridge.emit(Event.Type.usersDb, System.States.reload); // downgrade state to reload database
-      return result;
-    } catch (err) {
-      return Promise.reject(err);
-    }
+    };
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        for (let i = 0; i < users.length; i++) {
+          await insert(users[i]);
+        }
+        this.stateBridge.emit(Event.Type.usersDb, System.States.reload); // downgrade state to reload database
+        resolve(true);
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
 
   /**

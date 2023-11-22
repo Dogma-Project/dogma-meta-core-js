@@ -37,6 +37,7 @@ stateManager.subscribe([Event.Type.masterKey], ([payload]) => {
     logger.log("KEYS", "master key", "loaded");
     if (storage.user.publicKey) {
       storage.user.id = createSha256Hash(storage.user.publicKey);
+      stateManager.emit(Event.Type.storageUser, System.States.full);
     }
   }
 });
@@ -68,6 +69,7 @@ stateManager.subscribe([Event.Type.nodeKey], ([payload]) => {
     logger.log("KEYS", "node key", "loaded");
     if (storage.node.publicKey) {
       storage.node.id = createSha256Hash(storage.node.publicKey);
+      stateManager.emit(Event.Type.storageNode, System.States.full);
     }
   }
 });

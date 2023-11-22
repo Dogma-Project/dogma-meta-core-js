@@ -38,14 +38,32 @@ stateManager.subscribe([Event.Type.configDb], async ([configDb]) => {
         logger.log("CONFIG MODEL", "is empty");
         if (args.auto) {
           logger.log("CONFIG MODEL", "auto generation with defaults");
-          await configModel.persistConfig({
-            [Event.Type.configRouter]: args.port || DEFAULTS.ROUTER,
-            [Event.Type.configAutoDefine]: DEFAULTS.AUTO_DEFINE_IP,
-            [Event.Type.configDhtAnnounce]: Connection.Group.friends,
-            [Event.Type.configDhtLookup]: Connection.Group.friends,
-            [Event.Type.configDhtBootstrap]: Connection.Group.friends,
-            [Event.Type.configExternal]: DEFAULTS.EXTERNAL,
-          });
+          await configModel.persistConfig([
+            {
+              param: Event.Type.configRouter,
+              value: args.port || DEFAULTS.ROUTER,
+            },
+            {
+              param: Event.Type.configAutoDefine,
+              value: DEFAULTS.AUTO_DEFINE_IP,
+            },
+            {
+              param: Event.Type.configDhtAnnounce,
+              value: Connection.Group.friends,
+            },
+            {
+              param: Event.Type.configDhtLookup,
+              value: Connection.Group.friends,
+            },
+            {
+              param: Event.Type.configDhtBootstrap,
+              value: Connection.Group.friends,
+            },
+            {
+              param: Event.Type.configExternal,
+              value: DEFAULTS.EXTERNAL,
+            },
+          ]);
         }
         break;
       case System.States.limited:

@@ -58,8 +58,8 @@ declare namespace Connection {
       nodeSign: string;
     };
     export const enum Stage {
-      init,
-      verification,
+      init = 0,
+      verification = 1,
     }
   }
 }

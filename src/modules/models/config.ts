@@ -67,17 +67,11 @@ class ConfigModel implements Model {
   }
 
   async persistConfig(config: Types.Config.Model) {
-    const newObject = Object.keys(config).map((key) => ({
-      param: key,
-      value: config[key],
-    }));
-    for (const row of newObject) {
+    const model = Array.isArray(config) ? config : [config];
+    for (const row of model) {
       await this.db.updateAsync({ param: row.param }, row, { upsert: true });
+      this.stateBridge.emit(row.param, row.value);
     }
-    this.stateBridge.emit(
-      Types.Event.Type.configDb,
-      Types.System.States.reload
-    ); // downgrade state to reload database
   }
 }
 

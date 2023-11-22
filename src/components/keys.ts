@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import crypto from "node:crypto";
 import stateManager from "./state";
 import { Event, System, Keys } from "../types";
 import storage from "./storage";
@@ -7,6 +6,7 @@ import { keysDir } from "../modules/datadir";
 import logger from "../modules/logger";
 import args from "../modules/arguments";
 import { createKeyPair } from "../modules/keys";
+import { createSha256Hash } from "../modules/hash";
 
 stateManager.subscribe([Event.Type.masterKey], ([payload]) => {
   if (payload === System.States.empty) {
@@ -36,9 +36,7 @@ stateManager.subscribe([Event.Type.masterKey], ([payload]) => {
   } else if (payload === System.States.full) {
     logger.log("KEYS", "master key", "loaded");
     if (storage.user.publicKey) {
-      const hash = crypto.createHash("sha256");
-      hash.update(storage.user.publicKey);
-      storage.user.id = hash.digest("hex");
+      storage.user.id = createSha256Hash(storage.user.publicKey);
     }
   }
 });
@@ -69,9 +67,7 @@ stateManager.subscribe([Event.Type.nodeKey], ([payload]) => {
   } else if (payload === System.States.full) {
     logger.log("KEYS", "node key", "loaded");
     if (storage.node.publicKey) {
-      const hash = crypto.createHash("sha256");
-      hash.update(storage.node.publicKey);
-      storage.node.id = hash.digest("hex");
+      storage.node.id = createSha256Hash(storage.node.publicKey);
     }
   }
 });

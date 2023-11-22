@@ -31,6 +31,10 @@ export declare const DEFAULTS: {
     NODE_NAME: string;
     LOCAL_DISCOVERY_PORT: number;
 };
+export declare const enum KEYS {
+    TYPE = "pkcs1",
+    FORMAT = "pem"
+}
 /**
  * @constant
  * @type {Object}

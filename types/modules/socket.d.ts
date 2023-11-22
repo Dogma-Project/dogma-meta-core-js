@@ -34,22 +34,23 @@ declare class DogmaSocket extends EventEmitter {
     onDisconnect?: Function;
     tested: boolean;
     constructor(socket: net.Socket, direction: Types.Connection.Direction, state: StateManager, storage: Storage);
-    private _setDecoder;
-    private _setEncoder;
-    private _setGroup;
-    private _onData;
-    private _test;
-    private _onClose;
-    private _onError;
-    private _sign;
-    private _verify;
-    private _sendHandshake;
+    private setDecoder;
+    private setEncoder;
+    private setGroup;
+    private checkGroup;
+    private test;
+    private onData;
+    private onClose;
+    private onError;
+    private sign;
+    private verify;
+    private sendHandshake;
     /**
      *
      * @todo add data verification
      */
     protected handleHandshake(data: Buffer): void;
     protected handleTest(data: Buffer): void;
-    destroy(): net.Socket;
+    destroy(reason?: string): net.Socket;
 }
 export default DogmaSocket;

@@ -62,11 +62,6 @@ export const DESCRIPTOR = {
   SIZE: 15,
 };
 
-export const SIZES = {
-  MX: 1,
-  LEN: 2,
-};
-
 export const ATTACHMENTS = {
   FILE: 0,
   IMAGE: 1,
@@ -76,3 +71,12 @@ export const ATTACHMENTS = {
   VOICE: 5,
   VIDEO_MSG: 6,
 };
+
+export const enum KEYS {
+  TYPE = "pkcs1",
+  FORMAT = "pem",
+}
+export const enum SIZES {
+  MX = 1,
+  LEN = 2,
+}

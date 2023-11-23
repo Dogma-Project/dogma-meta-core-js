@@ -1,6 +1,6 @@
 {
-  "name": "dogma-core",
-  "version": "1.4.12",
+  "name": "@dogma-project/core",
+  "version": "0.4.1",
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
   "author": "Rotegott <rotegott@dogma-project.org> (https://dogma-project.org/)",
   "main": "./dist/index.js",
@@ -14,10 +14,6 @@
     "main-test": "tsc && NODE_ENV=development node dist/tests/main.js --prefix=test-1 --loglevel=5"
   },
   "homepage": "https://meta.dogma-project.org/",
-  "bugs": {
-    "url": "https://github.com/Dogma-Project/dogma-core-js/issues",
-    "email": "rotegott@dogma-project.org"
-  },
   "keywords": [
     "dogma",
     "dogma-core",
@@ -33,6 +29,10 @@
   "repository": {
     "type": "git",
     "url": "git@github.com:Dogma-Project/dogma-core-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Dogma-Project/dogma-core-js/issues",
+    "email": "rotegott@dogma-project.org"
   },
   "devDependencies": {
     "@types/node": "^18.17.1",

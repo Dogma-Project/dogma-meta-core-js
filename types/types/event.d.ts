@@ -1,10 +1,10 @@
-declare namespace Event {
-    const enum Action {
+export declare namespace Event {
+    enum Action {
         update = 0,
         set = 1
     }
     type Payload = any[];
-    const enum Type {
+    enum Type {
         start = "START",
         online = "ONLINE",
         offline = "OFFLINE",
@@ -45,4 +45,3 @@ declare namespace Event {
     type Listenter = (payload: Payload, type?: Type, action?: Action) => void;
     type ArrayOfListeners = [Type[], Listenter] | [];
 }
-export default Event;

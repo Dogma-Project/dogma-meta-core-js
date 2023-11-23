@@ -1,6 +1,6 @@
 /// <reference types="node" />
-import Sync from "./sync";
-declare namespace User {
+import { Sync } from "./sync";
+export declare namespace User {
     type Id = string;
     type Name = string;
     type Model = {
@@ -16,4 +16,3 @@ declare namespace User {
         publicKey: Buffer | null;
     };
 }
-export default User;

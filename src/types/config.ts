@@ -1,7 +1,7 @@
-import Constants from "./constants";
-import Event from "./event";
+import { Constants } from "./constants";
+import { Event } from "./event";
 
-declare namespace Config {
+export namespace Config {
   export namespace Model {
     export type Row = {
       param: Event.Type;
@@ -10,5 +10,3 @@ declare namespace Config {
   }
   export type Model = Model.Row | Model.Row[];
 }
-
-export default Config;

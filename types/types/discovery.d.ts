@@ -1,7 +1,7 @@
-import User from "./user";
-import Node from "./node";
-import Connection from "./connection";
-declare namespace Discovery {
+import { User } from "./user";
+import { Node } from "./node";
+import { Connection } from "./connection";
+export declare namespace Discovery {
     type Card = {
         type: "dogma-router";
         user_id: User.Id;
@@ -16,4 +16,3 @@ declare namespace Discovery {
         local_ipv6?: Connection.IPv6;
     };
 }
-export default Discovery;

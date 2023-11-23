@@ -1,4 +1,4 @@
-declare namespace File {
+export namespace File {
   export type Description = {
     descriptor: number; // check
     size: number;
@@ -6,5 +6,3 @@ declare namespace File {
     data?: string;
   };
 }
-
-export default File;

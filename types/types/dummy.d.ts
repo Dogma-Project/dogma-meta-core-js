@@ -1,8 +1,7 @@
-import Streams from "./streams";
-declare namespace Dummmy {
+import { Streams } from "./streams";
+export declare namespace Dummmy {
     type Abstract = {
         class: Streams.MX.dummy;
         body: null;
     };
 }
-export default Dummmy;

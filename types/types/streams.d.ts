@@ -1,6 +1,6 @@
 /// <reference types="node" />
-declare namespace Streams {
-    const enum MX {
+export declare namespace Streams {
+    enum MX {
         dummy = 0,
         handshake = 1,
         test = 2,
@@ -16,9 +16,8 @@ declare namespace Streams {
         data: Buffer;
         descriptor?: string;
     };
-    const enum SIZES {
+    enum SIZES {
         MX = 1,
         LEN = 2
     }
 }
-export default Streams;

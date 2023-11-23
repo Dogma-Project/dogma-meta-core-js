@@ -1,29 +1,29 @@
 import DogmaSocket from "../modules/socket";
-import User from "./user";
-import Node from "./node";
+import { User } from "./user";
+import { Node } from "./node";
 
-declare namespace Connection {
+export namespace Connection {
   export type Id = string;
   export type IPv4 = string;
   export type IPv6 = string;
-  export const enum Status {
-    notConnected,
-    connected,
-    error,
-    notAuthorized,
-    authorized,
+  export enum Status {
+    error = -1,
+    notConnected = 0,
+    connected = 1,
+    notAuthorized = 2,
+    authorized = 3,
   }
-  export const enum Group {
-    unknown,
-    all,
-    friends,
-    selfUser,
-    selfNode,
-    nobody,
+  export enum Group {
+    unknown = 0,
+    all = 1,
+    friends = 2,
+    selfUser = 3,
+    selfNode = 4,
+    nobody = 5,
   }
-  export const enum Direction {
-    outcoming,
-    incoming,
+  export enum Direction {
+    outcoming = 0,
+    incoming = 1,
   }
   export interface Description {
     connection_id: Id;
@@ -57,11 +57,9 @@ declare namespace Connection {
       nodeKey: string;
       nodeSign: string;
     };
-    export const enum Stage {
+    export enum Stage {
       init = 0,
       verification = 1,
     }
   }
 }
-
-export default Connection;

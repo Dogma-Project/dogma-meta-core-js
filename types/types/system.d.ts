@@ -1,5 +1,5 @@
-declare namespace System {
-    const enum LogLevel {
+export declare namespace System {
+    enum LogLevel {
         nothing = 0,
         errors = 1,
         debug = 2,
@@ -7,15 +7,14 @@ declare namespace System {
         warnings = 4,
         logs = 5
     }
-    const enum States {
-        error = 0,
-        disabled = 1,
-        ready = 2,
-        empty = 3,
-        reload = 4,
-        limited = 5,
-        ok = 6,
-        full = 7
+    enum States {
+        error = -1,
+        disabled = 0,
+        ready = 1,
+        empty = 2,
+        reload = 3,
+        limited = 4,
+        ok = 5,
+        full = 6
     }
 }
-export default System;

@@ -1,8 +1,8 @@
-import Connection from "./connection";
-import User from "./user";
-import Sync from "./sync";
+import { Connection } from "./connection";
+import { User } from "./user";
+import { Sync } from "./sync";
 
-declare namespace Node {
+export namespace Node {
   export type Id = string;
   export type Name = string;
   export type Model = {
@@ -24,5 +24,3 @@ declare namespace Node {
     local_ipv4?: Connection.IPv4;
   };
 }
-
-export default Node;

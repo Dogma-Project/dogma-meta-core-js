@@ -1,24 +1,25 @@
-import Connection from "./connection";
-import Node from "./node";
-import Streams from "./streams";
-import User from "./user";
-declare namespace DHT {
-    const enum Type {
+import { Connection } from "./connection";
+import { Node } from "./node";
+import { Streams } from "./streams";
+import { User } from "./user";
+export declare namespace DHT {
+    enum Type {
         dhtAnnounce = 0,
         dhtLookup = 1,
         dhtBootstrap = 2
     }
-    const enum Action {
+    enum Action {
         get = 0,
         set = 1,
         push = 2
     }
-    const enum Request {
+    enum Request {
         announce = 0,
         lookup = 1,
         revoke = 2
     }
-    const enum Response {
+    enum Response {
+        error = -1,
         alreadyPresent = 0,
         ok = 1
     }
@@ -95,4 +96,3 @@ declare namespace DHT {
         body: DHT.Requests;
     };
 }
-export default DHT;

@@ -1,17 +1,17 @@
-import Connection from "./connection";
-import Streams from "./streams";
+import { Connection } from "./connection";
+import { Streams } from "./streams";
 
-declare namespace Message {
-  export const enum Type {
-    direct,
-    user,
-    chat,
+export namespace Message {
+  export enum Type {
+    direct = 0,
+    user = 1,
+    chat = 2,
   }
-  export const enum Action {
-    send,
-    sync,
-    edit,
-    delete,
+  export enum Action {
+    send = 0,
+    sync = 1,
+    edit = 2,
+    delete = 3,
   }
 
   export type Model = {
@@ -51,5 +51,3 @@ declare namespace Message {
     body: Requests;
   };
 }
-
-export default Message;

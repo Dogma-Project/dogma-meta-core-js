@@ -1,7 +1,7 @@
-import Node from "./node";
-import User from "./user";
+import { Node } from "./node";
+import { User } from "./user";
 
-declare namespace Certificate {
+export namespace Certificate {
   export namespace Validation {
     export type Result = {
       result: number;
@@ -19,5 +19,3 @@ declare namespace Certificate {
     };
   }
 }
-
-export default Certificate;

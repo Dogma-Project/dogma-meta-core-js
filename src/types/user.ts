@@ -1,6 +1,6 @@
-import Sync from "./sync";
+import { Sync } from "./sync";
 
-declare namespace User {
+export namespace User {
   export type Id = string;
   export type Name = string;
   export type Model = {
@@ -16,5 +16,3 @@ declare namespace User {
     publicKey: Buffer | null;
   };
 }
-
-export default User;

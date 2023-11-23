@@ -1,8 +1,6 @@
-declare namespace Constants {
-  export const enum Boolean {
+export namespace Constants {
+  export enum Boolean {
     false = 0,
     true = 1,
   }
 }
-
-export default Constants;

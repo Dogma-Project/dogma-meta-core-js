@@ -14,6 +14,6 @@ declare class DHTModel implements Model {
         user_id: Types.User.Id;
         node_id?: Types.Node.Id;
     }): Datastore.Cursor<Record<string, any>[]>;
-    checkOrInsert(params: Types.DHT.Model): Promise<Types.DHT.Response>;
+    checkOrInsert(params: Types.DHT.Model): Promise<Types.DHT.Response.alreadyPresent | Types.DHT.Response.ok>;
 }
 export default DHTModel;

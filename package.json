@@ -1,8 +1,7 @@
 {
   "name": "@dogma-project/core",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
-  "author": "Rotegott <rotegott@dogma-project.org> (https://dogma-project.org/)",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
   "scripts": {
@@ -13,6 +12,11 @@
     "test": "tsc && NODE_ENV=test node --test dist/",
     "main-test": "tsc && NODE_ENV=development node dist/tests/main.js --prefix=test-1 --loglevel=5"
   },
+  "author": {
+    "name": "Rotegott",
+    "email": "rotegott@dogma-project.org",
+    "url": "https://dogma-project.org/"
+  },
   "homepage": "https://meta.dogma-project.org/",
   "keywords": [
     "dogma",
@@ -22,10 +26,6 @@
     "p2p"
   ],
   "license": "MIT",
-  "dependencies": {
-    "@seald-io/nedb": "^4.0.2",
-    "ext-ip": "^0.3.9"
-  },
   "repository": {
     "type": "git",
     "url": "git@github.com:Dogma-Project/dogma-core-js.git"
@@ -33,6 +33,10 @@
   "bugs": {
     "url": "https://github.com/Dogma-Project/dogma-core-js/issues",
     "email": "rotegott@dogma-project.org"
+  },
+  "dependencies": {
+    "@seald-io/nedb": "^4.0.2",
+    "ext-ip": "^0.3.9"
   },
   "devDependencies": {
     "@types/node": "^18.17.1",

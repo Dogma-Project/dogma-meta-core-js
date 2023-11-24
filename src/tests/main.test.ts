@@ -1,11 +1,14 @@
-// import assert from "node:assert";
+process.env.loglevel = "0";
+process.env.prefix = "test-0";
+
 import { describe, it } from "node:test";
 
 import { Keys, State, Model, Types, System } from "../index";
 import { DEFAULTS } from "../constants";
 
-System.setArg(Types.System.Args.prefix, "test-0");
-System.setArg(Types.System.Args.loglevel, 0);
+// System.setArg(Types.System.Args.prefix, "test-0");
+// System.setArg(Types.System.Args.loglevel, 0);
+
 System.run();
 
 describe("Functional test", () => {

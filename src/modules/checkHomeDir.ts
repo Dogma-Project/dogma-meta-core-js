@@ -5,9 +5,9 @@ import { System } from "../types";
 
 export default function checkHomeDir() {
   try {
-    const dir = getDatadir();
     const prefix = getArg(System.Args.prefix);
-    if (!prefix) return Promise.reject("Unknown home dir");
+    if (!prefix) return Promise.reject(1);
+    const dir = getDatadir();
     if (prefix === "empty" || prefix.indexOf("test-") > -1) {
       fs.rmSync(dir.data, { recursive: true, force: true });
     }

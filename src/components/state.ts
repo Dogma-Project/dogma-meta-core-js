@@ -10,6 +10,7 @@ const stateManager = new StateManager([
   Event.Type.usersDb,
   Event.Type.messagesDb,
   Event.Type.localDiscovery,
+  Event.Type.homeDir,
 ]);
 
 export default stateManager;

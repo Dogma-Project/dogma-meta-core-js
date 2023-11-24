@@ -12,7 +12,7 @@ type datadir = {
 export default function get(): datadir {
   const prefix = getArg(System.Args.prefix);
   const main = os.homedir() + "/.dogma-node";
-  const data = main + (prefix ? `/${prefix}` : "/default");
+  const data = main + `/${prefix}`;
   const nedb = data + "/nedb";
   const keys = data + "/keys";
   return { main, data, nedb, keys };

@@ -13,11 +13,11 @@ class FileModel implements Model {
     this.stateBridge = state;
   }
 
-  async init() {
+  async init(prefix: string) {
     try {
       logger.debug("nedb", "load database", "files");
       this.db = new Datastore({
-        filename: getDatadir().nedb + "/files.db",
+        filename: getDatadir(prefix).nedb + "/files.db",
       });
       await this.db.loadDatabaseAsync();
       // await this.db.ensureIndexAsync({

@@ -1,9 +1,11 @@
-process.env.prefix = "test-1";
+// process.env.prefix = "test-1";
 
 import { Keys, State, Model, Types, Connections, System } from "../index";
 import { DEFAULTS } from "../constants";
 import logger from "../modules/logger";
 import assert from "node:assert";
+
+const testPrefix = "test-1";
 
 State.stateManager.subscribe([Types.Event.Type.services], ([services]) => {
   logger.debug("TEST", "services", services);
@@ -70,12 +72,12 @@ const main = async () => {
   try {
     State.storage.user.name = "Test user";
     State.storage.node.name = "Test node";
-    await Keys.createKeyPair(Types.Keys.Type.masterKey, 2048);
+    await Keys.createKeyPair(Types.Keys.Type.masterKey, testPrefix, 2048);
     State.stateManager.emit(
       Types.Event.Type.masterKey,
       Types.System.States.ready
     );
-    await Keys.createKeyPair(Types.Keys.Type.nodeKey, 1024);
+    await Keys.createKeyPair(Types.Keys.Type.nodeKey, testPrefix, 1024);
     State.stateManager.emit(
       Types.Event.Type.nodeKey,
       Types.System.States.ready
@@ -111,13 +113,19 @@ const main = async () => {
   }
 };
 
-System.run();
+System.run(testPrefix);
 
-main()
-  .then(() => {
-    logger.debug("TEST", "Start test passed!");
-  })
-  .catch((err) => {
-    logger.error("TEST", err);
-    logger.debug("TEST", "Start test not passed!");
-  });
+State.stateManager.subscribe([Types.Event.Type.dirStatus], ([homeDir]) => {
+  if (homeDir === Types.System.States.full) {
+    main()
+      .then(() => {
+        logger.debug("TEST", "Start test passed!");
+      })
+      .catch((err) => {
+        logger.error("TEST", err);
+        logger.debug("TEST", "Start test not passed!");
+      });
+  } else if (homeDir === Types.System.States.empty) {
+    State.stateManager.emit(Types.Event.Type.dirStatus, testPrefix);
+  }
+});

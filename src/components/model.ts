@@ -21,13 +21,13 @@ const dhtModel = new DHTModel({ state: stateManager });
 const userModel = new UserModel({ state: stateManager });
 
 stateManager.subscribe(
-  [Event.Type.start, Event.Type.homeDir],
-  ([start, homeDir]) => {
+  [Event.Type.start, Event.Type.dirStatus, Event.Type.prefix],
+  ([start, homeDir, prefix]) => {
     if (homeDir === System.States.full) {
-      configModel.init();
-      nodeModel.init();
-      dhtModel.init();
-      userModel.init();
+      configModel.init(prefix);
+      nodeModel.init(prefix);
+      dhtModel.init(prefix);
+      userModel.init(prefix);
     }
   }
 );

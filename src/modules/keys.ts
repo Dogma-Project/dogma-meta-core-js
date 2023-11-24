@@ -32,10 +32,11 @@ function _generateKeyPair(
 
 export async function createKeyPair(
   type: Keys.Type,
+  prefix: string,
   length: Keys.InitialParams["keylength"] = 2048
 ) {
   try {
-    const dir = getDatadir();
+    const dir = getDatadir(prefix);
     const { publicKey, privateKey } = await _generateKeyPair(length);
     const opts: crypto.KeyExportOptions<"pem"> = {
       type: Keys.FORMATS.TYPE,

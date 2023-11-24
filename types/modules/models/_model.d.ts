@@ -3,6 +3,6 @@ import StateManager from "../state";
 export default interface Model {
     db: Datastore;
     stateBridge: StateManager;
-    init: () => void;
+    init: (prefix: string) => void;
     getAll: () => Promise<Record<string, any>[]>;
 }

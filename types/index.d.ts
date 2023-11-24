@@ -1,7 +1,6 @@
 import run from "./start";
 import { createKeyPair } from "./modules/keys";
 import { getArg } from "./modules/arguments";
-import { setDatadir } from "./modules/datadir";
 import connections from "./components/connections";
 import * as Model from "./components/model";
 import * as Types from "./types";
@@ -15,6 +14,5 @@ declare const State: {
 declare const System: {
     run: typeof run;
     getArg: typeof getArg;
-    setDatadir: typeof setDatadir;
 };
 export { System, Keys, State, Model, Types, connections as Connections };

@@ -22,6 +22,7 @@ export namespace Event {
 
     nodes = "NODES", // storage
     users = "USERS", // storage
+    prefix = "PREFIX", // storage
 
     services = "SERVICES",
     masterKey = "MASTER KEY", // service
@@ -36,7 +37,7 @@ export namespace Event {
     syncDb = "SYNC DB",
     server = "SERVER", // service
     localDiscovery = "LOCAL DISCOVERY", // service
-    homeDir = "HOME DIR", // service
+    dirStatus = "HOME DIR", // service
     storageUser = "STORAGE USER", // service
     storageNode = "STORAGE NODE", // service
 

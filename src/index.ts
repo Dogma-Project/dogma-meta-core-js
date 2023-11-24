@@ -1,7 +1,6 @@
 import run from "./start";
 import { createKeyPair } from "./modules/keys";
 import { getArg } from "./modules/arguments";
-import { setDatadir } from "./modules/datadir";
 
 import stateManager from "./components/state";
 import storage from "./components/storage";
@@ -19,7 +18,6 @@ const State = {
 const System = {
   run,
   getArg,
-  setDatadir,
 };
 
 export { System, Keys, State, Model, Types, connections as Connections };

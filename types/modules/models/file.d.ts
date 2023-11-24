@@ -8,7 +8,7 @@ declare class FileModel implements Model {
     constructor({ state }: {
         state: StateManager;
     });
-    init(): Promise<void>;
+    init(prefix: string): Promise<void>;
     getAll(): Promise<Record<string, any>[]>;
     permitFileTransfer({ user_id, file, }: {
         user_id: Types.User.Id;

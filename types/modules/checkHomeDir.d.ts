@@ -1,1 +1,1 @@
-export default function checkHomeDir(): Promise<boolean>;
+export default function checkHomeDir(prefix: string): Promise<boolean>;

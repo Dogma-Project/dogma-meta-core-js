@@ -7,22 +7,18 @@ type datadir = {
   data: string;
   nedb: string;
   keys: string;
+  prefix: string;
 };
 
-let switched = "";
-
-export function getDatadir(): datadir {
-  console.log("GET DATA DIR", switched);
-  const prefix = switched || getArg(System.Args.prefix);
+/**
+ * @todo add cache
+ * @param prefix
+ * @returns
+ */
+export function getDatadir(prefix: string): datadir {
   const main = os.homedir() + "/.dogma-node";
   const data = main + `/${prefix}`;
   const nedb = data + "/nedb";
   const keys = data + "/keys";
-  return { main, data, nedb, keys };
-}
-
-export function setDatadir(value: string) {
-  console.log("SET DATA DIR", value, switched);
-  if (!value.length) return;
-  switched = value;
+  return { main, data, nedb, keys, prefix };
 }

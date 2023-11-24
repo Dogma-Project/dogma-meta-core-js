@@ -13,11 +13,11 @@ class DHTModel implements Model {
     this.stateBridge = state;
   }
 
-  async init() {
+  async init(prefix: string) {
     try {
       logger.debug("nedb", "load database", "DHT");
       this.db = new Datastore({
-        filename: getDatadir().nedb + "/dht.db",
+        filename: getDatadir(prefix).nedb + "/dht.db",
       });
       await this.db.loadDatabaseAsync();
       // await this.db.ensureIndexAsync({

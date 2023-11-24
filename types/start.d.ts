@@ -1,2 +1,2 @@
 import "./init";
-export default function run(): void;
+export default function run(prefix?: string): void;

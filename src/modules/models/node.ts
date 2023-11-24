@@ -15,11 +15,11 @@ class NodeModel implements Model {
     this.stateBridge = state;
   }
 
-  async init() {
+  async init(prefix: string) {
     try {
       logger.debug("nedb", "load database", "nodes");
       this.db = new Datastore({
-        filename: getDatadir().nedb + "/nodes.db",
+        filename: getDatadir(prefix).nedb + "/nodes.db",
         timestampData: true,
       });
       await this.db.loadDatabaseAsync();

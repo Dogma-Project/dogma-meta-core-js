@@ -8,7 +8,7 @@ declare class NodeModel implements Model {
     constructor({ state }: {
         state: StateManager;
     });
-    init(): Promise<void>;
+    init(prefix: string): Promise<void>;
     getAll(): Promise<Record<string, any>[]>;
     loadNodesTable(): Promise<void>;
     getByUserId(user_id: User.Id): Promise<Record<string, any>[]>;

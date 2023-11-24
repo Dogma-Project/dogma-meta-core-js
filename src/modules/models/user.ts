@@ -14,11 +14,11 @@ class UserModel implements Model {
     this.stateBridge = state;
   }
 
-  async init() {
+  async init(prefix: string) {
     try {
       logger.debug("nedb", "load database", "users");
       this.db = new Datastore({
-        filename: getDatadir().nedb + "/users.db",
+        filename: getDatadir(prefix).nedb + "/users.db",
         timestampData: true,
       });
       await this.db.loadDatabaseAsync();

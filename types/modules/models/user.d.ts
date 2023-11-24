@@ -8,7 +8,7 @@ declare class UserModel implements Model {
     constructor({ state }: {
         state: StateManager;
     });
-    init(): Promise<void>;
+    init(prefix: string): Promise<void>;
     getAll(): Promise<Record<string, any>[]>;
     loadUsersTable(): Promise<void>;
     /**

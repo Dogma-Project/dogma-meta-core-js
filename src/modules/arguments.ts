@@ -22,21 +22,33 @@ export function getArg(type: System.Args.prefix): string | null;
 export function getArg(type: System.Args): value {
   const cached = cache[type];
   if (cached !== undefined) return cached;
+  let result;
   let env = process.env[type];
   if (env === undefined) {
     const arg = args.find((item) => item.indexOf(`--${type}=`) > -1);
     if (arg) env = arg.split("=")[1];
   }
   if (env) {
-    if (env === "true") return true;
-    if (env === "false") return false;
-    if (!Number.isNaN(Number(env))) return Number(env);
-    return env;
+    if (env === "true") {
+      result = true;
+    } else if (env === "false") {
+      result = false;
+    } else if (!Number.isNaN(Number(env))) {
+      result = Number(env);
+    }
+    result = env;
   } else {
-    return null;
+    result = null;
   }
+  cache[type] = result;
+  return result;
 }
 
+/**
+ * @deprecated
+ * @param type
+ * @param value
+ */
 export function setArg(type: System.Args, value: value) {
   cache[type] = value;
 }

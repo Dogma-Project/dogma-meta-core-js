@@ -2,7 +2,7 @@ import generateSyncId from "../generateSyncId";
 import logger from "../logger";
 // import Sync from "./sync";
 import { Event, System, Node, User, Sync } from "../../types";
-import getDatadir from "../datadir";
+import { getDatadir } from "../datadir";
 import Datastore from "@seald-io/nedb";
 import Model from "./_model";
 import StateManager from "../state";

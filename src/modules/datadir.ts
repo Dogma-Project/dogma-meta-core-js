@@ -9,11 +9,20 @@ type datadir = {
   keys: string;
 };
 
-export default function get(): datadir {
-  const prefix = getArg(System.Args.prefix);
+let switched = "";
+
+export function getDatadir(): datadir {
+  console.log("GET DATA DIR", switched);
+  const prefix = switched || getArg(System.Args.prefix);
   const main = os.homedir() + "/.dogma-node";
   const data = main + `/${prefix}`;
   const nedb = data + "/nedb";
   const keys = data + "/keys";
   return { main, data, nedb, keys };
+}
+
+export function setDatadir(value: string) {
+  console.log("SET DATA DIR", value, switched);
+  if (!value.length) return;
+  switched = value;
 }

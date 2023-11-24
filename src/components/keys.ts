@@ -2,7 +2,7 @@ import fs from "node:fs";
 import stateManager from "./state";
 import { Event, System, Keys } from "../types";
 import storage from "./storage";
-import getDatadir from "../modules/datadir";
+import { getDatadir } from "../modules/datadir";
 import logger from "../modules/logger";
 import { getArg } from "../modules/arguments";
 import { createKeyPair } from "../modules/keys";

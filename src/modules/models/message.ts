@@ -1,6 +1,6 @@
 import StateManager from "../state";
 import Model from "./_model";
-import getDatadir from "../datadir";
+import { getDatadir } from "../datadir";
 import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 import * as Types from "../../types";

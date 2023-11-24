@@ -2,7 +2,7 @@ import StateManager from "../state";
 import Datastore from "@seald-io/nedb";
 import * as Types from "../../types";
 import Model from "./_model";
-import getDatadir from "../datadir";
+import { getDatadir } from "../datadir";
 import logger from "../logger";
 
 class DHTModel implements Model {

@@ -1,11 +1,12 @@
 import fs from "node:fs";
-import getDatadir from "./datadir";
+import { getDatadir } from "./datadir";
 import { getArg } from "./arguments";
 import { System } from "../types";
 
 export default function checkHomeDir() {
   try {
-    const prefix = getArg(System.Args.prefix);
+    const auto = getArg(System.Args.auto);
+    const prefix = getArg(System.Args.prefix) || (auto ? "default" : null);
     if (!prefix) return Promise.reject(1);
     const dir = getDatadir();
     if (prefix === "empty" || prefix.indexOf("test-") > -1) {

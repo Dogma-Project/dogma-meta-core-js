@@ -2,7 +2,7 @@ import crypto, { RSAKeyPairKeyObjectOptions } from "node:crypto";
 import { Keys } from "../types";
 import logger from "./logger";
 import fs from "node:fs";
-import getDataDir from "./datadir";
+import { getDatadir } from "./datadir";
 
 type result = {
   publicKey: crypto.KeyObject;
@@ -35,7 +35,7 @@ export async function createKeyPair(
   length: Keys.InitialParams["keylength"] = 2048
 ) {
   try {
-    const dir = getDataDir();
+    const dir = getDatadir();
     const { publicKey, privateKey } = await _generateKeyPair(length);
     const opts: crypto.KeyExportOptions<"pem"> = {
       type: Keys.FORMATS.TYPE,

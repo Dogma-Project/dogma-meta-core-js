@@ -1,5 +1,5 @@
 import * as Types from "../../types";
-import getDatadir from "../datadir";
+import { getDatadir } from "../datadir";
 import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 import Model from "./_model";

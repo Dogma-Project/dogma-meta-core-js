@@ -1,3 +1,5 @@
+process.env.prefix = "test-1";
+
 import { Keys, State, Model, Types, Connections, System } from "../index";
 import { DEFAULTS } from "../constants";
 import logger from "../modules/logger";
@@ -110,6 +112,7 @@ const main = async () => {
 };
 
 System.run();
+
 main()
   .then(() => {
     logger.debug("TEST", "Start test passed!");

@@ -10,5 +10,10 @@ export declare function getArg(type: System.Args.discovery): boolean | null;
 export declare function getArg(type: System.Args.port): number | null;
 export declare function getArg(type: System.Args.loglevel): number | null;
 export declare function getArg(type: System.Args.prefix): string | null;
+/**
+ * @deprecated
+ * @param type
+ * @param value
+ */
 export declare function setArg(type: System.Args, value: value): void;
 export {};

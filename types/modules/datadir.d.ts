@@ -4,5 +4,6 @@ type datadir = {
     nedb: string;
     keys: string;
 };
-export default function get(): datadir;
+export declare function getDatadir(): datadir;
+export declare function setDatadir(value: string): void;
 export {};

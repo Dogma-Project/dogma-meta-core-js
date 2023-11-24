@@ -2,14 +2,12 @@ import StateManager from "../state";
 import Datastore from "@seald-io/nedb";
 import * as Types from "../../types";
 import Model from "./_model";
-import { nedbDir } from "../datadir";
+import getDatadir from "../datadir";
 import logger from "../logger";
 
 class DHTModel implements Model {
   stateBridge: StateManager;
-  db: Datastore = new Datastore({
-    filename: nedbDir + "/dht.db",
-  });
+  db!: Datastore;
 
   constructor({ state }: { state: StateManager }) {
     this.stateBridge = state;
@@ -18,6 +16,9 @@ class DHTModel implements Model {
   async init() {
     try {
       logger.debug("nedb", "load database", "DHT");
+      this.db = new Datastore({
+        filename: getDatadir().nedb + "/dht.db",
+      });
       await this.db.loadDatabaseAsync();
       // await this.db.ensureIndexAsync({
       //   fieldName: "param",

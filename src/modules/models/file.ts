@@ -1,5 +1,5 @@
 import * as Types from "../../types";
-import { nedbDir } from "../datadir";
+import getDatadir from "../datadir";
 import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 import Model from "./_model";
@@ -7,9 +7,7 @@ import StateManager from "../state";
 
 class FileModel implements Model {
   stateBridge: StateManager;
-  db: Datastore = new Datastore({
-    filename: nedbDir + "/files.db",
-  });
+  db!: Datastore;
 
   constructor({ state }: { state: StateManager }) {
     this.stateBridge = state;
@@ -18,6 +16,9 @@ class FileModel implements Model {
   async init() {
     try {
       logger.debug("nedb", "load database", "files");
+      this.db = new Datastore({
+        filename: getDatadir().nedb + "/files.db",
+      });
       await this.db.loadDatabaseAsync();
       // await this.db.ensureIndexAsync({
       //   fieldName: "param",

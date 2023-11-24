@@ -1,4 +1,4 @@
-import { Keys, State, Model, Types, Connections } from "../index";
+import { Keys, State, Model, Types, Connections, System } from "../index";
 import { DEFAULTS } from "../constants";
 import logger from "../modules/logger";
 import assert from "node:assert";
@@ -109,6 +109,7 @@ const main = async () => {
   }
 };
 
+System.run();
 main()
   .then(() => {
     logger.debug("TEST", "Start test passed!");

@@ -1,5 +1,5 @@
 import * as Types from "../../types";
-import { nedbDir } from "../datadir";
+import getDatadir from "../datadir";
 import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 import Model from "./_model";
@@ -8,9 +8,7 @@ import { PROTOCOL } from "../../constants";
 
 class ProtocolModel implements Model {
   stateBridge: StateManager;
-  db: Datastore = new Datastore({
-    filename: nedbDir + "/protocol.db",
-  });
+  db!: Datastore;
 
   constructor({ state }: { state: StateManager }) {
     this.stateBridge = state;
@@ -19,6 +17,9 @@ class ProtocolModel implements Model {
   async init() {
     try {
       logger.debug("nedb", "load database", "protocol");
+      this.db = new Datastore({
+        filename: getDatadir().nedb + "/protocol.db",
+      });
       await this.db.loadDatabaseAsync();
       // await this.db.ensureIndexAsync({
       //   fieldName: "param",

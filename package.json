@@ -1,14 +1,14 @@
 {
   "name": "@dogma-project/core",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
   "scripts": {
-    "start": "tsc && node dist/start.js",
-    "auto": "tsc && NODE_ENV=development node dist/start.js --prefix=default --loglevel=5 --auto=true --master=dogma_user --node=dogma_node",
-    "auto2": "tsc && NODE_ENV=development node dist/start.js --port=24602 --prefix=second --loglevel=5 --auto=true --master=user --node=node",
-    "empty": "tsc && NODE_ENV=development node dist/start.js --prefix=empty --loglevel=5",
+    "start": "tsc && node dist/run.js",
+    "auto": "tsc && NODE_ENV=development node dist/run.js --prefix=default --loglevel=5 --auto=true --master=dogma_user --node=dogma_node",
+    "auto2": "tsc && NODE_ENV=development node dist/run.js --port=24602 --prefix=second --loglevel=5 --auto=true --master=user --node=node",
+    "empty": "tsc && NODE_ENV=development node dist/run.js --prefix=empty --loglevel=5",
     "test": "tsc && NODE_ENV=test node --test dist/",
     "main-test": "tsc && NODE_ENV=development node dist/tests/main.js --prefix=test-1 --loglevel=5"
   },

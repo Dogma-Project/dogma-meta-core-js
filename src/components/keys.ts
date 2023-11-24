@@ -2,13 +2,14 @@ import fs from "node:fs";
 import stateManager from "./state";
 import { Event, System, Keys } from "../types";
 import storage from "./storage";
-import { keysDir } from "../modules/datadir";
+import getDatadir from "../modules/datadir";
 import logger from "../modules/logger";
 import { getArg } from "../modules/arguments";
 import { createKeyPair } from "../modules/keys";
 import { createSha256Hash } from "../modules/hash";
 
 stateManager.subscribe([Event.Type.masterKey], ([payload]) => {
+  const dir = getDatadir();
   if (payload === System.States.empty) {
     logger.log("KEYS", "master key", "empty");
     if (getArg(System.Args.auto)) {
@@ -25,9 +26,9 @@ stateManager.subscribe([Event.Type.masterKey], ([payload]) => {
     logger.log("KEYS", "master key", "ready");
     try {
       storage.user.privateKey = fs.readFileSync(
-        keysDir + "/master-private.pem"
+        dir.keys + "/master-private.pem"
       );
-      storage.user.publicKey = fs.readFileSync(keysDir + "/master-public.pem");
+      storage.user.publicKey = fs.readFileSync(dir.keys + "/master-public.pem");
       stateManager.emit(Event.Type.masterKey, System.States.full);
     } catch (e) {
       logger.log("store", "MASTER KEYS NOT FOUND");
@@ -43,6 +44,7 @@ stateManager.subscribe([Event.Type.masterKey], ([payload]) => {
 });
 
 stateManager.subscribe([Event.Type.nodeKey], ([payload]) => {
+  const dir = getDatadir();
   if (payload === System.States.empty) {
     logger.log("KEYS", "node key", "empty");
     if (getArg(System.Args.auto)) {
@@ -58,8 +60,8 @@ stateManager.subscribe([Event.Type.nodeKey], ([payload]) => {
   } else if (payload === System.States.ready) {
     logger.log("KEYS", "node key", "ready");
     try {
-      storage.node.privateKey = fs.readFileSync(keysDir + "/node-private.pem");
-      storage.node.publicKey = fs.readFileSync(keysDir + "/node-public.pem");
+      storage.node.privateKey = fs.readFileSync(dir.keys + "/node-private.pem");
+      storage.node.publicKey = fs.readFileSync(dir.keys + "/node-public.pem");
       stateManager.emit(Event.Type.nodeKey, System.States.full);
     } catch (e) {
       logger.log("store", "NODE KEYS NOT FOUND");
@@ -74,8 +76,13 @@ stateManager.subscribe([Event.Type.nodeKey], ([payload]) => {
   }
 });
 
-stateManager.subscribe([Event.Type.start, Event.Type.homeDir], () => {
-  logger.log("KEYS", "starting");
-  stateManager.emit(Event.Type.masterKey, System.States.ready);
-  stateManager.emit(Event.Type.nodeKey, System.States.ready);
-});
+stateManager.subscribe(
+  [Event.Type.start, Event.Type.homeDir],
+  ([start, homeDir]) => {
+    if (homeDir === System.States.full) {
+      logger.log("KEYS", "starting");
+      stateManager.emit(Event.Type.masterKey, System.States.ready);
+      stateManager.emit(Event.Type.nodeKey, System.States.ready);
+    }
+  }
+);

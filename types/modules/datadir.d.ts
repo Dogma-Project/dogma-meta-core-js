@@ -1,4 +1,8 @@
-export declare const dogmaDir: string;
-export declare const datadir: string;
-export declare const nedbDir: string;
-export declare const keysDir: string;
+type datadir = {
+    main: string;
+    data: string;
+    nedb: string;
+    keys: string;
+};
+export default function get(): datadir;
+export {};

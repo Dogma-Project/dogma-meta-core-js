@@ -1,16 +1,13 @@
 import StateManager from "../state";
 import Model from "./_model";
-import { nedbDir } from "../datadir";
+import getDatadir from "../datadir";
 import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 import * as Types from "../../types";
 
 class MessageModel implements Model {
   stateBridge: StateManager;
-  db: Datastore = new Datastore({
-    filename: nedbDir + "/messages.db",
-    timestampData: true,
-  });
+  db!: Datastore;
 
   constructor({ state }: { state: StateManager }) {
     this.stateBridge = state;
@@ -19,6 +16,10 @@ class MessageModel implements Model {
   async init() {
     try {
       logger.debug("nedb", "load database", "messages");
+      this.db = new Datastore({
+        filename: getDatadir().nedb + "/messages.db",
+        timestampData: true,
+      });
       await this.db.loadDatabaseAsync();
       await this.db.ensureIndexAsync({
         fieldName: "sync_id",

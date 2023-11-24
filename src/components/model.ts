@@ -20,12 +20,17 @@ const nodeModel = new NodeModel({ state: stateManager });
 const dhtModel = new DHTModel({ state: stateManager });
 const userModel = new UserModel({ state: stateManager });
 
-stateManager.subscribe([Event.Type.start, Event.Type.homeDir], () => {
-  configModel.init();
-  nodeModel.init();
-  dhtModel.init();
-  userModel.init();
-});
+stateManager.subscribe(
+  [Event.Type.start, Event.Type.homeDir],
+  ([start, homeDir]) => {
+    if (homeDir === System.States.full) {
+      configModel.init();
+      nodeModel.init();
+      dhtModel.init();
+      userModel.init();
+    }
+  }
+);
 
 stateManager.subscribe([Event.Type.configDb], async ([configDb]) => {
   try {

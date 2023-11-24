@@ -1,5 +1,6 @@
-import "./start";
+import run from "./start";
 import { createKeyPair } from "./modules/keys";
+import { getArg, setArg } from "./modules/arguments";
 
 import stateManager from "./components/state";
 import storage from "./components/storage";
@@ -14,5 +15,10 @@ const State = {
   stateManager,
   storage,
 };
+const System = {
+  run,
+  getArg,
+  setArg,
+};
 
-export { Keys, State, Model, Types, connections as Connections };
+export { System, Keys, State, Model, Types, connections as Connections };

@@ -1,17 +1,14 @@
 import generateSyncId from "../generateSyncId";
 import { Event, System, User, Sync } from "../../types";
 import logger from "../logger";
-import { nedbDir } from "../datadir";
+import getDatadir from "../datadir";
 import Datastore from "@seald-io/nedb";
 import Model from "./_model";
 import StateManager from "../state";
 
 class UserModel implements Model {
   stateBridge: StateManager;
-  db: Datastore = new Datastore({
-    filename: nedbDir + "/users.db",
-    timestampData: true,
-  });
+  db!: Datastore;
 
   constructor({ state }: { state: StateManager }) {
     this.stateBridge = state;
@@ -20,6 +17,10 @@ class UserModel implements Model {
   async init() {
     try {
       logger.debug("nedb", "load database", "users");
+      this.db = new Datastore({
+        filename: getDatadir().nedb + "/users.db",
+        timestampData: true,
+      });
       await this.db.loadDatabaseAsync();
       await this.db.ensureIndexAsync({
         fieldName: "user_id",

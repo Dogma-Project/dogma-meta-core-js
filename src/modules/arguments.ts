@@ -21,6 +21,7 @@ export function getArg(type: System.Args.loglevel): number | null;
 export function getArg(type: System.Args.prefix): string | null;
 export function getArg(type: System.Args): value {
   const cached = cache[type];
+  console.debug("GET", type, cached);
   if (cached !== undefined) return cached;
   let env = process.env[type];
   if (env === undefined) {
@@ -38,7 +39,6 @@ export function getArg(type: System.Args): value {
 }
 
 export function setArg(type: System.Args, value: value) {
+  console.debug("SET ARG", type, value);
   cache[type] = value;
 }
-
-const wmz = getArg(System.Args.auto);

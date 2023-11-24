@@ -12,7 +12,7 @@ import {
   SyncModel,
 } from "../modules/model";
 import logger from "../modules/logger";
-import args from "../modules/arguments";
+import { getArg } from "../modules/arguments";
 import { DEFAULTS } from "../constants";
 
 const configModel = new ConfigModel({ state: stateManager });
@@ -36,12 +36,12 @@ stateManager.subscribe([Event.Type.configDb], async ([configDb]) => {
         break;
       case System.States.empty:
         logger.log("CONFIG MODEL", "is empty");
-        if (args.auto) {
+        if (getArg(System.Args.auto)) {
           logger.log("CONFIG MODEL", "auto generation with defaults");
           await configModel.persistConfig([
             {
               param: Event.Type.configRouter,
-              value: args.port || DEFAULTS.ROUTER,
+              value: getArg(System.Args.port) || DEFAULTS.ROUTER,
             },
             {
               param: Event.Type.configAutoDefine,

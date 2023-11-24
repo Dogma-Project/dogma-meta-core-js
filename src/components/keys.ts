@@ -4,14 +4,14 @@ import { Event, System, Keys } from "../types";
 import storage from "./storage";
 import { keysDir } from "../modules/datadir";
 import logger from "../modules/logger";
-import args from "../modules/arguments";
+import { getArg } from "../modules/arguments";
 import { createKeyPair } from "../modules/keys";
 import { createSha256Hash } from "../modules/hash";
 
 stateManager.subscribe([Event.Type.masterKey], ([payload]) => {
   if (payload === System.States.empty) {
     logger.log("KEYS", "master key", "empty");
-    if (args.auto) {
+    if (getArg(System.Args.auto)) {
       createKeyPair(Keys.Type.masterKey, 4096)
         .then(() => {
           stateManager.emit(Event.Type.masterKey, System.States.ready);
@@ -45,7 +45,7 @@ stateManager.subscribe([Event.Type.masterKey], ([payload]) => {
 stateManager.subscribe([Event.Type.nodeKey], ([payload]) => {
   if (payload === System.States.empty) {
     logger.log("KEYS", "node key", "empty");
-    if (args.auto) {
+    if (getArg(System.Args.auto)) {
       createKeyPair(Keys.Type.nodeKey, 2048)
         .then(() => {
           stateManager.emit(Event.Type.nodeKey, System.States.ready);

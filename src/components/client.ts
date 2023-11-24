@@ -6,7 +6,7 @@ import dht from "./dht";
 import * as Types from "../types";
 import storage from "./storage";
 import state from "./state";
-import args from "../modules/arguments";
+import { getArg } from "../modules/arguments";
 
 const client = new Client({ connections, state, storage });
 
@@ -42,7 +42,7 @@ state.subscribe(
   [Types.Event.Type.nodes, Types.Event.Type.users, Types.Event.Type.nodeKey],
   () => {
     // eventEmitter.emit("friends", true);
-    if (args.discovery) return; // don't lookup in discovery mode
+    if (getArg(Types.System.Args.discovery)) return; // don't lookup in discovery mode
     clearInterval(connectFriendsInterval);
     client.connectFriends(); // check
     connectFriendsInterval = setInterval(() => client.connectFriends(), 60000); // edit
@@ -57,7 +57,7 @@ state.subscribe(
   ],
   ([configDhtLookup]) => {
     // edit
-    if (args.discovery) return; // don't lookup in discovery mode
+    if (getArg(Types.System.Args.discovery)) return; // don't lookup in discovery mode
     clearInterval(searchFriendsInterval);
     if (configDhtLookup) {
       client.searchFriends(); // check

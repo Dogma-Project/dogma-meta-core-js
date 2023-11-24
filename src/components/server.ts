@@ -5,7 +5,7 @@ import storage from "./storage";
 import * as Types from "../types";
 import logger from "../modules/logger";
 import client from "./client";
-import args from "../modules/arguments";
+import { getArg } from "../modules/arguments";
 
 const server = new Server({ connections, storage, state: stateManager });
 
@@ -61,7 +61,8 @@ stateManager.subscribe(
   ],
   ([configRouter]) => {
     logger.log("DEBUG", "Server start");
-    if (args.port) logger.log("SERVER", "forced to port", args.port);
-    server.start(args.port || configRouter);
+    const forced = getArg(Types.System.Args.port);
+    if (forced) logger.log("SERVER", "forced to port", forced);
+    server.start(forced || configRouter);
   }
 );

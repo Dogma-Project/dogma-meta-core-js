@@ -17,4 +17,13 @@ export namespace System {
     ok = 5,
     full = 6,
   }
+  export enum Args {
+    auto = "auto",
+    discovery = "discovery",
+    master = "master",
+    node = "node",
+    port = "port",
+    loglevel = "loglevel",
+    prefix = "prefix",
+  }
 }

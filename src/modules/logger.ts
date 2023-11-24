@@ -1,4 +1,4 @@
-import args from "./arguments";
+import { getArg } from "./arguments";
 import { DEFAULTS } from "../constants";
 import * as Types from "../types";
 
@@ -41,9 +41,8 @@ import * as Types from "../types";
 */
 
 let logLevel = DEFAULTS.LOG_LEVEL;
-if (args.logLevel !== undefined) {
-  logLevel = Number(args.logLevel) || 0;
-}
+const argsLogLevel = getArg(Types.System.Args.loglevel);
+if (argsLogLevel !== null) logLevel = argsLogLevel;
 
 console.log("LOG LEVEL:", logLevel);
 

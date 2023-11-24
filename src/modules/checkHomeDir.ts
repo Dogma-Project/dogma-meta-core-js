@@ -1,10 +1,14 @@
 import fs from "node:fs";
 import { nedbDir, keysDir, datadir } from "./datadir";
-import args from "./arguments";
+import { getArg } from "./arguments";
+import { System } from "../types";
+import logger from "./logger";
 
 export default function checkHomeDir() {
   try {
-    if (args.prefix === "empty" || args.prefix === "test") {
+    const prefix = getArg(System.Args.prefix);
+    if (!prefix) return Promise.reject("Unknown home dir");
+    if (prefix === "empty" || prefix.indexOf("test-") > -1) {
       fs.rmSync(datadir, { recursive: true, force: true });
     }
     if (!fs.existsSync(nedbDir)) fs.mkdirSync(nedbDir, { recursive: true });

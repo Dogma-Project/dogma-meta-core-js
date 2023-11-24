@@ -1,25 +1,44 @@
+import { System } from "../types";
 const args = process.argv.slice(2);
 
-/* Boolean */
-const auto = !!args.find((item) => item == "--auto");
-const discovery = !!args.find((item) => item == "--discovery");
+type value = string | number | boolean | null;
 
-/* Strings */
-const masterParam = args.find((item) => item.indexOf("--master=") > -1);
-const master = !!masterParam ? masterParam.split("=")[1] : undefined;
-const nodeParam = args.find((item) => item.indexOf("--node=") > -1);
-const node = !!nodeParam ? nodeParam.split("=")[1] : undefined;
-const prefixParam = args.find((item) => item.indexOf("--prefix=") > -1);
-const prefix = !!prefixParam ? prefixParam.split("=")[1] : undefined;
+type Cache = {
+  [key in System.Args]?: value;
+};
 
-/* Numbers */
-const portParam = args.find((item) => item.indexOf("--port=") > -1);
-const port = !!portParam ? portParam.split("=")[1] : undefined;
-const logLevelParam = args.find((item) => item.indexOf("--loglevel=") > -1);
-const logLevel = !!logLevelParam ? logLevelParam.split("=")[1] : undefined;
-const interfaceParam = args.find((item) => item.indexOf("--interface=") > -1);
-const ifport = !!interfaceParam ? interfaceParam.split("=")[1] : undefined;
+const cache: Cache = {};
 
-const obj = { auto, discovery, master, node, port, logLevel, prefix, ifport };
+/**
+ * @todo add parsed cache
+ * @param type
+ * @returns
+ */
+export function getArg(type: System.Args.auto): boolean | null;
+export function getArg(type: System.Args.discovery): boolean | null;
+export function getArg(type: System.Args.port): number | null;
+export function getArg(type: System.Args.loglevel): number | null;
+export function getArg(type: System.Args.prefix): string | null;
+export function getArg(type: System.Args): value {
+  const cached = cache[type];
+  if (cached !== undefined) return cached;
+  let env = process.env[type];
+  if (env === undefined) {
+    const arg = args.find((item) => item.indexOf(`--${type}=`) > -1);
+    if (arg) env = arg.split("=")[1];
+  }
+  if (env) {
+    if (env === "true") return true;
+    if (env === "false") return false;
+    if (!Number.isNaN(Number(env))) return Number(env);
+    return env;
+  } else {
+    return null;
+  }
+}
 
-export default obj;
+export function setArg(type: System.Args, value: value) {
+  cache[type] = value;
+}
+
+const wmz = getArg(System.Args.auto);

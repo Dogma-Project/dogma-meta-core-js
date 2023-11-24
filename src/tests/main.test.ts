@@ -1,7 +1,7 @@
 // import assert from "node:assert";
 import { describe, it } from "node:test";
 
-process.argv.push("--prefix=test");
+process.argv.push("--prefix=test-0");
 process.argv.push("--loglevel=0");
 
 import { Keys, State, Model, Types } from "../index";

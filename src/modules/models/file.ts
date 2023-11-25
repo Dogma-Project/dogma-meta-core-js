@@ -15,7 +15,7 @@ class FileModel implements Model {
 
   async init(prefix: string) {
     try {
-      logger.debug("nedb", "load database", "files");
+      logger.log("nedb", "load database", "files");
       this.db = new Datastore({
         filename: getDatadir(prefix).nedb + "/files.db",
       });

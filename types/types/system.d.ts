@@ -2,10 +2,10 @@ export declare namespace System {
     enum LogLevel {
         nothing = 0,
         errors = 1,
-        debug = 2,
+        warnings = 2,
         info = 3,
-        warnings = 4,
-        logs = 5
+        logs = 4,
+        debug = 5
     }
     enum States {
         error = -1,

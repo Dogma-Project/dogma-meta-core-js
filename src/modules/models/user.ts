@@ -16,7 +16,7 @@ class UserModel implements Model {
 
   async init(prefix: string) {
     try {
-      logger.debug("nedb", "load database", "users");
+      logger.log("nedb", "load database", "users");
       this.db = new Datastore({
         filename: getDatadir(prefix).nedb + "/users.db",
         timestampData: true,
@@ -126,7 +126,7 @@ class UserModel implements Model {
       for (const row of data) {
         const { sync_id, user_id } = row;
         if (!sync_id) {
-          logger.debug("node", "sync", "unknown sync_id", sync_id);
+          logger.warn("node", "sync", "unknown sync_id", sync_id);
           continue;
         }
         // delete row._id;

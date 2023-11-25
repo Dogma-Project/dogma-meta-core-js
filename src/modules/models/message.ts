@@ -15,7 +15,7 @@ class MessageModel implements Model {
 
   async init(prefix: string) {
     try {
-      logger.debug("nedb", "load database", "messages");
+      logger.log("nedb", "load database", "messages");
       this.db = new Datastore({
         filename: getDatadir(prefix).nedb + "/messages.db",
         timestampData: true,

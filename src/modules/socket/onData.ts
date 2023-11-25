@@ -6,21 +6,24 @@ export default function onData(
   this: DogmaSocket,
   result: Types.Streams.DemuxedResult
 ) {
-  switch (result.mx) {
+  const { mx, data } = result;
+  switch (mx) {
     case Types.Streams.MX.handshake:
-      this.handleHandshake(result.data);
+      this.handleHandshake(data);
       break;
     case Types.Streams.MX.test:
-      this.handleTest(result.data);
+      this.handleTest(data);
       break;
     case Types.Streams.MX.dht:
-      this.stateBridge.emit(Types.Event.Type.dataDht, result.data);
-      break;
+    case Types.Streams.MX.control:
     case Types.Streams.MX.messages:
-      this.stateBridge.emit(Types.Event.Type.dataMessages, result.data);
+    case Types.Streams.MX.mail:
+    case Types.Streams.MX.web:
+    case Types.Streams.MX.file:
+      this.emit("data", result);
       break;
     default:
-      logger.warn("onData", "unknown MX", result.mx);
+      logger.warn("onData", "unknown MX", mx);
       break;
   }
 }

@@ -24,12 +24,8 @@ This package is a dependency for Dogma Meta Application, which is currently in a
 
 ```
 git clone git@github.com:Dogma-Project/dogma-core-js.git
-```
-
-or
-
-```
-npm i dogma-core
+cd dogma-core-js
+npm install
 ```
 
 ## Usage
@@ -38,13 +34,10 @@ npm i dogma-core
 npm run auto
 ```
 
-## History
-
-TODO: Write history
-
 ## Credits
 
-TODO: Write credits
+Author: rotegott <rotegott@dogma-project.org>\
+[Official page](https://meta.dogma-project.org/)
 
 ## License
 

@@ -15,7 +15,7 @@ class DHTModel implements Model {
 
   async init(prefix: string) {
     try {
-      logger.debug("nedb", "load database", "DHT");
+      logger.log("nedb", "load database", "DHT");
       this.db = new Datastore({
         filename: getDatadir(prefix).nedb + "/dht.db",
       });

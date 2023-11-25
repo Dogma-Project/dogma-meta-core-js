@@ -13,7 +13,7 @@ stateManager.subscribe(
   ([payload, prefix]) => {
     const dir = getDatadir(prefix);
     if (payload === System.States.empty) {
-      logger.log("KEYS", "master key", "empty");
+      logger.info("store", "Master key not found");
       if (getArg(System.Args.auto)) {
         createKeyPair(Keys.Type.masterKey, prefix, 4096)
           .then(() => {
@@ -25,7 +25,7 @@ stateManager.subscribe(
           });
       }
     } else if (payload === System.States.ready) {
-      logger.log("KEYS", "master key", "ready");
+      logger.log("KEYS", "Reading master key");
       try {
         storage.user.privateKey = fs.readFileSync(
           dir.keys + "/master-private.pem"
@@ -35,11 +35,11 @@ stateManager.subscribe(
         );
         stateManager.emit(Event.Type.masterKey, System.States.full);
       } catch (e) {
-        logger.log("store", "MASTER KEYS NOT FOUND");
+        // edit
         stateManager.emit(Event.Type.masterKey, System.States.empty);
       }
     } else if (payload === System.States.full) {
-      logger.log("KEYS", "master key", "loaded");
+      logger.info("KEYS", "master key", "loaded");
       if (storage.user.publicKey) {
         storage.user.id = createSha256Hash(storage.user.publicKey);
         stateManager.emit(Event.Type.storageUser, System.States.full);
@@ -53,7 +53,7 @@ stateManager.subscribe(
   ([payload, prefix]) => {
     const dir = getDatadir(prefix);
     if (payload === System.States.empty) {
-      logger.log("KEYS", "node key", "empty");
+      logger.info("KEYS", "Node key not found");
       if (getArg(System.Args.auto)) {
         createKeyPair(Keys.Type.nodeKey, prefix, 2048)
           .then(() => {
@@ -65,7 +65,7 @@ stateManager.subscribe(
           });
       }
     } else if (payload === System.States.ready) {
-      logger.log("KEYS", "node key", "ready");
+      logger.log("KEYS", "Reading node key");
       try {
         storage.node.privateKey = fs.readFileSync(
           dir.keys + "/node-private.pem"
@@ -73,11 +73,11 @@ stateManager.subscribe(
         storage.node.publicKey = fs.readFileSync(dir.keys + "/node-public.pem");
         stateManager.emit(Event.Type.nodeKey, System.States.full);
       } catch (e) {
-        logger.log("store", "NODE KEYS NOT FOUND");
+        // edit
         stateManager.emit(Event.Type.nodeKey, System.States.empty);
       }
     } else if (payload === System.States.full) {
-      logger.log("KEYS", "node key", "loaded");
+      logger.info("KEYS", "node key", "loaded");
       if (storage.node.publicKey) {
         storage.node.id = createSha256Hash(storage.node.publicKey);
         stateManager.emit(Event.Type.storageNode, System.States.full);
@@ -90,7 +90,7 @@ stateManager.subscribe(
   [Event.Type.start, Event.Type.dirStatus],
   ([start, homeDir]) => {
     if (homeDir === System.States.full) {
-      logger.log("KEYS", "starting");
+      logger.log("KEYS", "Start loading keys.");
       stateManager.emit(Event.Type.masterKey, System.States.ready);
       stateManager.emit(Event.Type.nodeKey, System.States.ready);
     }

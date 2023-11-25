@@ -288,7 +288,7 @@ class DogmaSocket extends EventEmitter {
   protected handleTest(data: Buffer) {
     this.tested = true;
     this.emit("online", this.node_id);
-    logger.info("Socket", "Connection tested", this.id);
+    logger.log("Socket", "Connection tested", this.id);
   }
 
   public destroy(reason?: string) {

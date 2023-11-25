@@ -16,7 +16,7 @@ class ConfigModel implements Model {
 
   async init(prefix: string) {
     try {
-      logger.debug("nedb", "load database", "config");
+      logger.log("nedb", "load database", "config");
       this.db = new Datastore({
         filename: getDatadir(prefix).nedb + "/config.db",
       });

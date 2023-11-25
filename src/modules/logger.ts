@@ -30,82 +30,78 @@ import * as Types from "../types";
 // BgCyan = "\x1b[46m"
 // BgWhite = "\x1b[47m"
 
-/*
-    log levels:
-    0 - nothing
-    1 - only errors
-    2 - errors + debug
-    3 - errors + debug + info
-    4 - errors + debug + info + warnings
-    5 - errors + debug + info + warnings + logs
-*/
-
 const logLevel = () => {
   const logLevel = getArg(Types.System.Args.loglevel);
   return logLevel === null ? DEFAULTS.LOG_LEVEL : logLevel;
 };
 
 /**
- *
+ * Red messages in console. Level 1.
  * @param type
  * @param message
  */
 const dogmaError = (type: string, ...message: any) => {
   if (logLevel() < Types.System.LogLevel.errors) return;
   type = type.toUpperCase();
-  console.error(`\x1b[31m[${type}]\x1b[0m`, ...message); // red
+  console.error(`\x1b[31m\x1b[40m[${type}]\x1b[0m`, ...message); // red
 };
 
 /**
- * Green messages in chat. Loglevel: 2 System.LogLevel.debug
- * @param type
- * @param message
- */
-const dogmaDebug = (type: string, ...message: any) => {
-  if (logLevel() < Types.System.LogLevel.debug) return;
-  type = type.toUpperCase();
-  console.log(`\x1b[32m\x1b[40m[${type}]\x1b[0m`, ...message); //
-};
-
-/**
- *
- * @param type
- * @param message
- */
-const dogmaInfo = (type: string, ...message: any) => {
-  if (logLevel() < Types.System.LogLevel.info) return;
-  type = type.toUpperCase();
-  console.log(`\x1b[36m[${type}]\x1b[0m`, ...message); // blue
-};
-
-/**
- *
+ * Yellow messages in console. Level 2.
  * @param type
  * @param message
  */
 const dogmaWarning = (type: string, ...message: any) => {
   if (logLevel() < Types.System.LogLevel.warnings) return;
   type = type.toUpperCase();
-  console.warn(`\x1b[33m[${type}]\x1b[0m`, ...message); // yellow
+  console.warn(`\x1b[33m\x1b[40m[${type}]\x1b[0m`, ...message); // yellow
 };
 
 /**
- * Black messages in chat. Loglevel: 5 System.LogLevel.logs
+ * Green messages in console. Level 3.
+ * @param type
+ * @param message
+ */
+const dogmaInfo = (type: string, ...message: any) => {
+  if (logLevel() < Types.System.LogLevel.info) return;
+  type = type.toUpperCase();
+  console.info(`\x1b[32m\x1b[40m[${type}]\x1b[0m`, ...message); // blue
+};
+
+/**
+ * Cyan messages in console. Level 4.
  * @param type
  * @param message
  */
 const dogmaLog = (type: string, ...message: any) => {
   if (logLevel() < Types.System.LogLevel.logs) return;
   type = type.toUpperCase();
-  console.log(`\x1b[37m\x1b[40m[${type}]\x1b[0m`, ...message); // black
+  console.log(`\x1b[36m\x1b[40m[${type}]\x1b[0m`, ...message); // black
 };
 
+/**
+ * Magenta messages in console. Level 4.
+ * @param type
+ * @param message
+ */
+const dogmaDebug = (type: string, ...message: any) => {
+  if (logLevel() < Types.System.LogLevel.debug) return;
+  type = type.toUpperCase();
+  console.debug(`\x1b[35m\x1b[40m[${type}]\x1b[0m`, ...message); //
+};
+
+// dogmaError("TEST", "Error color");
+// dogmaWarning("TEST", "Warning color");
+// dogmaInfo("TEST", "Info color");
+// dogmaLog("TEST", "Log color");
+// dogmaDebug("TEST", "Debug color");
+
 const obj = {
-  log: dogmaLog,
-  warn: dogmaWarning,
   error: dogmaError,
-  debug: dogmaDebug,
+  warn: dogmaWarning,
   info: dogmaInfo,
+  log: dogmaLog,
+  debug: dogmaDebug,
 };
 
 export default obj;

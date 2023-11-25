@@ -40,7 +40,7 @@ stateManager.subscribe([Event.Type.configDb], async ([configDb]) => {
         await configModel.loadConfigTable();
         break;
       case System.States.empty:
-        logger.log("CONFIG MODEL", "is empty");
+        logger.info("CONFIG MODEL", "DB is empty");
         if (getArg(System.Args.auto)) {
           logger.log("CONFIG MODEL", "auto generation with defaults");
           await configModel.persistConfig([
@@ -94,7 +94,7 @@ stateManager.subscribe(
         userModel.loadUsersTable();
         break;
       case System.States.empty:
-        logger.log("USER MODEL", "is empty");
+        logger.info("USER MODEL", "DB is empty");
         if (storageUser === System.States.full) {
           logger.log("USER MODEL", "insert own user into database");
           await userModel.persistUsers([
@@ -126,7 +126,7 @@ stateManager.subscribe(
         nodeModel.loadNodesTable();
         break;
       case System.States.empty:
-        logger.log("NODE MODEL", "is empty");
+        logger.info("NODE MODEL", "DB is empty");
         if (
           storageNode === System.States.full &&
           storageUser === System.States.full

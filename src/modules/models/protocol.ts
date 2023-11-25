@@ -16,7 +16,7 @@ class ProtocolModel implements Model {
 
   async init(prefix: string) {
     try {
-      logger.debug("nedb", "load database", "protocol");
+      logger.log("nedb", "load database", "protocol");
       this.db = new Datastore({
         filename: getDatadir(prefix).nedb + "/protocol.db",
       });

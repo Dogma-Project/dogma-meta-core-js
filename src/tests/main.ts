@@ -27,19 +27,20 @@ State.stateManager.subscribe([Types.Event.Type.online], ([online]) => {
   };
   Connections.sendRequestToNode(message, online);
 });
-State.stateManager.subscribe(
-  [Types.Event.Type.dataMessages],
-  ([dataMessages]) => {
-    const data = dataMessages.toString();
-    const expected = {
-      type: Types.Message.Type.direct,
-      action: Types.Message.Action.send,
-      data: { text: "ok" },
-    };
-    assert.deepEqual(JSON.parse(data), expected);
-    // ok
-  }
-);
+
+// State.stateManager.subscribe(
+//   [Types.Event.Type.dataMessages],
+//   ([dataMessages]) => {
+//     const data = dataMessages.toString();
+//     const expected = {
+//       type: Types.Message.Type.direct,
+//       action: Types.Message.Action.send,
+//       data: { text: "ok" },
+//     };
+//     assert.deepEqual(JSON.parse(data), expected);
+//     // ok
+//   }
+// );
 
 /**
  * Test DHT
@@ -57,16 +58,17 @@ State.stateManager.subscribe([Types.Event.Type.online], ([online]) => {
   };
   Connections.sendRequestToNode(message, online);
 });
-State.stateManager.subscribe([Types.Event.Type.dataDht], ([dataDht]) => {
-  const data = dataDht.toString();
-  const expected = {
-    type: Types.DHT.Request.announce,
-    action: Types.DHT.Action.push,
-    data: { port: 100500 },
-  };
-  assert.deepEqual(JSON.parse(data), expected);
-  // ok
-});
+
+// State.stateManager.subscribe([Types.Event.Type.dataDht], ([dataDht]) => {
+//   const data = dataDht.toString();
+//   const expected = {
+//     type: Types.DHT.Request.announce,
+//     action: Types.DHT.Action.push,
+//     data: { port: 100500 },
+//   };
+//   assert.deepEqual(JSON.parse(data), expected);
+//   // ok
+// });
 
 const main = async () => {
   try {

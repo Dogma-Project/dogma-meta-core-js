@@ -17,7 +17,7 @@ class NodeModel implements Model {
 
   async init(prefix: string) {
     try {
-      logger.debug("nedb", "load database", "nodes");
+      logger.log("nedb", "load database", "nodes");
       this.db = new Datastore({
         filename: getDatadir(prefix).nedb + "/nodes.db",
         timestampData: true,
@@ -120,7 +120,7 @@ class NodeModel implements Model {
       for (const row of data) {
         const { sync_id, user_id, node_id } = row;
         if (!sync_id) {
-          logger.debug("node", "sync", "unknown sync_id", sync_id);
+          logger.log("node", "sync", "unknown sync_id", sync_id);
           continue;
         }
         await this.db.updateAsync(

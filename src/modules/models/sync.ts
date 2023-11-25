@@ -15,7 +15,7 @@ class SyncModel implements Model {
 
   async init(prefix: string) {
     try {
-      logger.debug("nedb", "load database", "sync");
+      logger.log("nedb", "load database", "sync");
       this.db = new Datastore({
         filename: getDatadir(prefix).nedb + "/sync.db",
       });

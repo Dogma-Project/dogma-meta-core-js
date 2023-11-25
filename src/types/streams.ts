@@ -9,6 +9,7 @@ export namespace Streams {
     dht = 6,
     web = 7,
     file = 8,
+    relay = 9,
   }
   export type DemuxedResult = {
     mx: MX;

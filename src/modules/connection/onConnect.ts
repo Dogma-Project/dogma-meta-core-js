@@ -22,8 +22,8 @@ export default function onConnect(
       this.stateBridge.emit(Types.Event.Type.offline, node_id);
       const index = this.online.indexOf(node_id);
       if (index !== -1) {
-        logger.log("connection", "OFFLINE", node_id);
         this.online.splice(index, 1);
+        logger.info("connection", "OFFLINE", node_id);
       }
     }
   });
@@ -32,7 +32,11 @@ export default function onConnect(
     if (!!node_id) {
       this.stateBridge.emit(Types.Event.Type.online, node_id);
       this.online.push(node_id);
+      logger.info("connection", "ONLINE", node_id);
     }
+  });
+  dogmaSocket.on("data", (data: Types.Streams.DemuxedResult) => {
+    //
   });
   this.peers[dogmaSocket.id] = dogmaSocket;
   logger.info("connection", "connected", dogmaSocket.id, peer.address);

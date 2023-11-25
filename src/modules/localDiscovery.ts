@@ -2,6 +2,7 @@ import dgram from "node:dgram";
 import EventEmitter from "node:events";
 import * as Types from "../types";
 import { getLocalAddress } from "./getLocalAddress";
+import logger from "./logger";
 
 /** @module LocalDiscovery */
 
@@ -30,6 +31,10 @@ class LocalDiscovery extends EventEmitter {
       this.emit("ready", {
         address,
       });
+      logger.info(
+        "Local Discovery",
+        `Discovery socket is listening on ${this.port}`
+      );
     });
     this.server.on("message", (msg, from) => {
       // add validation
@@ -79,7 +84,7 @@ class LocalDiscovery extends EventEmitter {
             err,
           });
         } else {
-          console.log("sent broadcast message to", this.broadcast, this.port);
+          logger.log("sent broadcast message to", this.broadcast, this.port);
         }
       }
     );

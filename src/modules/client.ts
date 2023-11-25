@@ -69,7 +69,7 @@ export default class Client {
 
   test(peer: Types.Connection.Peer, cb: (result: boolean) => void) {
     try {
-      logger.debug("client", "TEST OWN SERVER", peer.address);
+      logger.log("client", "TEST OWN SERVER", peer.address);
 
       const socket = net.connect({
         port: peer.port,
@@ -81,15 +81,16 @@ export default class Client {
 
       socket.setTimeout(5000);
       socket.on("timeout", () => {
-        console.log("socket timeout");
         if (socket.connecting) {
-          logger.debug("client", "TEST CONNECTION TIMEOUT");
+          logger.log("client", "TEST CONNECTION TIMEOUT");
           socket.destroy();
           return cb(false);
+        } else {
+          logger.warn("client", "TEST CONNECTION UNKNOWN BEHAVIOUR");
         }
       });
       socket.on("error", (error) => {
-        logger.debug("client", "TEST CONNECTION ERROR");
+        logger.log("client", "TEST CONNECTION ERROR");
         cb(false);
       });
       socket.on("connect", () => {

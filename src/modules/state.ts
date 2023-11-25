@@ -39,7 +39,7 @@ class StateManager {
     }
     this.state[type] = payload; // test
     if (this.listeners[type] === undefined) {
-      return logger.warn("state", "key isn't registered", type);
+      return logger.debug("state", "There's no handlers for event", type);
     }
     if (this.services.indexOf(type) > -1) {
       const services = this.services.map((type) => {

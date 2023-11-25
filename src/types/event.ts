@@ -14,12 +14,6 @@ export namespace Event {
     updateUser = "UPDATE USER",
     sendRequest = "SEND REQUEST",
 
-    dataDummy = "DATA DUMMY", // stream
-    dataControl = "DATA CONTROL", // stream
-    dataMessages = "DATA MESSAGES", // stream
-    dataMail = "DATA MAIL", // stream
-    dataDht = "DATA DHT", // stream
-
     nodes = "NODES", // storage
     users = "USERS", // storage
     prefix = "PREFIX", // storage

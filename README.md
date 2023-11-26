@@ -1,15 +1,15 @@
-# Dogma Meta (Headless)
+# Dogma Meta (Core)
 
 **Dogma Meta** is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in TypeScript.
 
 ## About package
 
-This package is a part of **Dogma Meta** Application, which is currently in active development. "Headless" is a standalone app to run on a server without GUI, like a service. You can control basic functions with REST API combined with SSE callback (Server-Sent Events);
+This package is a part of **Dogma Meta** Application, which is currently in active development. "Core" is a main dependency of NodeJS-based versions of **Meta** app, like [Dogma Meta (Headless)](https://www.npmjs.com/package/@dogma-project/headless-meta) or a desktop Electron-based app.
 
 ## You can use **Dogma Meta** platform to:
 
-- Build private networks through secure TLS connections between own nodes and nodes of your friends.
-- Communicate with friends with Dogma's text, voice or video chats.
+- Build private networks through secure e2e-encrypted connections between own nodes and nodes of your friends.
+- Communicate with friends with text, voice or video chats.
 - Send and receive files between connected nodes.
 - Synchronize important data between own nodes to keep it safe.
 
@@ -23,7 +23,7 @@ This package is a part of **Dogma Meta** Application, which is currently in acti
 ## Installation
 
 ```
-git clone git@github.com:Dogma-Project/dogma-core-js.git
+git clone https://github.com/Dogma-Project/dogma-core-js.git
 cd dogma-core-js
 npm install
 ```

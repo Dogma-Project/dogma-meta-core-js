@@ -1,6 +1,6 @@
 {
   "name": "@dogma-project/core",
-  "version": "0.4.13",
+  "version": "0.4.14",
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
@@ -28,7 +28,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git@github.com:Dogma-Project/dogma-core-js.git"
+    "url": "https://github.com/Dogma-Project/dogma-core-js/"
   },
   "bugs": {
     "url": "https://github.com/Dogma-Project/dogma-core-js/issues",

@@ -1,8 +1,12 @@
-# Dogma Project Meta
+# Dogma Meta (Headless)
 
 **Dogma Meta** is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in TypeScript.
 
-## You can use Dogma Meta platform to:
+## About package
+
+This package is a part of **Dogma Meta** Application, which is currently in active development. "Headless" is a standalone app to run on a server without GUI, like a service. You can control basic functions with REST API combined with SSE callback (Server-Sent Events);
+
+## You can use **Dogma Meta** platform to:
 
 - Build private networks through secure TLS connections between own nodes and nodes of your friends.
 - Communicate with friends with Dogma's text, voice or video chats.
@@ -15,10 +19,6 @@
 - Syncthing
 - Tox
 - Tor
-
-## Attention!
-
-This package is a dependency for Dogma Meta Application, which is currently in active development.
 
 ## Installation
 

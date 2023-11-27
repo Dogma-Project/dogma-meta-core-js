@@ -4,7 +4,7 @@ import {
   closeConnectionsByUserId,
   sendRequestToNode,
   sendRequestToUser,
-  // streamToNode,
+  on,
   peerFromIP,
   multicast,
   getConnectionByNodeId,
@@ -19,6 +19,9 @@ import Storage from "./storage";
 class Connections {
   protected stateBridge: StateManager;
   protected storageBridge: Storage;
+  protected handlers: {
+    [key in Types.Streams.MX]?: Types.Streams.DataHandler;
+  } = {};
 
   constructor({ state, storage }: { state: StateManager; storage: Storage }) {
     this.stateBridge = state;
@@ -39,13 +42,10 @@ class Connections {
   public onConnect = onConnect;
   public peerFromIP = peerFromIP;
   public multicast = multicast;
+  public on = on;
   public isNodeOnline = (node_id: Types.Node.Id) => {
     return this.online.indexOf(node_id) > -1;
   };
 }
-
-/*
-dht.setPeers(connection.peers); // edit
-*/
 
 export default Connections;

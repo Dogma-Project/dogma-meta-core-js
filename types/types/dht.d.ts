@@ -53,6 +53,7 @@ export declare namespace DHT {
                 node_id: Node.Id;
             };
         }
+        type Common = Request | Answer;
     }
     namespace Announce {
         interface Request {

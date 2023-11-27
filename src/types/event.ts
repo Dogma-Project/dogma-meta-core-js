@@ -11,7 +11,6 @@ export namespace Event {
     online = "ONLINE",
     offline = "OFFLINE",
     externalPort = "EXTERNAL PORT",
-    updateUser = "UPDATE USER",
     sendRequest = "SEND REQUEST",
 
     nodes = "NODES", // storage

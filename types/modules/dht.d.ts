@@ -21,9 +21,6 @@ declare class DHT extends EventEmitter {
         [key in Types.DHT.Type]: Types.Connection.Group;
     };
     peers: DogmaSocket[];
-    /**
-     *
-     */
     constructor({ storage, state, connections, model }: DHTParams);
     /**
      *
@@ -32,12 +29,11 @@ declare class DHT extends EventEmitter {
     setPeers(peers: DogmaSocket[]): void;
     setPermission(type: Types.DHT.Type, level: Types.Connection.Group): void;
     announce(port: number): void;
+    private handleAnnounce;
     lookup(user_id: Types.User.Id, node_id?: Types.Node.Id): void;
+    private handleLookup;
     revoke(user_id: Types.User.Id, node_id?: Types.Node.Id): void;
-    handleRequest(params: Types.DHT.Card, socket: DogmaSocket): Promise<void>;
-    _handleAnnounce({ from, request, }: Types.DHT.CardQuery<Types.DHT.Announce.Request>): Promise<Types.DHT.Response.alreadyPresent | Types.DHT.Response.ok>;
-    _handleLookup({ from, request, }: Types.DHT.CardQuery<Types.DHT.LookUp.Request>): Promise<Types.DHT.LookUp.Answer.Data[]>;
-    _handleRevoke({ from, request, }: Types.DHT.CardQuery<Types.DHT.Revoke.Request>): void;
-    _handlePeers({ from, request, }: Types.DHT.CardQuery<Types.DHT.LookUp.Answer>): void;
+    private handleRevoke;
+    private getPeers;
 }
 export default DHT;

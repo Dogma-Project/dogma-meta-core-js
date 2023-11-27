@@ -31,7 +31,7 @@ class DogmaSocket extends EventEmitter {
   status: Types.Connection.Status = Types.Connection.Status.notConnected;
   group: Types.Connection.Group = Types.Connection.Group.unknown;
 
-  private outSession: string;
+  private readonly outSession: string;
   private inSession?: string;
 
   private publicUserKey?: crypto.KeyObject;
@@ -40,6 +40,7 @@ class DogmaSocket extends EventEmitter {
   public node_id?: Types.Node.Id;
   public unverified_user_id?: Types.User.Id;
   public unverified_node_id?: Types.Node.Id;
+  public readonly peer: Types.Connection.Peer;
   onDisconnect?: Function; // edit
 
   public tested: boolean = false;
@@ -69,6 +70,20 @@ class DogmaSocket extends EventEmitter {
     this.status = Types.Connection.Status.connected;
     this.setDecoder();
     this.sendHandshake(Types.Connection.Handshake.Stage.init);
+    const host = socket.remoteAddress;
+    const port = socket.remotePort;
+    const family = socket.remoteFamily;
+    if (host && port && family) {
+      this.peer = {
+        host,
+        port,
+        address: `${host}:${port}`,
+        version: family === "IPv4" ? 4 : 6,
+        public: host.indexOf("192.168.") === -1, // edit for ipv6
+      };
+    } else {
+      throw "Unknown address";
+    }
   }
 
   private setDecoder() {

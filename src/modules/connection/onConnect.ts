@@ -36,7 +36,8 @@ export default function onConnect(
     }
   });
   dogmaSocket.on("data", (data: Types.Streams.DemuxedResult) => {
-    //
+    const handler = this.handlers[data.mx];
+    handler && handler(data.data, dogmaSocket, data.descriptor);
   });
   this.peers[dogmaSocket.id] = dogmaSocket;
   logger.info("connection", "connected", dogmaSocket.id, peer.address);

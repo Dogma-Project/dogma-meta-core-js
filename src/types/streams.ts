@@ -1,3 +1,5 @@
+import DogmaSocket from "../modules/socket";
+
 export namespace Streams {
   export enum MX {
     dummy = 0,
@@ -20,4 +22,9 @@ export namespace Streams {
     MX = 1,
     LEN = 2,
   }
+  export type DataHandler = (
+    data: Buffer,
+    socket: DogmaSocket,
+    descriptor?: string
+  ) => void;
 }

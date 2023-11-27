@@ -22,17 +22,5 @@ export default class Client {
         node_id: Types.Node.Id;
     }): void;
     test(peer: Types.Connection.Peer, cb: (result: boolean) => void): void;
-    /**
-     * DHT Lookup all friends
-     */
-    searchFriends(): void;
-    /**
-     * @todo move to connections
-     */
-    connectFriends(): void;
-    /**
-     *
-     * @todo move from here
-     */
-    dhtLookup(user_id: Types.User.Id): void;
+    connectFriends(nodes: Types.Node.Model[]): void;
 }

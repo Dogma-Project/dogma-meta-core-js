@@ -1,4 +1,4 @@
-import { onConnect, closeConnectionByNodeId, closeConnectionsByUserId, sendRequestToNode, sendRequestToUser, peerFromIP, multicast, getConnectionByNodeId, getConnectionsByUserId } from "./connection/index";
+import { onConnect, closeConnectionByNodeId, closeConnectionsByUserId, sendRequestToNode, sendRequestToUser, on, peerFromIP, multicast, getConnectionByNodeId, getConnectionsByUserId } from "./connection/index";
 import * as Types from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
@@ -6,6 +6,9 @@ import Storage from "./storage";
 declare class Connections {
     protected stateBridge: StateManager;
     protected storageBridge: Storage;
+    protected handlers: {
+        [key in Types.Streams.MX]?: Types.Streams.DataHandler;
+    };
     constructor({ state, storage }: {
         state: StateManager;
         storage: Storage;
@@ -21,6 +24,7 @@ declare class Connections {
     onConnect: typeof onConnect;
     peerFromIP: typeof peerFromIP;
     multicast: typeof multicast;
+    on: typeof on;
     isNodeOnline: (node_id: Types.Node.Id) => boolean;
 }
 export default Connections;

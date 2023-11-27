@@ -56,6 +56,7 @@ export namespace DHT {
         node_id: Node.Id;
       };
     }
+    export type Common = Request | Answer;
   }
 
   export namespace Announce {

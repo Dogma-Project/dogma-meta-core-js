@@ -30,40 +30,41 @@ dht.on("peers", (data: Types.DHT.LookUp.Answer.Data[]) => {
 let connectFriendsInterval: NodeJS.Timer | undefined;
 let searchFriendsInterval: NodeJS.Timer | undefined;
 
-/**
- * @todo deprecated CHECK!!!
- */
-state.subscribe([Types.Event.Type.updateUser, Types.Event.Type.users], () => {
-  const user_id = state.state[Types.Event.Type.updateUser];
-  connections.closeConnectionsByUserId(user_id);
-});
-
-state.subscribe(
-  [Types.Event.Type.nodes, Types.Event.Type.users, Types.Event.Type.nodeKey],
-  () => {
-    // eventEmitter.emit("friends", true);
-    if (getArg(Types.System.Args.discovery)) return; // don't lookup in discovery mode
-    clearInterval(connectFriendsInterval);
-    client.connectFriends(); // check
-    connectFriendsInterval = setInterval(() => client.connectFriends(), 60000); // edit
-  }
-);
-
-state.subscribe(
-  [
-    Types.Event.Type.configDhtLookup,
-    Types.Event.Type.users,
-    Types.Event.Type.nodeKey,
-  ],
-  ([configDhtLookup]) => {
-    // edit
-    if (getArg(Types.System.Args.discovery)) return; // don't lookup in discovery mode
-    clearInterval(searchFriendsInterval);
-    if (configDhtLookup) {
-      client.searchFriends(); // check
-      searchFriendsInterval = setInterval(() => client.searchFriends(), 30000); // edit
+if (!getArg(Types.System.Args.discovery)) {
+  /**
+   * Try to connect friends
+   */
+  state.subscribe(
+    [Types.Event.Type.users, Types.Event.Type.nodes, Types.Event.Type.nodeKey],
+    ([users, nodes]) => {
+      clearInterval(connectFriendsInterval);
+      connectFriendsInterval = setInterval(() => {
+        client.connectFriends(nodes || []);
+      }, 45000); // edit
     }
-  }
-);
+  );
+
+  /**
+   * search friends by DHT
+   */
+  state.subscribe(
+    [
+      Types.Event.Type.configDhtLookup,
+      Types.Event.Type.users,
+      Types.Event.Type.dhtService,
+    ],
+    ([configDhtLookup, users, dhtService]) => {
+      clearInterval(searchFriendsInterval);
+      if (configDhtLookup) {
+        searchFriendsInterval = setInterval(() => {
+          if (users && Array.isArray(users)) {
+            logger.log("CLIENT", "Trying to search friends", users.length);
+            users.forEach((user: Types.User.Model) => dht.lookup(user.user_id));
+          }
+        }, 45000); // edit
+      }
+    }
+  );
+}
 
 export default client;

@@ -45,19 +45,19 @@ State.stateManager.subscribe([Types.Event.Type.online], ([online]) => {
 /**
  * Test DHT
  */
-State.stateManager.subscribe([Types.Event.Type.online], ([online]) => {
-  const message: Types.Request = {
-    class: Types.Streams.MX.dht,
-    body: {
-      type: Types.DHT.Request.announce,
-      action: Types.DHT.Action.push,
-      data: {
-        port: 100500,
-      },
-    },
-  };
-  Connections.sendRequestToNode(message, online);
-});
+// State.stateManager.subscribe([Types.Event.Type.online], ([online]) => {
+//   const message: Types.DHT.Abstract = {
+//     class: Types.Streams.MX.dht,
+//     body: {
+//       type: Types.DHT.Request.announce,
+//       action: Types.DHT.Action.push,
+//       data: {
+//         port: 100500,
+//       },
+//     },
+//   };
+//   Connections.sendRequestToNode(message, online);
+// });
 
 // State.stateManager.subscribe([Types.Event.Type.dataDht], ([dataDht]) => {
 //   const data = dataDht.toString();

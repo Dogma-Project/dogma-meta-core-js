@@ -44,6 +44,8 @@ export default class Client {
     peer: Types.Connection.Peer,
     node: { user_id: Types.User.Id; node_id: Types.Node.Id }
   ) {
+    logger.log("Client", "Try peer", node.node_id);
+
     const { user_id, node_id } = node;
     if (this.connectionsBridge.isNodeOnline(node_id)) return; // add to logs
 
@@ -55,13 +57,14 @@ export default class Client {
         | undefined;
       if (!users || !Array.isArray(users)) return;
       const inFriends = users.find((user) => user.user_id === user_id);
-      if (!inFriends)
+      if (!inFriends) {
         return logger.log(
           "client",
           "tryPeer",
           user_id,
           "not in the friends list"
         );
+      }
     }
 
     this._connect(peer);
@@ -103,27 +106,8 @@ export default class Client {
     }
   }
 
-  /**
-   * DHT Lookup all friends
-   */
-  searchFriends() {
-    const users = this.stateBridge.state[Types.Event.Type.users] as
-      | Types.User.Model[]
-      | undefined;
-    if (users && Array.isArray(users)) {
-      logger.log("CLIENT", "Trying to search friends", users.length);
-      users.forEach((user) => this.dhtLookup(user.user_id));
-    }
-  }
-
-  /**
-   * @todo move to connections
-   */
-  connectFriends() {
-    const nodes = this.stateBridge.state[Types.Event.Type.nodes] as
-      | Types.Node.Model[]
-      | undefined;
-    if (nodes && Array.isArray(nodes)) {
+  connectFriends(nodes: Types.Node.Model[]) {
+    if (nodes.length) {
       logger.log("CLIENT", "Trying to connect friends", nodes.length);
       nodes.forEach((node) => {
         const { public_ipv4, local_ipv4, user_id, node_id } = node;
@@ -140,18 +124,5 @@ export default class Client {
         }
       });
     }
-  }
-
-  /**
-   *
-   * @todo move from here
-   */
-  dhtLookup(user_id: Types.User.Id) {
-    // try {
-    //   logger.log("client", "DHT LOOKUP", user_id);
-    //   dht.lookup(user_id);
-    // } catch (err) {
-    //   logger.error("client", "DHT lookup error", err);
-    // }
   }
 }

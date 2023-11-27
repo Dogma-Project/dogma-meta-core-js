@@ -25,9 +25,6 @@ class DHT extends EventEmitter {
   };
   peers: DogmaSocket[];
 
-  /**
-   *
-   */
   constructor({ storage, state, connections, model }: DHTParams) {
     super();
     this.peers = [];
@@ -40,6 +37,33 @@ class DHT extends EventEmitter {
     this.stateBridge = state;
     this.storageBridge = storage;
     this.modelBridge = model;
+    /**
+     * @todo add verification
+     */
+    this.connectionsBridge.on(Types.Streams.MX.dht, (data, socket) => {
+      logger.debug("DHT", "DATA", data);
+      // add verification
+      try {
+        const str = data.toString();
+        const parsed = JSON.parse(str) as Types.DHT.Abstract;
+        switch (parsed.body.type) {
+          case Types.DHT.Request.announce:
+            this.handleAnnounce(parsed.body, socket);
+            break;
+          case Types.DHT.Request.lookup:
+            this.handleLookup(parsed.body, socket);
+            break;
+          case Types.DHT.Request.revoke:
+            this.handleRevoke(parsed.body, socket);
+            break;
+          default:
+            logger.warn("DHT", "unknown DHT request type");
+            break;
+        }
+      } catch (err) {
+        logger.error("DHT DATA", err);
+      }
+    });
   }
 
   /**
@@ -56,7 +80,7 @@ class DHT extends EventEmitter {
   }
 
   public announce(port: number) {
-    logger.log("DHT", "announce", "announcing port", port);
+    logger.log("DHT", "Announce port", port);
     const permission = this.permissions[Types.DHT.Type.dhtAnnounce];
     const request: Types.DHT.Abstract = {
       class: Types.Streams.MX.dht,
@@ -69,7 +93,32 @@ class DHT extends EventEmitter {
     this.connectionsBridge.multicast(request, permission);
   }
 
+  private handleAnnounce(
+    request: Types.DHT.Announce.Request,
+    socket: DogmaSocket
+  ) {
+    // only push
+    if (request.action === Types.DHT.Action.push) {
+      const { node_id, user_id, peer } = socket;
+      logger.log("DHT", "Handle announce from", user_id);
+      if (!peer.public) return logger.debug("DHT", "skip local", peer);
+      const { port } = request.data;
+      if (user_id && node_id && port) {
+        const full: Types.DHT.Model = {
+          user_id,
+          node_id,
+          public_ipv4: peer.address,
+          port,
+        };
+        this.modelBridge.checkOrInsert(full);
+      }
+    } else {
+      logger.warn("DHT", "unk action");
+    }
+  }
+
   public lookup(user_id: Types.User.Id, node_id?: Types.Node.Id) {
+    logger.log("DHT", "Request loookup", user_id);
     const permission = this.permissions[Types.DHT.Type.dhtLookup];
     const request: Types.DHT.Abstract = {
       class: Types.Streams.MX.dht,
@@ -82,7 +131,31 @@ class DHT extends EventEmitter {
     this.connectionsBridge.multicast(request, permission);
   }
 
+  private async handleLookup(
+    request: Types.DHT.LookUp.Common,
+    socket: DogmaSocket
+  ) {
+    if (request.action === Types.DHT.Action.get) {
+      const { user_id, node_id } = request.data;
+      logger.log("DHT", "Handle lookup from", user_id);
+      const peers = await this.getPeers(user_id, node_id);
+      if (peers.length) {
+        const card: Types.DHT.LookUp.Answer = {
+          action: Types.DHT.Action.set,
+          type: Types.DHT.Request.lookup,
+          data: peers,
+        };
+        socket.input.dht && socket.input.dht.write(JSON.stringify(card)); // edit
+      }
+    } else if (request.action === Types.DHT.Action.set) {
+      const { data } = request;
+      this.emit("peers", data);
+    } else {
+    }
+  }
+
   public revoke(user_id: Types.User.Id, node_id?: Types.Node.Id) {
+    logger.log("DHT", "Request revoke", user_id);
     const permission = this.permissions[Types.DHT.Type.dhtAnnounce];
     const request: Types.DHT.Abstract = {
       class: Types.Streams.MX.dht,
@@ -95,90 +168,18 @@ class DHT extends EventEmitter {
     this.connectionsBridge.multicast(request, permission);
   }
 
-  public async handleRequest(params: Types.DHT.Card, socket: DogmaSocket) {
-    // add validation
-    try {
-      const {
-        request: { type, action },
-        from,
-      } = params;
-
-      if (!type || !action) {
-        return logger.warn(
-          "DHT",
-          "handleRequest",
-          "unknown request",
-          type,
-          action
-        );
-      }
-
-      switch (params.request.type) {
-        case Types.DHT.Request.announce:
-          params.request;
-          await this._handleAnnounce({
-            from,
-            request: params.request,
-          });
-          break;
-        case Types.DHT.Request.revoke:
-          await this._handleRevoke({
-            from,
-            request: params.request,
-          });
-          break;
-        case Types.DHT.Request.lookup:
-          if (params.request.action === Types.DHT.Action.get) {
-            const peers = await this._handleLookup({
-              from,
-              request: params.request,
-            });
-            if (peers && Object.keys(peers).length) {
-              const card: Types.DHT.LookUp.Answer = {
-                action: Types.DHT.Action.set,
-                type: Types.DHT.Request.lookup,
-                data: peers,
-              };
-              socket.input.dht && socket.input.dht.write(JSON.stringify(card)); // edit
-            }
-          } else if (params.request.action === Types.DHT.Action.set) {
-            this._handlePeers({
-              from,
-              request: params.request,
-            });
-          }
-          break;
-      }
-    } catch (err) {
-      logger.error("DHT", "handleRequest", err);
+  private handleRevoke(request: Types.DHT.Revoke.Request, socket: DogmaSocket) {
+    // only push
+    if (request.action === Types.DHT.Action.push) {
+      logger.debug("DHT", "handleRevoke", arguments);
+    } else {
+      logger.warn("DHT", "unk action");
     }
   }
 
-  async _handleAnnounce({
-    from,
-    request,
-  }: Types.DHT.CardQuery<Types.DHT.Announce.Request>) {
-    const { node_id, user_id, public_ipv4 } = from;
-    const { port } = request.data;
-    const full: Types.DHT.Model = { node_id, user_id, public_ipv4, port };
-    return this.modelBridge.checkOrInsert(full);
-  }
-
-  async _handleLookup({
-    from,
-    request,
-  }: Types.DHT.CardQuery<Types.DHT.LookUp.Request>) {
-    request;
-    const { user_id, node_id } = request.data;
-
-    let params: {
-      user_id: Types.User.Id;
-      node_id?: Types.Node.Id;
-    } = { user_id };
-    if (node_id) params.node_id = node_id;
-
+  private async getPeers(user_id: Types.User.Id, node_id?: Types.Node.Id) {
     try {
-      const documents = await this.modelBridge.get(params);
+      const documents = await this.modelBridge.get({ user_id, node_id });
       const result: Types.DHT.LookUp.Answer.Data[] = documents.map((item) => {
         const { user_id, node_id, public_ipv4, port } = item;
         return { user_id, node_id, public_ipv4, port };
@@ -187,21 +188,6 @@ class DHT extends EventEmitter {
     } catch (err) {
       throw err;
     }
-  }
-
-  _handleRevoke({
-    from,
-    request,
-  }: Types.DHT.CardQuery<Types.DHT.Revoke.Request>) {
-    logger.debug("DHT", "handleRevoke", arguments);
-  }
-
-  _handlePeers({
-    from,
-    request,
-  }: Types.DHT.CardQuery<Types.DHT.LookUp.Answer>) {
-    const { data } = request;
-    this.emit("peers", data);
   }
 }
 

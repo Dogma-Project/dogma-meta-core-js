@@ -25,6 +25,7 @@ export namespace Event {
     nodesDb = "NODES DB", // service
     usersDb = "USERS DB", // service
     messagesDb = "MESSAGES DB", // service
+    dhtService = "DHT SERVICE", // service
     dhtDb = "DHT DB",
     filesDb = "FILES DB",
     protocolDb = "PROTOCOL DB",

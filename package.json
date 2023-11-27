@@ -1,6 +1,6 @@
 {
   "name": "@dogma-project/core",
-  "version": "0.4.14",
+  "version": "0.4.15",
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
@@ -10,7 +10,7 @@
     "auto2": "tsc && NODE_ENV=development node dist/run.js --loglevel=3 --auto=true --port=24602 --prefix=second  --master=user --node=node",
     "empty": "tsc && NODE_ENV=development node dist/run.js --loglevel=4 --prefix=empty",
     "test": "tsc && NODE_ENV=test node --test dist/",
-    "main-test": "tsc && NODE_ENV=development node dist/tests/main.js --loglevel=4"
+    "main-test": "tsc && NODE_ENV=development node dist/tests/main.js --loglevel=5"
   },
   "author": {
     "name": "Rotegott",

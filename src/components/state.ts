@@ -11,6 +11,7 @@ const stateManager = new StateManager([
   Event.Type.messagesDb,
   Event.Type.localDiscovery,
   Event.Type.dirStatus,
+  Event.Type.dhtService,
 ]);
 
 export default stateManager;

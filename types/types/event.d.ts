@@ -21,6 +21,7 @@ export declare namespace Event {
         nodesDb = "NODES DB",
         usersDb = "USERS DB",
         messagesDb = "MESSAGES DB",
+        dhtService = "DHT SERVICE",
         dhtDb = "DHT DB",
         filesDb = "FILES DB",
         protocolDb = "PROTOCOL DB",

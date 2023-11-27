@@ -52,10 +52,11 @@ class DHT extends EventEmitter {
 
   public setPermission(type: Types.DHT.Type, level: Types.Connection.Group) {
     this.permissions[type] = level;
-    logger.log("DHT", "setPermission", "set permission level", type, level); // change to log
+    logger.log("DHT", "setPermission", "set permission level", type, level);
   }
 
   public announce(port: number) {
+    logger.log("DHT", "announce", "announcing port", port);
     const permission = this.permissions[Types.DHT.Type.dhtAnnounce];
     const request: Types.DHT.Abstract = {
       class: Types.Streams.MX.dht,

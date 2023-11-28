@@ -4,7 +4,7 @@ import { Event } from "./event";
 export namespace Config {
   export namespace Model {
     export type Row = {
-      param: Event.Type;
+      param: Event.Type.Config;
       value: string | number | Constants.Boolean;
     };
   }

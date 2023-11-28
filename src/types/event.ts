@@ -5,19 +5,49 @@ export namespace Event {
   }
   export type Payload = any[];
 
-  export enum Type {
-    start = "START", // init event
+  export namespace Type {
+    export type Config =
+      | Type.configRouter
+      | Type.configAutoDefine
+      | Type.configDhtAnnounce
+      | Type.configDhtBootstrap
+      | Type.configDhtLookup
+      | Type.configExternal
+      | Type.configLocalDiscovery
+      | Type.configPublicIpV4;
+    export type Service =
+      | Type.masterKey
+      | Type.nodeKey
+      | Type.configDb
+      | Type.nodesDb
+      | Type.usersDb
+      | Type.messagesDb
+      | Type.dhtService
+      | Type.dhtDb
+      | Type.filesDb
+      | Type.protocolDb
+      | Type.syncDb
+      | Type.server
+      | Type.localDiscovery
+      | Type.dirStatus
+      | Type.storageUser
+      | Type.storageNode;
+    export type Services = Type.services;
+    export type Storage = Type.nodes | Type.users | Type.prefix;
+    export type Action = Type.start | Type.online | Type.offline;
+  }
 
-    online = "ONLINE",
-    offline = "OFFLINE",
-    externalPort = "EXTERNAL PORT",
-    sendRequest = "SEND REQUEST",
+  export enum Type {
+    start = "START", // action
+    online = "ONLINE", // action
+    offline = "OFFLINE", // action
 
     nodes = "NODES", // storage
     users = "USERS", // storage
     prefix = "PREFIX", // storage
 
     services = "SERVICES",
+
     masterKey = "MASTER KEY", // service
     nodeKey = "NODE KEY", // service
     configDb = "CONFIG DB", // service
@@ -25,10 +55,10 @@ export namespace Event {
     usersDb = "USERS DB", // service
     messagesDb = "MESSAGES DB", // service
     dhtService = "DHT SERVICE", // service
-    dhtDb = "DHT DB",
-    filesDb = "FILES DB",
-    protocolDb = "PROTOCOL DB",
-    syncDb = "SYNC DB",
+    dhtDb = "DHT DB", // service
+    filesDb = "FILES DB", // service
+    protocolDb = "PROTOCOL DB", // service
+    syncDb = "SYNC DB", // service
     server = "SERVER", // service
     localDiscovery = "LOCAL DISCOVERY", // service
     dirStatus = "HOME DIR", // service

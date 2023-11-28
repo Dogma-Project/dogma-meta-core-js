@@ -1,7 +1,7 @@
 import { Event } from "../types";
 declare class StateManager {
     private services;
-    constructor(services?: Event.Type[]);
+    constructor(services?: Event.Type.Service[]);
     private listeners;
     state: {
         [index: string]: any;

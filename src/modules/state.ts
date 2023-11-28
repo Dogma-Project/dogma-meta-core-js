@@ -2,7 +2,7 @@ import { Event, System } from "../types";
 import logger from "./logger";
 
 class StateManager {
-  constructor(private services: Event.Type[] = []) {}
+  constructor(private services: Event.Type.Service[] = []) {}
 
   private listeners: {
     [index: string]: Event.ArrayOfListeners[];
@@ -41,7 +41,8 @@ class StateManager {
     if (this.listeners[type] === undefined) {
       return logger.debug("state", "There's no handlers for event", type);
     }
-    if (this.services.indexOf(type) > -1) {
+    if (this.services.indexOf(type as Event.Type.Service) > -1) {
+      // edit
       const services = this.services.map((type) => {
         return {
           service: type,

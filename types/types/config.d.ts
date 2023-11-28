@@ -3,7 +3,7 @@ import { Event } from "./event";
 export declare namespace Config {
     namespace Model {
         type Row = {
-            param: Event.Type;
+            param: Event.Type.Config;
             value: string | number | Constants.Boolean;
         };
     }

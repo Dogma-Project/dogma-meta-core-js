@@ -36,7 +36,7 @@ if (!getArg(Types.System.Args.discovery)) {
    */
   state.subscribe(
     [Types.Event.Type.users, Types.Event.Type.nodes, Types.Event.Type.nodeKey],
-    ([users, nodes]) => {
+    ([users, nodes, nodeKey]) => {
       clearInterval(connectFriendsInterval);
       connectFriendsInterval = setInterval(() => {
         client.connectFriends(nodes || []);
@@ -47,6 +47,7 @@ if (!getArg(Types.System.Args.discovery)) {
   /**
    * search friends by DHT
    */
+  //
   state.subscribe(
     [
       Types.Event.Type.configDhtLookup,

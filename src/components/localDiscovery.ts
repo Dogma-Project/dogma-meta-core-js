@@ -52,7 +52,7 @@ stateManager.subscribe(
         type: "dogma-router",
         user_id: storage.user.id || "unk",
         node_id: storage.node.id || "unk",
-        port: configRouter,
+        port: Number(configRouter),
       });
     }
   }

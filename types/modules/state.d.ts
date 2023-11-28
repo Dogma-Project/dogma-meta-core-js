@@ -1,4 +1,7 @@
-import { Event } from "../types";
+import { Event, System, Config } from "../types";
+type MapPredicate<T> = T extends Event.Type.Service ? System.States : T extends Event.Type.Config ? Config.Value : any;
+type Mapped<Arr extends ReadonlyArray<unknown>, Result extends Array<unknown> = []> = Arr extends [infer Head, ...infer Tail] ? Mapped<[...Tail], [...Result, MapPredicate<Head>]> : Result;
+type Listener<U extends ReadonlyArray<any>> = (args: Mapped<U>, type: any, action: any) => void;
 declare class StateManager {
     private services;
     constructor(services?: Event.Type.Service[]);
@@ -11,7 +14,7 @@ declare class StateManager {
      * @param '[array of events]'
      * @param '([array of payloads], type?, action?)'
      */
-    subscribe: (type: Event.Type[], callback: Event.Listenter) => void;
+    subscribe: <T extends Event.Type, U extends readonly T[]>(type: [...U], callback: Listener<U>) => void;
     /**
      *
      * @param type

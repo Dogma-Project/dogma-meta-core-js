@@ -23,7 +23,7 @@ stateManager.subscribe(
       case Types.System.States.limited:
         const ipv4 =
           stateManager.state[Types.Event.Type.configPublicIpV4] || "8.8.8.8"; // edit
-        const port = configRouter || 12345; // edit
+        const port = Number(configRouter) || 12345; // edit
         const peer: Types.Connection.Peer = {
           host: ipv4,
           port,
@@ -65,7 +65,7 @@ stateManager.subscribe(
     logger.log("DEBUG", "Server start");
     const forced = getArg(Types.System.Args.port);
     if (forced) logger.log("SERVER", "forced to port", forced);
-    server.start(forced || configRouter);
+    server.start(forced || Number(configRouter));
   }
 );
 
@@ -81,7 +81,7 @@ stateManager.subscribe(
       server === Types.System.States.full
     ) {
       const forced = getArg(Types.System.Args.port);
-      dht.announce(forced || configRouter);
+      dht.announce(forced || Number(configRouter));
     }
   }
 );

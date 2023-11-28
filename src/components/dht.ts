@@ -12,37 +12,52 @@ const dht = new DHT({
   model: dhtModel,
 });
 
-stateManager.subscribe([Types.Event.Type.configDhtLookup], ([value]) => {
-  dht.setPermission(Types.DHT.Type.dhtLookup, value);
-});
-stateManager.subscribe([Types.Event.Type.configDhtAnnounce], ([value]) => {
-  dht.setPermission(Types.DHT.Type.dhtAnnounce, value);
-});
-
-stateManager.subscribe([Types.Event.Type.configDhtBootstrap], ([value]) => {
-  dht.setPermission(Types.DHT.Type.dhtBootstrap, value);
-  switch (value) {
-    case Types.Connection.Group.all:
-      stateManager.emit(Types.Event.Type.dhtService, Types.System.States.full);
-      break;
-    case Types.Connection.Group.friends:
-      stateManager.emit(Types.Event.Type.dhtService, Types.System.States.ok);
-      break;
-    case Types.Connection.Group.selfUser:
-    case Types.Connection.Group.selfNode:
-      stateManager.emit(
-        Types.Event.Type.dhtService,
-        Types.System.States.limited
-      );
-      break;
-    default:
-      // disabled
-      stateManager.emit(
-        Types.Event.Type.dhtService,
-        Types.System.States.disabled
-      );
-      break;
+stateManager.subscribe(
+  [Types.Event.Type.configDhtLookup],
+  ([configDhtLookup]) => {
+    dht.setPermission(Types.DHT.Type.dhtLookup, configDhtLookup as number);
   }
-});
+);
+stateManager.subscribe(
+  [Types.Event.Type.configDhtAnnounce],
+  ([configDhtAnnounce]) => {
+    dht.setPermission(Types.DHT.Type.dhtAnnounce, configDhtAnnounce as number);
+  }
+);
+
+stateManager.subscribe(
+  [Types.Event.Type.configDhtBootstrap],
+  ([configDhtBootstrap]) => {
+    dht.setPermission(
+      Types.DHT.Type.dhtBootstrap,
+      configDhtBootstrap as number
+    );
+    switch (configDhtBootstrap) {
+      case Types.Connection.Group.all:
+        stateManager.emit(
+          Types.Event.Type.dhtService,
+          Types.System.States.full
+        );
+        break;
+      case Types.Connection.Group.friends:
+        stateManager.emit(Types.Event.Type.dhtService, Types.System.States.ok);
+        break;
+      case Types.Connection.Group.selfUser:
+      case Types.Connection.Group.selfNode:
+        stateManager.emit(
+          Types.Event.Type.dhtService,
+          Types.System.States.limited
+        );
+        break;
+      default:
+        // disabled
+        stateManager.emit(
+          Types.Event.Type.dhtService,
+          Types.System.States.disabled
+        );
+        break;
+    }
+  }
+);
 
 export default dht;

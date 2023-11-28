@@ -1,11 +1,30 @@
-import { Event, System } from "../types";
+import { Event, System, Config } from "../types";
 import logger from "./logger";
+
+type MapPredicate<T> = T extends Event.Type.Service
+  ? System.States
+  : T extends Event.Type.Config
+  ? Config.Value
+  : any;
+
+type Mapped<
+  Arr extends ReadonlyArray<unknown>,
+  Result extends Array<unknown> = []
+> = Arr extends [infer Head, ...infer Tail]
+  ? Mapped<[...Tail], [...Result, MapPredicate<Head>]>
+  : Result;
+
+type Listener<U extends ReadonlyArray<any>> = (
+  args: Mapped<U>,
+  type: any,
+  action: any
+) => void;
 
 class StateManager {
   constructor(private services: Event.Type.Service[] = []) {}
 
   private listeners: {
-    [index: string]: Event.ArrayOfListeners[];
+    [index: string]: [Event.Type[], any][];
   } = {};
   public state: {
     [index: string]: any;
@@ -16,7 +35,11 @@ class StateManager {
    * @param '[array of events]'
    * @param '([array of payloads], type?, action?)'
    */
-  public subscribe = (type: Event.Type[], callback: Event.Listenter) => {
+  //(args: Mapped<U>, type: any, action: any) => void
+  public subscribe = <T extends Event.Type, U extends ReadonlyArray<T>>(
+    type: [...U],
+    callback: Listener<U>
+  ) => {
     type.forEach((key) => {
       if (this.listeners[key] === undefined) this.listeners[key] = [];
       this.listeners[key].push([type, callback]);

@@ -101,7 +101,7 @@ class DHT extends EventEmitter {
     if (request.action === Types.DHT.Action.push) {
       const { node_id, user_id, peer } = socket;
       logger.log("DHT", "Handle announce from", user_id);
-      if (!peer.public) return logger.debug("DHT", "skip local", peer);
+      if (!peer.public) return logger.debug("DHT", "skip local", peer.address);
       const { port } = request.data;
       if (user_id && node_id && port) {
         const full: Types.DHT.Model = {

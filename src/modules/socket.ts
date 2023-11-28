@@ -359,7 +359,7 @@ class DogmaSocket extends EventEmitter {
   }
 
   protected handleSymmetricKey(data: Buffer) {
-    logger.debug("SOCKET", "GOT SYMMETRIC KEY", data.length);
+    // logger.debug("SOCKET", "GOT SYMMETRIC KEY", data.length);
     // check and validate
     this.outSymmetricKey = data;
     this.afterSymmetricKey();

@@ -47,25 +47,6 @@ export default class Server {
     const host = "0.0.0.0"; // temp
     this.ss.listen(port, host, () => {
       logger.info("server", `TCP socket is listening on ${host}:${port}`);
-      /**
-       * @todo move from here
-       */
-      /*
-      setTimeout(() => {
-        const {
-          user: { id: user_id },
-          node: { id: node_id },
-        } = store;
-        const card = {
-          type: "dogma-router",
-          user_id,
-          node_id,
-          port,
-        };
-        LocalDiscovery.announce(card);
-        dht.announce(port);
-      }, 3000);
-      */
       this.stateBridge.emit(
         Types.Event.Type.server,
         Types.System.States.limited

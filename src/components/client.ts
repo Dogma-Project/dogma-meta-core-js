@@ -51,7 +51,7 @@ if (!getArg(Types.System.Args.discovery)) {
     [
       Types.Event.Type.configDhtLookup,
       Types.Event.Type.users,
-      Types.Event.Type.dhtService,
+      Types.Event.Type.dhtService, // check
     ],
     ([configDhtLookup, users, dhtService]) => {
       clearInterval(searchFriendsInterval);

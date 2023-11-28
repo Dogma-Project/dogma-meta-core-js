@@ -15,7 +15,7 @@ class Decoder extends EventEmitter {
   public decode(chunk: Buffer) {
     try {
       const mx = chunk.subarray(0, Streams.SIZES.MX).readUInt8(0);
-      logger.debug("DECRYPT", "MX", mx);
+      // logger.debug("DECRYPT", "MX", mx);
       const len = chunk
         .subarray(Streams.SIZES.MX, Streams.SIZES.MX + Streams.SIZES.LEN)
         .readUInt16BE(0);
@@ -36,14 +36,14 @@ class Decoder extends EventEmitter {
         if (!this.symmetricKey) {
           return logger.warn("Decrypt", "Symmetric key not ready");
         }
-        logger.debug("DECRYPT", "DATA", data.length);
+        // logger.debug("DECRYPT", "DATA", data.length);
         const ivlen = 12;
         const atlen = 16;
         const metadata = data.subarray(-ivlen + -atlen);
         const iv = metadata.subarray(0, ivlen);
         const authTag = metadata.subarray(-atlen);
         data = data.subarray(0, -metadata.length);
-        logger.debug("DECRYPT", "IV", iv.length, authTag.length, data.length);
+        // logger.debug("DECRYPT", "IV", iv.length, authTag.length, data.length);
         const decipher = crypto.createDecipheriv(
           "aes-256-gcm",
           this.symmetricKey,

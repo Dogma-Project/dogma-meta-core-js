@@ -41,13 +41,13 @@ class AesEncoder extends Transform {
         [encrypted, iv, authTag],
         encrypted.length + iv.length + authTag.length
       );
-      logger.debug(
-        "ENCRYPT AES",
-        "LENGTH ----------------->",
-        encrypted.length,
-        iv.length,
-        authTag.length
-      );
+      // logger.debug(
+      //   "ENCRYPT AES",
+      //   "LENGTH ----------------->",
+      //   encrypted.length,
+      //   iv.length,
+      //   authTag.length
+      // );
       const len = Buffer.alloc(Streams.SIZES.LEN, 0);
       len.writeUInt16BE(chunk.length);
       const result = Buffer.concat(

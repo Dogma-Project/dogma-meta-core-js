@@ -1,5 +1,6 @@
 import * as Types from "../../types";
 import Connections from "../connections";
+import logger from "../logger";
 
 export default function multicast(
   this: Connections,
@@ -8,6 +9,7 @@ export default function multicast(
 ) {
   if (destination === Types.Connection.Group.unknown) return;
   if (destination > Types.Connection.Group.selfNode) return;
+  logger.log("Multicast", "Class:", request.class, "Destination:", destination);
   for (const cid in this.peers) {
     const socket = this.peers[cid];
     if (socket.group >= destination) {

@@ -36,7 +36,8 @@ export declare namespace Event {
         configDhtBootstrap = "CONFIG DHT BOOTSTRAP",
         configAutoDefine = "CONFIG AUTO DEFINE",
         configExternal = "CONFIG EXTERNAL",
-        configPublicIpV4 = "CONFIG PUBLIC IPV4"
+        configPublicIpV4 = "CONFIG PUBLIC IPV4",
+        configLocalDiscovery = "CONFIG LOCAL DISCOVERY"
     }
     type Listenter = (payload: Payload, type?: Type, action?: Action) => void;
     type ArrayOfListeners = [Type[], Listenter] | [];

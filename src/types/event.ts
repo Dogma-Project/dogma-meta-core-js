@@ -42,6 +42,7 @@ export namespace Event {
     configAutoDefine = "CONFIG AUTO DEFINE", // config
     configExternal = "CONFIG EXTERNAL", // config
     configPublicIpV4 = "CONFIG PUBLIC IPV4", // config
+    configLocalDiscovery = "CONFIG LOCAL DISCOVERY",
   }
 
   export type Listenter = (

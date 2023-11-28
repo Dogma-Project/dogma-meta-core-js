@@ -9,11 +9,13 @@ declare class LocalDiscovery extends EventEmitter {
     port: number;
     broadcast: string;
     server: dgram.Socket;
+    ready: boolean;
     constructor({ port, ip }: {
         port: number;
         ip: string;
     });
     startServer(): this;
-    announce(card: Types.Discovery.Card): this;
+    stopServer(): void;
+    announce(card: Types.Discovery.Card): void | this;
 }
 export default LocalDiscovery;

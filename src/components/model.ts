@@ -1,6 +1,6 @@
 import stateManager from "./state";
 import storage from "./storage";
-import { Connection, Event, System } from "../types";
+import { Connection, Event, System, Constants } from "../types";
 import {
   ConfigModel,
   NodeModel,
@@ -50,7 +50,7 @@ stateManager.subscribe([Event.Type.configDb], async ([configDb]) => {
             },
             {
               param: Event.Type.configAutoDefine,
-              value: DEFAULTS.AUTO_DEFINE_IP,
+              value: Constants.Boolean.true,
             },
             {
               param: Event.Type.configDhtAnnounce,
@@ -67,6 +67,10 @@ stateManager.subscribe([Event.Type.configDb], async ([configDb]) => {
             {
               param: Event.Type.configExternal,
               value: DEFAULTS.EXTERNAL,
+            },
+            {
+              param: Event.Type.configLocalDiscovery,
+              value: Constants.Boolean.true,
             },
           ]);
         }

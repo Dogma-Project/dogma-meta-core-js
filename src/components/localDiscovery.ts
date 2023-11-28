@@ -9,29 +9,44 @@ const disc = new LocalDiscovery({
   port: DEFAULTS.LOCAL_DISCOVERY_PORT,
   ip: "",
 });
-
-stateManager.subscribe([Types.Event.Type.start], () => {
-  disc.startServer();
-  disc.on("ready", (data) => {
-    stateManager.emit(
-      Types.Event.Type.localDiscovery,
-      Types.System.States.full
-    );
-    logger.log("Local discovery server", "ready", data);
-  });
-  disc.on("error", (data) => {
-    stateManager.emit(
-      Types.Event.Type.localDiscovery,
-      Types.System.States.error
-    );
-    logger.error("Local discovery server", "error", data);
-  });
+disc.on("ready", (data) => {
+  stateManager.emit(Types.Event.Type.localDiscovery, Types.System.States.full);
+  logger.log("Local discovery server", "ready", data);
+});
+disc.on("error", (data) => {
+  stateManager.emit(Types.Event.Type.localDiscovery, Types.System.States.error);
+  logger.error("Local discovery server", "error", data);
+});
+disc.on("stop", () => {
+  stateManager.emit(
+    Types.Event.Type.localDiscovery,
+    Types.System.States.disabled
+  );
+  logger.log("Local discovery server", "stopped");
 });
 
 stateManager.subscribe(
-  [Types.Event.Type.server, Types.Event.Type.configRouter],
-  ([server, configRouter]) => {
-    if (server >= Types.System.States.limited) {
+  [Types.Event.Type.configLocalDiscovery, Types.Event.Type.start],
+  ([configLocalDiscovery]) => {
+    if (!!configLocalDiscovery) {
+      disc.startServer();
+    } else {
+      disc.stopServer();
+    }
+  }
+);
+
+stateManager.subscribe(
+  [
+    Types.Event.Type.server,
+    Types.Event.Type.configRouter,
+    Types.Event.Type.localDiscovery,
+  ],
+  ([server, configRouter, localDiscovery]) => {
+    if (
+      server >= Types.System.States.limited &&
+      localDiscovery === Types.System.States.full
+    ) {
       if (!configRouter) return logger.warn("Local discovery", "Unknown port");
       disc.announce({
         type: "dogma-router",

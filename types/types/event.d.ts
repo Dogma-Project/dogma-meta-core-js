@@ -1,3 +1,4 @@
+import { System } from "./system";
 export declare namespace Event {
     enum Action {
         update = 0,
@@ -11,6 +12,10 @@ export declare namespace Event {
         type Storage = Type.nodes | Type.users | Type.prefix;
         type Action = Type.start | Type.online | Type.offline;
     }
+    type ServicesList = {
+        service: Type.Service;
+        state: System.States;
+    }[];
     enum Type {
         start = "START",
         online = "ONLINE",
@@ -44,6 +49,4 @@ export declare namespace Event {
         configPublicIpV4 = "CONFIG PUBLIC IPV4",
         configLocalDiscovery = "CONFIG LOCAL DISCOVERY"
     }
-    type Listenter = (payload: Payload, type?: Type, action?: Action) => void;
-    type ArrayOfListeners = [Type[], Listenter] | [];
 }

@@ -1,5 +1,5 @@
 import { Event, System, Config } from "../types";
-type MapPredicate<T> = T extends Event.Type.Service ? System.States : T extends Event.Type.Config ? Config.Value : any;
+type MapPredicate<T> = T extends Event.Type.Service ? System.States : T extends Event.Type.Config ? Config.Value : T extends Event.Type.Services ? Event.ServicesList : any;
 type Mapped<Arr extends ReadonlyArray<unknown>, Result extends Array<unknown> = []> = Arr extends [infer Head, ...infer Tail] ? Mapped<[...Tail], [...Result, MapPredicate<Head>]> : Result;
 type Listener<U extends ReadonlyArray<any>> = (args: Mapped<U>, type: any, action: any) => void;
 declare class StateManager {

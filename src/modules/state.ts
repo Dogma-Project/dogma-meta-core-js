@@ -5,6 +5,8 @@ type MapPredicate<T> = T extends Event.Type.Service
   ? System.States
   : T extends Event.Type.Config
   ? Config.Value
+  : T extends Event.Type.Services
+  ? Event.ServicesList
   : any;
 
 type Mapped<
@@ -69,7 +71,7 @@ class StateManager {
       const services = this.services.map((type) => {
         return {
           service: type,
-          state: this.state[type] || System.States.disabled,
+          state: (this.state[type] as System.States) || System.States.disabled,
         };
       });
       this.emit(Event.Type.services, services);

@@ -1,3 +1,5 @@
+import { System } from "./system";
+
 export namespace Event {
   export enum Action {
     update = 0,
@@ -37,6 +39,11 @@ export namespace Event {
     export type Action = Type.start | Type.online | Type.offline;
   }
 
+  export type ServicesList = {
+    service: Type.Service;
+    state: System.States;
+  }[];
+
   export enum Type {
     start = "START", // action
     online = "ONLINE", // action
@@ -74,12 +81,4 @@ export namespace Event {
     configPublicIpV4 = "CONFIG PUBLIC IPV4", // config
     configLocalDiscovery = "CONFIG LOCAL DISCOVERY",
   }
-
-  export type Listenter = (
-    payload: Payload,
-    type?: Type,
-    action?: Action
-  ) => void;
-
-  export type ArrayOfListeners = [Type[], Listenter] | [];
 }

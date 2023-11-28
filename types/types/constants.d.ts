@@ -3,4 +3,7 @@ export declare namespace Constants {
         false = 0,
         true = 1
     }
+    const enum Messages {
+        test = "hello"
+    }
 }

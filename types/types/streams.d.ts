@@ -2,8 +2,8 @@
 import DogmaSocket from "../modules/socket";
 export declare namespace Streams {
     enum MX {
-        dummy = 0,
-        handshake = 1,
+        handshake = 0,
+        key = 1,
         test = 2,
         control = 3,
         messages = 4,

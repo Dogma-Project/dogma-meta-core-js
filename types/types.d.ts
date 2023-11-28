@@ -4,7 +4,6 @@ import { Connection } from "./types/connection";
 import { Constants } from "./types/constants";
 import { DHT } from "./types/dht";
 import { Discovery } from "./types/discovery";
-import { Dummmy } from "./types/dummy";
 import { Event } from "./types/event";
 import { File } from "./types/file";
 import { Keys } from "./types/keys";
@@ -23,5 +22,5 @@ declare global {
         unique(): Array<T>;
     }
 }
-export type Request = DHT.Abstract | Message.Abstract | Dummmy.Abstract;
-export { Certificate, Config, Connection, Constants, DHT, Discovery, Dummmy, Event, File, Keys, Message, Node, Response, Streams, Sync, System, User, };
+export type Request = DHT.Abstract | Message.Abstract;
+export { Certificate, Config, Connection, Constants, DHT, Discovery, Event, File, Keys, Message, Node, Response, Streams, Sync, System, User, };

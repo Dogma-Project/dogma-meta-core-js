@@ -39,6 +39,7 @@ export declare const DEFAULTS: {
 export declare const PROTOCOL: {
     DB: number;
     CERTIFICATE: number;
+    CONNECTION: number;
 };
 export declare const MSG_FORMAT: {
     DEFAULT: number;

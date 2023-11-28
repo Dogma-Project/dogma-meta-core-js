@@ -45,7 +45,7 @@ export namespace Connection {
   export namespace Handshake {
     export type StageInitRequest = {
       stage: Stage.init;
-      protocol: 1;
+      protocol: 2;
       session: string;
       user_id: User.Id;
       node_id: Node.Id;

@@ -11,6 +11,9 @@ export default function onData(
     case Types.Streams.MX.handshake:
       this.handleHandshake(data);
       break;
+    case Types.Streams.MX.key:
+      this.handleSymmetricKey(data);
+      break;
     case Types.Streams.MX.test:
       this.handleTest(data);
       break;

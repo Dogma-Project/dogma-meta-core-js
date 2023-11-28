@@ -5,7 +5,7 @@ import EventEmitter from "node:events";
 import * as Types from "../types";
 import generateSyncId from "./generateSyncId";
 import logger from "./logger";
-import { Decoder, Encoder } from "./streams";
+import { Decoder, RsaEncoder, AesEncoder, PlainEncoder } from "./streams";
 import { onData } from "./socket/index";
 import StateManager from "./state";
 import Storage from "./storage";
@@ -19,13 +19,19 @@ class DogmaSocket extends EventEmitter {
   private readonly socket: net.Socket;
 
   public input: {
-    handshake: Encoder;
-    test?: Encoder;
-    control?: Encoder;
-    messages?: Encoder;
-    mail?: Encoder;
-    dht?: Encoder;
+    handshake: PlainEncoder;
+    key?: RsaEncoder;
+    test?: AesEncoder;
+    control?: AesEncoder;
+    messages?: AesEncoder;
+    mail?: AesEncoder;
+    dht?: AesEncoder;
+    web?: AesEncoder; // not implemented
+    file?: AesEncoder; // not implemented
+    relay?: AesEncoder; // not implemented
   };
+
+  private decoder?: Decoder;
 
   public readonly direction: Types.Connection.Direction;
   status: Types.Connection.Status = Types.Connection.Status.notConnected;
@@ -33,6 +39,9 @@ class DogmaSocket extends EventEmitter {
 
   private readonly outSession: string;
   private inSession?: string;
+
+  private outSymmetricKey?: Buffer;
+  private readonly inSymmetricKey: Buffer;
 
   private publicUserKey?: crypto.KeyObject;
   private publicNodeKey?: crypto.KeyObject;
@@ -54,6 +63,8 @@ class DogmaSocket extends EventEmitter {
     super();
     this.id = generateSyncId(6);
     this.outSession = generateSyncId(12);
+    this.inSymmetricKey = crypto.randomBytes(32);
+
     this.direction = direction;
     this.stateBridge = state;
     this.storageBridge = storage;
@@ -62,7 +73,7 @@ class DogmaSocket extends EventEmitter {
     this.socket.on("close", this.onClose);
     this.socket.on("error", this.onError);
     this.input = {
-      handshake: new Encoder({
+      handshake: new PlainEncoder({
         id: Types.Streams.MX.handshake,
       }),
     };
@@ -93,39 +104,57 @@ class DogmaSocket extends EventEmitter {
       type: Types.Keys.FORMATS.TYPE,
       format: Types.Keys.FORMATS.FORMAT,
     });
-    const decoder = new Decoder(privateNodeKey);
-    decoder.on("data", (data) => this.onData(data));
-    this.socket.on("data", (data) => decoder.decode(data));
+    this.decoder = new Decoder(privateNodeKey);
+    this.decoder.symmetricKey = this.inSymmetricKey;
+    this.decoder.on("data", (data) => this.onData(data));
+    this.socket.on("data", (data) => {
+      this.decoder && this.decoder.decode(data);
+    });
   }
 
-  private setEncoder() {
-    this.input.test = new Encoder({
-      id: Types.Streams.MX.test,
+  private setRsaEncoders() {
+    if (!this.publicNodeKey) {
+      return logger.error("Socket", "Rsa key didn't set");
+    }
+    this.input.key = new RsaEncoder({
+      id: Types.Streams.MX.key,
       publicKey: this.publicNodeKey,
+    });
+    this.input.key.pipe(this.socket);
+  }
+
+  private setAesEncoders() {
+    if (!this.outSymmetricKey) {
+      return logger.error("Socket", "Aes key didn't set");
+    }
+
+    this.input.test = new AesEncoder({
+      id: Types.Streams.MX.test,
+      symmetricKey: this.outSymmetricKey,
     });
     this.input.test.pipe(this.socket);
 
-    this.input.control = new Encoder({
+    this.input.control = new AesEncoder({
       id: Types.Streams.MX.control,
-      publicKey: this.publicNodeKey,
+      symmetricKey: this.outSymmetricKey,
     });
     this.input.control.pipe(this.socket);
 
-    this.input.messages = new Encoder({
+    this.input.messages = new AesEncoder({
       id: Types.Streams.MX.messages,
-      publicKey: this.publicNodeKey,
+      symmetricKey: this.outSymmetricKey,
     });
     this.input.messages.pipe(this.socket);
 
-    this.input.mail = new Encoder({
+    this.input.mail = new AesEncoder({
       id: Types.Streams.MX.mail,
-      publicKey: this.publicNodeKey,
+      symmetricKey: this.outSymmetricKey,
     });
     this.input.mail.pipe(this.socket);
 
-    this.input.dht = new Encoder({
+    this.input.dht = new AesEncoder({
       id: Types.Streams.MX.dht,
-      publicKey: this.publicNodeKey,
+      symmetricKey: this.outSymmetricKey,
     });
     this.input.dht.pipe(this.socket);
   }
@@ -163,7 +192,11 @@ class DogmaSocket extends EventEmitter {
   }
 
   private test() {
-    this.input.test && this.input.test.write("ok");
+    this.input.test && this.input.test.write(Types.Constants.Messages.test);
+  }
+
+  private sendSymmetricKey() {
+    this.input.key && this.input.key.write(this.inSymmetricKey);
   }
 
   private onData = onData;
@@ -204,15 +237,16 @@ class DogmaSocket extends EventEmitter {
     if (stage === Types.Connection.Handshake.Stage.init) {
       const request: Types.Connection.Handshake.StageInitRequest = {
         stage,
-        protocol: 1,
+        protocol: 2,
         session: this.outSession,
         user_id: this.storageBridge.user.id,
         node_id: this.storageBridge.node.id,
       };
       this.input.handshake.write(JSON.stringify(request));
     } else if (stage === Types.Connection.Handshake.Stage.verification) {
-      if (this.inSession === undefined)
+      if (this.inSession === undefined) {
         return logger.warn("Socket", "unknown inSession");
+      }
 
       const userSign = this.sign(
         this.inSession,
@@ -285,10 +319,7 @@ class DogmaSocket extends EventEmitter {
           if (this.unverified_node_id !== this.node_id) return; // edit ban
 
           logger.log("Socket", this.id, "verified");
-          this.setGroup();
-          this.checkGroup();
-          this.setEncoder();
-          this.test();
+          this.afterVerification();
         } catch (err) {
           logger.error("HS Verification", err);
         }
@@ -300,10 +331,38 @@ class DogmaSocket extends EventEmitter {
     }
   }
 
-  protected handleTest(data: Buffer) {
-    this.tested = true;
+  private afterVerification() {
+    this.setGroup();
+    this.checkGroup();
+    this.setRsaEncoders();
+    this.sendSymmetricKey();
+  }
+
+  private afterSymmetricKey() {
+    this.setAesEncoders();
+    this.test();
+  }
+
+  private afterTest() {
     this.emit("online", this.node_id);
-    logger.log("Socket", "Connection tested", this.id);
+  }
+
+  protected handleTest(data: Buffer) {
+    const msg = data.toString();
+    if (msg === Types.Constants.Messages.test) {
+      this.tested = true;
+      this.afterTest();
+    } else {
+      logger.warn("Socket", "Unknown test data", msg, msg.length);
+      this.destroy();
+    }
+  }
+
+  protected handleSymmetricKey(data: Buffer) {
+    logger.debug("SOCKET", "GOT SYMMETRIC KEY", data.length);
+    // check and validate
+    this.outSymmetricKey = data;
+    this.afterSymmetricKey();
   }
 
   public destroy(reason?: string) {

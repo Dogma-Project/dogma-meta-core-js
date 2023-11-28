@@ -61,7 +61,7 @@ if (!getArg(Types.System.Args.discovery)) {
             logger.log("CLIENT", "Trying to search friends", users.length);
             users.forEach((user: Types.User.Model) => dht.lookup(user.user_id));
           }
-        }, 45000); // edit
+        }, 5000); // edit
       }
     }
   );

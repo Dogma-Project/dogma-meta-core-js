@@ -1,9 +1,11 @@
 import { EventEmitter } from "node:stream";
 import crypto from "node:crypto";
 import { Streams } from "../../types";
+import logger from "../logger";
 
 class Decoder extends EventEmitter {
-  privateKey: crypto.KeyLike;
+  private privateKey: crypto.KeyLike;
+  public symmetricKey?: Buffer;
 
   constructor(privateKey: crypto.KeyLike) {
     super();
@@ -13,6 +15,7 @@ class Decoder extends EventEmitter {
   public decode(chunk: Buffer) {
     try {
       const mx = chunk.subarray(0, Streams.SIZES.MX).readUInt8(0);
+      logger.debug("DECRYPT", "MX", mx);
       const len = chunk
         .subarray(Streams.SIZES.MX, Streams.SIZES.MX + Streams.SIZES.LEN)
         .readUInt16BE(0);
@@ -21,11 +24,34 @@ class Decoder extends EventEmitter {
       if (len + offset !== chunk.length) {
         setTimeout(() => {
           this.decode(chunk.subarray(len + offset, chunk.length));
-        }, 10);
+        }, 1);
       }
-      if (mx !== Streams.MX.handshake) {
-        if (!this.privateKey) return;
+      if (mx === Streams.MX.key) {
+        if (!this.privateKey) {
+          return logger.warn("Decrypt", "Private key not ready");
+        }
         data = crypto.privateDecrypt(this.privateKey, data);
+      } else if (mx !== Streams.MX.handshake) {
+        // decrypt symmetric
+        if (!this.symmetricKey) {
+          return logger.warn("Decrypt", "Symmetric key not ready");
+        }
+        logger.debug("DECRYPT", "DATA", data.length);
+        const ivlen = 12;
+        const atlen = 16;
+        const metadata = data.subarray(-ivlen + -atlen);
+        const iv = metadata.subarray(0, ivlen);
+        const authTag = metadata.subarray(-atlen);
+        data = data.subarray(0, -metadata.length);
+        logger.debug("DECRYPT", "IV", iv.length, authTag.length, data.length);
+        const decipher = crypto.createDecipheriv(
+          "aes-256-gcm",
+          this.symmetricKey,
+          iv
+        );
+        decipher.setAuthTag(authTag);
+        data = decipher.update(data);
+        decipher.final();
       }
       const result: Streams.DemuxedResult = {
         mx,

@@ -4,7 +4,8 @@
 import { EventEmitter } from "node:stream";
 import crypto from "node:crypto";
 declare class Decoder extends EventEmitter {
-    privateKey: crypto.KeyLike;
+    private privateKey;
+    symmetricKey?: Buffer;
     constructor(privateKey: crypto.KeyLike);
     decode(chunk: Buffer): void;
     setPrivateKey(privateKey: crypto.KeyLike): void;

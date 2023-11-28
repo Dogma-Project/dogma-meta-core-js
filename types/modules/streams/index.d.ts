@@ -1,4 +1,6 @@
 import BufferToStream from "./buffer-to-stream";
-import Encoder from "./encoder";
+import RsaEncoder from "./rsa-encoder";
+import AesEncoder from "./aes-encoder";
+import PlainEncoder from "./plain-encoder";
 import Decoder from "./decoder";
-export { Encoder, Decoder, BufferToStream };
+export { RsaEncoder, AesEncoder, PlainEncoder, Decoder, BufferToStream };

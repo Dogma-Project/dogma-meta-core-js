@@ -41,20 +41,20 @@ class DHT extends EventEmitter {
      * @todo add verification
      */
     this.connectionsBridge.on(Types.Streams.MX.dht, (data, socket) => {
-      logger.debug("DHT", "DATA", data);
       // add verification
       try {
         const str = data.toString();
-        const parsed = JSON.parse(str) as Types.DHT.Abstract;
-        switch (parsed.body.type) {
+        logger.debug("DHT", "DATA", str);
+        const parsed = JSON.parse(str) as Types.DHT.Requests;
+        switch (parsed.type) {
           case Types.DHT.Request.announce:
-            this.handleAnnounce(parsed.body, socket);
+            this.handleAnnounce(parsed, socket);
             break;
           case Types.DHT.Request.lookup:
-            this.handleLookup(parsed.body, socket);
+            this.handleLookup(parsed, socket);
             break;
           case Types.DHT.Request.revoke:
-            this.handleRevoke(parsed.body, socket);
+            this.handleRevoke(parsed, socket);
             break;
           default:
             logger.warn("DHT", "unknown DHT request type");

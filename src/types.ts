@@ -4,7 +4,6 @@ import { Connection } from "./types/connection";
 import { Constants } from "./types/constants";
 import { DHT } from "./types/dht";
 import { Discovery } from "./types/discovery";
-import { Dummmy } from "./types/dummy";
 import { Event } from "./types/event";
 import { File } from "./types/file";
 import { Keys } from "./types/keys";
@@ -25,7 +24,7 @@ declare global {
   }
 }
 
-export type Request = DHT.Abstract | Message.Abstract | Dummmy.Abstract;
+export type Request = DHT.Abstract | Message.Abstract;
 export {
   Certificate,
   Config,
@@ -33,7 +32,6 @@ export {
   Constants,
   DHT,
   Discovery,
-  Dummmy,
   Event,
   File,
   Keys,

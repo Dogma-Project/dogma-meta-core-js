@@ -1,10 +1,10 @@
-import { Event, System, Config } from "../types";
+import { Event, System, Config, Constants } from "../types";
 import logger from "./logger";
 
 type MapPredicate<T> = T extends Event.Type.Service
   ? System.States
   : T extends Event.Type.Config
-  ? Config.Value
+  ? Config.Value<T>
   : T extends Event.Type.Services
   ? Event.ServicesList
   : any;
@@ -22,6 +22,11 @@ type Listener<U extends ReadonlyArray<any>> = (
   action: any
 ) => void;
 
+type IOverload = {
+  (type: Event.Type, payload: any | boolean): void;
+  (param: object): void;
+};
+
 class StateManager {
   constructor(private services: Event.Type.Service[] = []) {}
 
@@ -29,7 +34,7 @@ class StateManager {
     [index: string]: [Event.Type[], any][];
   } = {};
   public state: {
-    [index: string]: any;
+    [key in Event.Type]?: MapPredicate<key>;
   } = {};
 
   /**
@@ -37,7 +42,6 @@ class StateManager {
    * @param '[array of events]'
    * @param '([array of payloads], type?, action?)'
    */
-  //(args: Mapped<U>, type: any, action: any) => void
   public subscribe = <T extends Event.Type, U extends ReadonlyArray<T>>(
     type: [...U],
     callback: Listener<U>
@@ -53,7 +57,18 @@ class StateManager {
    * @param type
    * @param payload Any payload | or Boolean "true" for forced emit
    */
-  public emit = (type: Event.Type, payload: any | boolean) => {
+  public emit(type: Event.Type.ConfigBool, payload: Constants.Boolean): void;
+  public emit(type: Event.Type.ConfigStr, payload: string): void;
+  public emit(type: Event.Type.ConfigNum, payload: number): void;
+  public emit(
+    type: Event.Type.Config,
+    payload: number | string | Constants.Boolean
+  ): void;
+  public emit(type: Event.Type.Service, payload: System.States): void;
+  public emit(type: Event.Type.Services, payload: Event.ServicesList): void;
+  public emit(type: Event.Type.Storage, payload: any): void;
+  public emit(type: Event.Type.Action, payload: any): void;
+  public emit(type: Event.Type, payload: any) {
     // logger.info("Event emitted", type, payload);
     let action: Event.Action = Event.Action.update;
     if (this.state[type] === undefined) {
@@ -85,7 +100,7 @@ class StateManager {
       });
       ready && entry[1](result, type, action); // edit
     });
-  };
+  }
 }
 
 export default StateManager;

@@ -6,7 +6,10 @@ export declare namespace Event {
     }
     type Payload = any[];
     namespace Type {
-        type Config = Type.configRouter | Type.configAutoDefine | Type.configDhtAnnounce | Type.configDhtBootstrap | Type.configDhtLookup | Type.configExternal | Type.configLocalDiscovery | Type.configPublicIpV4;
+        type ConfigStr = Type.configExternal | Type.configPublicIpV4;
+        type ConfigBool = Type.configAutoDefine | Type.configLocalDiscovery;
+        type ConfigNum = Type.configRouter | Type.configDhtAnnounce | Type.configDhtBootstrap | Type.configDhtLookup;
+        type Config = ConfigStr | ConfigBool | ConfigNum;
         type Service = Type.masterKey | Type.nodeKey | Type.configDb | Type.nodesDb | Type.usersDb | Type.messagesDb | Type.dhtService | Type.dhtDb | Type.filesDb | Type.protocolDb | Type.syncDb | Type.server | Type.localDiscovery | Type.dirStatus | Type.storageUser | Type.storageNode;
         type Services = Type.services;
         type Storage = Type.nodes | Type.users | Type.prefix;

@@ -8,15 +8,14 @@ export namespace Event {
   export type Payload = any[];
 
   export namespace Type {
-    export type Config =
+    export type ConfigStr = Type.configExternal | Type.configPublicIpV4;
+    export type ConfigBool = Type.configAutoDefine | Type.configLocalDiscovery;
+    export type ConfigNum =
       | Type.configRouter
-      | Type.configAutoDefine
       | Type.configDhtAnnounce
       | Type.configDhtBootstrap
-      | Type.configDhtLookup
-      | Type.configExternal
-      | Type.configLocalDiscovery
-      | Type.configPublicIpV4;
+      | Type.configDhtLookup;
+    export type Config = ConfigStr | ConfigBool | ConfigNum;
     export type Service =
       | Type.masterKey
       | Type.nodeKey

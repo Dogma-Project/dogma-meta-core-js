@@ -1,5 +1,5 @@
-import { Event, System, Config } from "../types";
-type MapPredicate<T> = T extends Event.Type.Service ? System.States : T extends Event.Type.Config ? Config.Value : T extends Event.Type.Services ? Event.ServicesList : any;
+import { Event, System, Config, Constants } from "../types";
+type MapPredicate<T> = T extends Event.Type.Service ? System.States : T extends Event.Type.Config ? Config.Value<T> : T extends Event.Type.Services ? Event.ServicesList : any;
 type Mapped<Arr extends ReadonlyArray<unknown>, Result extends Array<unknown> = []> = Arr extends [infer Head, ...infer Tail] ? Mapped<[...Tail], [...Result, MapPredicate<Head>]> : Result;
 type Listener<U extends ReadonlyArray<any>> = (args: Mapped<U>, type: any, action: any) => void;
 declare class StateManager {
@@ -7,7 +7,7 @@ declare class StateManager {
     constructor(services?: Event.Type.Service[]);
     private listeners;
     state: {
-        [index: string]: any;
+        [key in Event.Type]?: MapPredicate<key>;
     };
     /**
      *
@@ -20,6 +20,13 @@ declare class StateManager {
      * @param type
      * @param payload Any payload | or Boolean "true" for forced emit
      */
-    emit: (type: Event.Type, payload: any | boolean) => void;
+    emit(type: Event.Type.ConfigBool, payload: Constants.Boolean): void;
+    emit(type: Event.Type.ConfigStr, payload: string): void;
+    emit(type: Event.Type.ConfigNum, payload: number): void;
+    emit(type: Event.Type.Config, payload: number | string | Constants.Boolean): void;
+    emit(type: Event.Type.Service, payload: System.States): void;
+    emit(type: Event.Type.Services, payload: Event.ServicesList): void;
+    emit(type: Event.Type.Storage, payload: any): void;
+    emit(type: Event.Type.Action, payload: any): void;
 }
 export default StateManager;

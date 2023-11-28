@@ -34,6 +34,27 @@ class ConfigModel implements Model {
     }
   }
 
+  // private convertTypes(
+  //   type: Types.Event.Type.Config,
+  //   value: any
+  // ): number | string | boolean {
+  //   switch (type) {
+  //     case Types.Event.Type.configRouter:
+  //     case Types.Event.Type.configDhtAnnounce:
+  //     case Types.Event.Type.configDhtBootstrap:
+  //     case Types.Event.Type.configDhtLookup:
+  //       return Number(value);
+  //     case Types.Event.Type.configExternal:
+  //     case Types.Event.Type.configPublicIpV4:
+  //       return value as string;
+  //     case Types.Event.Type.configAutoDefine:
+  //     case Types.Event.Type.configLocalDiscovery:
+  //       return !!value;
+  //     default:
+  //       return value as string;
+  //   }
+  // }
+
   async loadConfigTable() {
     try {
       logger.log("Config Model", "Load config table");
@@ -41,8 +62,7 @@ class ConfigModel implements Model {
       if (data.length) {
         // add condition
         data.forEach((element) => {
-          const type: Types.Event.Type = element.param;
-          this.stateBridge.emit(type, element.value);
+          this.stateBridge.emit(element.param, element.value);
         });
         /**
          * @todo edit empty fields check

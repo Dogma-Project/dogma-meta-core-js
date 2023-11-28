@@ -15,8 +15,9 @@ const stateManager = new StateManager([
   Event.Type.dhtService,
 ]);
 
-// stateManager.subscribe([Event.Type.services], ([services]) => {
-//   logger.debug("TEST", "services", services);
-// });
+stateManager.subscribe([Event.Type.services], ([services]) => {
+  const lel = stateManager.state[Event.Type.localDiscovery];
+  logger.debug("TEST", "services", services);
+});
 
 export default stateManager;

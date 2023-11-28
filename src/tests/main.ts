@@ -128,6 +128,6 @@ State.stateManager.subscribe([Types.Event.Type.dirStatus], ([homeDir]) => {
         logger.debug("TEST", "Start test not passed!");
       });
   } else if (homeDir === Types.System.States.empty) {
-    State.stateManager.emit(Types.Event.Type.dirStatus, testPrefix);
+    State.stateManager.emit(Types.Event.Type.prefix, testPrefix);
   }
 });

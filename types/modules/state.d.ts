@@ -9,6 +9,7 @@ declare class StateManager {
     state: {
         [key in Event.Type]?: MapPredicate<key>;
     };
+    private trigger;
     /**
      *
      * @param '[array of events]'
@@ -18,7 +19,7 @@ declare class StateManager {
     /**
      *
      * @param type
-     * @param payload Any payload | or Boolean "true" for forced emit
+     * @param payload Any payload
      */
     emit(type: Event.Type.ConfigBool, payload: boolean): void;
     emit(type: Event.Type.ConfigStr, payload: string): void;
@@ -28,5 +29,7 @@ declare class StateManager {
     emit(type: Event.Type.Services, payload: Event.ServicesList): void;
     emit(type: Event.Type.Storage, payload: any): void;
     emit(type: Event.Type.Action, payload: any): void;
+    emit(type: Event.Type, payload: typeof this.trigger): void;
+    enforce(type: Event.Type): void;
 }
 export default StateManager;

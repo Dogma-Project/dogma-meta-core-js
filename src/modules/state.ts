@@ -22,11 +22,6 @@ type Listener<U extends ReadonlyArray<any>> = (
   action: any
 ) => void;
 
-type IOverload = {
-  (type: Event.Type, payload: any | boolean): void;
-  (param: object): void;
-};
-
 class StateManager {
   constructor(private services: Event.Type.Service[] = []) {}
 
@@ -36,6 +31,7 @@ class StateManager {
   public state: {
     [key in Event.Type]?: MapPredicate<key>;
   } = {};
+  private trigger = Symbol("trigger");
 
   /**
    *
@@ -55,7 +51,7 @@ class StateManager {
   /**
    *
    * @param type
-   * @param payload Any payload | or Boolean "true" for forced emit
+   * @param payload Any payload
    */
   public emit(type: Event.Type.ConfigBool, payload: boolean): void;
   public emit(type: Event.Type.ConfigStr, payload: string): void;
@@ -68,16 +64,20 @@ class StateManager {
   public emit(type: Event.Type.Services, payload: Event.ServicesList): void;
   public emit(type: Event.Type.Storage, payload: any): void;
   public emit(type: Event.Type.Action, payload: any): void;
+  public emit(type: Event.Type, payload: typeof this.trigger): void;
   public emit(type: Event.Type, payload: any) {
-    // logger.info("Event emitted", type, payload);
     let action: Event.Action = Event.Action.update;
     if (this.state[type] === undefined) {
       action = Event.Action.set;
     }
-    if (payload !== true) {
+    if (payload !== this.trigger) {
       if (JSON.stringify(this.state[type]) === JSON.stringify(payload)) return;
+      this.state[type] = payload; // test
+    } else {
+      if (this.state[type] === undefined) {
+        this.state[type] = this.trigger;
+      }
     }
-    this.state[type] = payload; // test
     if (this.listeners[type] === undefined) {
       return logger.debug("state", "There's no handlers for event", type);
     }
@@ -100,6 +100,10 @@ class StateManager {
       });
       ready && entry[1](result, type, action); // edit
     });
+  }
+
+  public enforce(type: Event.Type) {
+    this.emit(type, this.trigger);
   }
 }
 

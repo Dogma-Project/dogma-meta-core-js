@@ -57,12 +57,12 @@ class StateManager {
    * @param type
    * @param payload Any payload | or Boolean "true" for forced emit
    */
-  public emit(type: Event.Type.ConfigBool, payload: Constants.Boolean): void;
+  public emit(type: Event.Type.ConfigBool, payload: boolean): void;
   public emit(type: Event.Type.ConfigStr, payload: string): void;
   public emit(type: Event.Type.ConfigNum, payload: number): void;
   public emit(
     type: Event.Type.Config,
-    payload: number | string | Constants.Boolean
+    payload: number | string | boolean
   ): void;
   public emit(type: Event.Type.Service, payload: System.States): void;
   public emit(type: Event.Type.Services, payload: Event.ServicesList): void;

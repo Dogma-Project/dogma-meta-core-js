@@ -6,7 +6,7 @@ export namespace Config {
     T extends Event.Type.ConfigStr
       ? string
       : T extends Event.Type.ConfigBool
-      ? Constants.Boolean
+      ? boolean
       : T extends Event.Type.ConfigNum
       ? number
       : never;

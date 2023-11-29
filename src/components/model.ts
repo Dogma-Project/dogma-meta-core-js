@@ -50,7 +50,7 @@ stateManager.subscribe([Event.Type.configDb], async ([configDb]) => {
             },
             {
               param: Event.Type.configAutoDefine,
-              value: Constants.Boolean.true,
+              value: true,
             },
             {
               param: Event.Type.configDhtAnnounce,
@@ -70,7 +70,7 @@ stateManager.subscribe([Event.Type.configDb], async ([configDb]) => {
             },
             {
               param: Event.Type.configLocalDiscovery,
-              value: Constants.Boolean.true,
+              value: true,
             },
           ]);
         }

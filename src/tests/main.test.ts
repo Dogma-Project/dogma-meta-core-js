@@ -16,7 +16,7 @@ describe("Functional test", () => {
     });
   });
 
-  it("Create keypair", async () => {
+  it("main", async () => {
     State.storage.user.name = "Test user";
     State.storage.node.name = "Test node";
     await Keys.createKeyPair(Types.Keys.Type.masterKey, testPrefix, 2048);
@@ -54,7 +54,19 @@ describe("Functional test", () => {
         param: Types.Event.Type.configExternal,
         value: DEFAULTS.EXTERNAL,
       },
+      {
+        param: Types.Event.Type.configLocalDiscovery,
+        value: true,
+      },
     ]);
+    await Model.configModel.persistConfig({
+      param: Types.Event.Type.configLocalDiscovery,
+      value: false,
+    });
+    await Model.configModel.persistConfig({
+      param: Types.Event.Type.configLocalDiscovery,
+      value: true,
+    });
     process.exit();
   });
 });

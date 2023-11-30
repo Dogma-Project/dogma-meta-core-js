@@ -8,7 +8,7 @@ declare class LocalDiscovery extends EventEmitter {
     ip: string;
     port: number;
     broadcast: string;
-    server: dgram.Socket;
+    server?: dgram.Socket;
     ready: boolean;
     constructor({ port, ip }: {
         port: number;

@@ -10,7 +10,7 @@ class LocalDiscovery extends EventEmitter {
   ip: string;
   port: number;
   broadcast: string;
-  server: dgram.Socket;
+  server?: dgram.Socket;
   ready: boolean = false;
 
   constructor({ port = 45432, ip = "0.0.0.0" }: { port: number; ip: string }) {
@@ -20,16 +20,16 @@ class LocalDiscovery extends EventEmitter {
     this.ip = "0.0.0.0";
     this.port = port;
     this.broadcast = broadcast;
+  }
+
+  public startServer() {
     this.server = dgram.createSocket({
       type: "udp4",
       reuseAddr: true,
     });
-  }
-
-  public startServer() {
     this.server.on("listening", () => {
       this.ready = true;
-      const address = this.server.address();
+      const address = this.server?.address();
       this.emit("ready", {
         address,
       });
@@ -69,7 +69,7 @@ class LocalDiscovery extends EventEmitter {
         address: this.ip,
       },
       () => {
-        this.server.setBroadcast(true);
+        this.server?.setBroadcast(true);
       }
     );
 
@@ -77,7 +77,7 @@ class LocalDiscovery extends EventEmitter {
   }
 
   public stopServer() {
-    this.server.close();
+    this.server?.close();
   }
 
   public announce(card: Types.Discovery.Card) {
@@ -88,7 +88,7 @@ class LocalDiscovery extends EventEmitter {
         "Can't send discovery card. UDP server is stopped"
       );
     }
-    this.server.send(
+    this.server?.send(
       message,
       0,
       message.length,

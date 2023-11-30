@@ -1,4 +1,4 @@
-process.env.loglevel = "0";
+process.env.loglevel = "1";
 process.env.prefix = "test-0";
 
 import { describe, it } from "node:test";

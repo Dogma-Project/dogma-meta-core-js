@@ -11,7 +11,7 @@ const disc = new LocalDiscovery({
 });
 disc.on("ready", (data) => {
   stateManager.emit(Types.Event.Type.localDiscovery, Types.System.States.full);
-  logger.log("Local discovery server", "ready", data);
+  logger.info("Local discovery server", "ready", data);
 });
 disc.on("error", (data) => {
   stateManager.emit(Types.Event.Type.localDiscovery, Types.System.States.error);
@@ -22,7 +22,7 @@ disc.on("stop", () => {
     Types.Event.Type.localDiscovery,
     Types.System.States.disabled
   );
-  logger.log("Local discovery server", "stopped");
+  logger.info("Local discovery server", "stopped");
 });
 
 stateManager.subscribe(

@@ -30,13 +30,7 @@ class LocalDiscovery extends EventEmitter {
     this.server.on("listening", () => {
       this.ready = true;
       const address = this.server?.address();
-      this.emit("ready", {
-        address,
-      });
-      logger.info(
-        "Local Discovery",
-        `Discovery socket is listening on ${this.port}`
-      );
+      this.emit("ready", address);
     });
     this.server.on("message", (msg, from) => {
       // add validation

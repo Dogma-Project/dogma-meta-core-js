@@ -31,6 +31,10 @@ export default class Client {
       const socket = net.connect(peer.port, peer.host, () => {
         this.connectionsBridge.onConnect(socket, peer);
       });
+      socket.on("error", (err: Error) => {
+        // determine reason
+        // logger.warn("CONNECT", err);
+      });
     } catch (e) {
       logger.error("client", "Can't establish connection", e);
     }

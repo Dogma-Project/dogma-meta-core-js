@@ -108,7 +108,7 @@ class DogmaSocket extends EventEmitter {
     this.decoder.symmetricKey = this.inSymmetricKey;
     this.decoder.on("data", (data) => this.onData(data));
     this.socket.on("data", (data) => {
-      this.decoder && this.decoder.decode(data);
+      this.decoder && this.decoder.input(data);
     });
   }
 
@@ -359,7 +359,6 @@ class DogmaSocket extends EventEmitter {
   }
 
   protected handleSymmetricKey(data: Buffer) {
-    // logger.debug("SOCKET", "GOT SYMMETRIC KEY", data.length);
     // check and validate
     this.outSymmetricKey = data;
     this.afterSymmetricKey();

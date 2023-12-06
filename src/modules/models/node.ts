@@ -23,10 +23,10 @@ class NodeModel implements Model {
         timestampData: true,
       });
       await this.db.loadDatabaseAsync();
-      await this.db.ensureIndexAsync({
-        fieldName: "param",
-        unique: true,
-      });
+      // await this.db.ensureIndexAsync({
+      //   fieldName: "param",
+      //   unique: true,
+      // });
       this.stateBridge.emit(Event.Type.nodesDb, System.States.ready);
     } catch (err) {
       logger.error("config.nodes", err);

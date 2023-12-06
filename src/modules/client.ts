@@ -113,7 +113,7 @@ export default class Client {
         const { public_ipv4, local_ipv4, user_id, node_id } = node;
         if (public_ipv4) {
           // add validation
-          const [host, port] = public_ipv4; // edit!!!
+          const [host, port] = public_ipv4.split(":"); // edit!!!
           const peer: Types.Connection.Peer = {
             address: public_ipv4,
             host,

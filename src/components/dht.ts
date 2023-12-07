@@ -4,6 +4,12 @@ import stateManager from "./state";
 import storage from "./storage";
 import * as Types from "../types";
 import { dhtModel } from "./model";
+import {
+  C_Event,
+  C_DHT,
+  C_Connection,
+  C_System,
+} from "@dogma-project/constants-meta";
 
 const dht = new DHT({
   state: stateManager,
@@ -12,49 +18,34 @@ const dht = new DHT({
   model: dhtModel,
 });
 
+stateManager.subscribe([C_Event.Type.configDhtLookup], ([configDhtLookup]) => {
+  dht.setPermission(C_DHT.Type.dhtLookup, configDhtLookup as number);
+});
 stateManager.subscribe(
-  [Types.Event.Type.configDhtLookup],
-  ([configDhtLookup]) => {
-    dht.setPermission(Types.DHT.Type.dhtLookup, configDhtLookup as number);
-  }
-);
-stateManager.subscribe(
-  [Types.Event.Type.configDhtAnnounce],
+  [C_Event.Type.configDhtAnnounce],
   ([configDhtAnnounce]) => {
-    dht.setPermission(Types.DHT.Type.dhtAnnounce, configDhtAnnounce as number);
+    dht.setPermission(C_DHT.Type.dhtAnnounce, configDhtAnnounce as number);
   }
 );
 
 stateManager.subscribe(
-  [Types.Event.Type.configDhtBootstrap],
+  [C_Event.Type.configDhtBootstrap],
   ([configDhtBootstrap]) => {
-    dht.setPermission(
-      Types.DHT.Type.dhtBootstrap,
-      configDhtBootstrap as number
-    );
+    dht.setPermission(C_DHT.Type.dhtBootstrap, configDhtBootstrap as number);
     switch (configDhtBootstrap) {
-      case Types.Connection.Group.all:
-        stateManager.emit(
-          Types.Event.Type.dhtService,
-          Types.System.States.full
-        );
+      case C_Connection.Group.all:
+        stateManager.emit(C_Event.Type.dhtService, C_System.States.full);
         break;
-      case Types.Connection.Group.friends:
-        stateManager.emit(Types.Event.Type.dhtService, Types.System.States.ok);
+      case C_Connection.Group.friends:
+        stateManager.emit(C_Event.Type.dhtService, C_System.States.ok);
         break;
-      case Types.Connection.Group.selfUser:
-      case Types.Connection.Group.selfNode:
-        stateManager.emit(
-          Types.Event.Type.dhtService,
-          Types.System.States.limited
-        );
+      case C_Connection.Group.selfUser:
+      case C_Connection.Group.selfNode:
+        stateManager.emit(C_Event.Type.dhtService, C_System.States.limited);
         break;
       default:
         // disabled
-        stateManager.emit(
-          Types.Event.Type.dhtService,
-          Types.System.States.disabled
-        );
+        stateManager.emit(C_Event.Type.dhtService, C_System.States.disabled);
         break;
     }
   }

@@ -7,6 +7,7 @@ import * as Types from "../types";
 import storage from "./storage";
 import state from "./state";
 import { getArg } from "../modules/arguments";
+import { C_Event, C_System } from "@dogma-project/constants-meta";
 
 const client = new Client({ connections, state, storage });
 
@@ -30,12 +31,12 @@ dht.on("peers", (data: Types.DHT.LookUp.Answer.Data[]) => {
 let connectFriendsInterval: NodeJS.Timer | undefined;
 let searchFriendsInterval: NodeJS.Timer | undefined;
 
-if (!getArg(Types.System.Args.discovery)) {
+if (!getArg(C_System.Args.discovery)) {
   /**
    * Try to connect friends
    */
   state.subscribe(
-    [Types.Event.Type.users, Types.Event.Type.nodes, Types.Event.Type.nodeKey],
+    [C_Event.Type.users, C_Event.Type.nodes, C_Event.Type.nodeKey],
     ([users, nodes, nodeKey]) => {
       clearInterval(connectFriendsInterval);
       connectFriendsInterval = setInterval(() => {
@@ -50,9 +51,9 @@ if (!getArg(Types.System.Args.discovery)) {
   //
   state.subscribe(
     [
-      Types.Event.Type.configDhtLookup,
-      Types.Event.Type.users,
-      Types.Event.Type.dhtService, // check
+      C_Event.Type.configDhtLookup,
+      C_Event.Type.users,
+      C_Event.Type.dhtService, // check
     ],
     ([configDhtLookup, users, dhtService]) => {
       clearInterval(searchFriendsInterval);

@@ -1,26 +1,11 @@
 /// <reference types="node" />
 import DogmaSocket from "../modules/socket";
+import { C_Streams } from "@dogma-project/constants-meta";
 export declare namespace Streams {
-    enum MX {
-        handshake = 0,
-        key = 1,
-        test = 2,
-        control = 3,
-        messages = 4,
-        mail = 5,
-        dht = 6,
-        web = 7,
-        file = 8,
-        relay = 9
-    }
     type DemuxedResult = {
-        mx: MX;
+        mx: C_Streams.MX;
         data: Buffer;
         descriptor?: string;
     };
-    enum SIZES {
-        MX = 1,
-        LEN = 2
-    }
     type DataHandler = (data: Buffer, socket: DogmaSocket, descriptor?: string) => void;
 }

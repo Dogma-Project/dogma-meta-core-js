@@ -4,6 +4,7 @@ import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 import Model from "./_model";
 import StateManager from "../state";
+import { C_Event, C_System } from "@dogma-project/constants-meta";
 
 class FileModel implements Model {
   stateBridge: StateManager;
@@ -24,10 +25,7 @@ class FileModel implements Model {
       //   fieldName: "param",
       //   unique: true,
       // });
-      this.stateBridge.emit(
-        Types.Event.Type.filesDb,
-        Types.System.States.ready
-      );
+      this.stateBridge.emit(C_Event.Type.filesDb, C_System.States.ready);
     } catch (err) {
       logger.error("files.nedb", err);
     }

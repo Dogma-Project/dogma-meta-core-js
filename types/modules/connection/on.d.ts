@@ -1,4 +1,5 @@
 import ConnectionClass from "../connections";
+import { C_Streams } from "@dogma-project/constants-meta";
 import { Streams } from "../../types";
 /**
  * Sets data handlers for various MX types. Can set just once;
@@ -6,4 +7,4 @@ import { Streams } from "../../types";
  * @param event MX
  * @param handler function - handler
  */
-export default function on(this: ConnectionClass, event: Streams.MX, handler: Streams.DataHandler): void;
+export default function on(this: ConnectionClass, event: C_Streams.MX, handler: Streams.DataHandler): void;

@@ -1,10 +1,11 @@
 import generateSyncId from "../generateSyncId";
-import { Event, System, User, Sync } from "../../types";
+import { User } from "../../types";
 import logger from "../logger";
 import { getDatadir } from "../datadir";
 import Datastore from "@seald-io/nedb";
 import Model from "./_model";
 import StateManager from "../state";
+import { C_Event, C_System, C_Sync } from "@dogma-project/constants-meta";
 
 class UserModel implements Model {
   stateBridge: StateManager;
@@ -26,7 +27,7 @@ class UserModel implements Model {
         fieldName: "user_id",
         unique: true,
       });
-      this.stateBridge.emit(Event.Type.usersDb, System.States.ready);
+      this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.ready);
     } catch (err) {
       logger.error("users.nedb", err);
     }
@@ -41,10 +42,10 @@ class UserModel implements Model {
       logger.log("User Model", "Load user table");
       const data = await this.getAll();
       if (data.length) {
-        this.stateBridge.emit(Event.Type.usersDb, System.States.full);
-        this.stateBridge.emit(Event.Type.users, data);
+        this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.full);
+        this.stateBridge.emit(C_Event.Type.users, data);
       } else {
-        this.stateBridge.emit(Event.Type.usersDb, System.States.empty);
+        this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.empty);
       }
     } catch (err) {
       logger.error("user.nedb", err);
@@ -69,7 +70,7 @@ class UserModel implements Model {
         if (result.affectedDocuments) {
           if (!Array.isArray(result.affectedDocuments)) {
             if (!("sync_id" in result.affectedDocuments)) {
-              const sync_id = generateSyncId(Sync.SIZES.USER_ID);
+              const sync_id = generateSyncId(C_Sync.SIZES.USER_ID);
               await this.db.updateAsync({ user_id }, { $set: { sync_id } });
             }
           } else {
@@ -91,7 +92,7 @@ class UserModel implements Model {
         for (let i = 0; i < users.length; i++) {
           await insert(users[i]);
         }
-        this.stateBridge.emit(Event.Type.usersDb, System.States.reload); // downgrade state to reload database
+        this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.reload); // downgrade state to reload database
         resolve(true);
       } catch (err) {
         reject(err);
@@ -105,7 +106,7 @@ class UserModel implements Model {
   async removeUser(user_id: User.Id) {
     try {
       await this.db.removeAsync({ user_id }, { multi: true });
-      this.stateBridge.emit(Event.Type.usersDb, System.States.reload); // downgrade state to reload database
+      this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.reload); // downgrade state to reload database
 
       /*
       await nodesDb.removeAsync({ user_id }, { multi: true });
@@ -134,7 +135,7 @@ class UserModel implements Model {
           upsert: true,
         });
       }
-      this.stateBridge.emit(Event.Type.usersDb, System.States.reload); // downgrade state to reload database
+      this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.reload); // downgrade state to reload database
       // Sync.confirm("users", from);
       return true;
     } catch (err) {

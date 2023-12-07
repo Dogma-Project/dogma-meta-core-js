@@ -4,6 +4,7 @@ import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 import Model from "./_model";
 import StateManager from "../state";
+import { C_Event, C_System } from "@dogma-project/constants-meta";
 
 class SyncModel implements Model {
   stateBridge: StateManager;
@@ -24,7 +25,7 @@ class SyncModel implements Model {
       //   fieldName: "param",
       //   unique: true,
       // });
-      this.stateBridge.emit(Types.Event.Type.syncDb, Types.System.States.ready);
+      this.stateBridge.emit(C_Event.Type.syncDb, C_System.States.ready);
     } catch (err) {
       logger.error("sync.nedb", err);
     }

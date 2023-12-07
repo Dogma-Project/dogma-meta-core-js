@@ -1,28 +1,8 @@
 import { Connection } from "./connection";
 import { Node } from "./node";
-import { Streams } from "./streams";
 import { User } from "./user";
+import { C_DHT, C_Streams } from "@dogma-project/constants-meta";
 export declare namespace DHT {
-    enum Type {
-        dhtAnnounce = 0,
-        dhtLookup = 1,
-        dhtBootstrap = 2
-    }
-    enum Action {
-        get = 0,
-        set = 1,
-        push = 2
-    }
-    enum Request {
-        announce = 0,
-        lookup = 1,
-        revoke = 2
-    }
-    enum Response {
-        error = -1,
-        alreadyPresent = 0,
-        ok = 1
-    }
     type Model = {
         user_id: User.Id;
         node_id: Node.Id;
@@ -31,8 +11,8 @@ export declare namespace DHT {
     };
     namespace LookUp {
         interface Request {
-            type: DHT.Request.lookup;
-            action: DHT.Action.get;
+            type: C_DHT.Request.lookup;
+            action: C_DHT.Action.get;
             data: Request.Data;
         }
         namespace Request {
@@ -42,8 +22,8 @@ export declare namespace DHT {
             };
         }
         interface Answer {
-            type: DHT.Request.lookup;
-            action: DHT.Action.set;
+            type: C_DHT.Request.lookup;
+            action: C_DHT.Action.set;
             data: Answer.Data[];
         }
         namespace Answer {
@@ -57,8 +37,8 @@ export declare namespace DHT {
     }
     namespace Announce {
         interface Request {
-            type: DHT.Request.announce;
-            action: DHT.Action.push;
+            type: C_DHT.Request.announce;
+            action: C_DHT.Action.push;
             data: Request.Data;
         }
         namespace Request {
@@ -69,8 +49,8 @@ export declare namespace DHT {
     }
     namespace Revoke {
         interface Request {
-            type: DHT.Request.revoke;
-            action: DHT.Action.push;
+            type: C_DHT.Request.revoke;
+            action: C_DHT.Action.push;
             data: Request.Data;
         }
         namespace Request {
@@ -93,7 +73,7 @@ export declare namespace DHT {
     };
     type Card = CardQuery<Requests> | CardAnswer;
     type Abstract = {
-        class: Streams.MX.dht;
+        class: C_Streams.MX.dht;
         body: DHT.Requests;
     };
 }

@@ -4,7 +4,7 @@ import * as Types from "../../types";
 import Model from "./_model";
 import { getDatadir } from "../datadir";
 import logger from "../logger";
-
+import { C_Event, C_System, C_DHT } from "@dogma-project/constants-meta";
 class DHTModel implements Model {
   stateBridge: StateManager;
   db!: Datastore;
@@ -24,7 +24,7 @@ class DHTModel implements Model {
       //   fieldName: "param",
       //   unique: true,
       // });
-      this.stateBridge.emit(Types.Event.Type.dhtDb, Types.System.States.ready);
+      this.stateBridge.emit(C_Event.Type.dhtDb, C_System.States.ready);
     } catch (err) {
       logger.error("dht.nedb", err);
     }
@@ -46,9 +46,9 @@ class DHTModel implements Model {
         await this.db.updateAsync({ user_id, node_id }, params, {
           upsert: true,
         });
-        return Types.DHT.Response.ok;
+        return C_DHT.Response.ok;
       } else {
-        return Types.DHT.Response.alreadyPresent;
+        return C_DHT.Response.alreadyPresent;
       }
     } catch (err) {
       return Promise.reject(err);

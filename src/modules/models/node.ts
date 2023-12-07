@@ -1,11 +1,11 @@
 import generateSyncId from "../generateSyncId";
 import logger from "../logger";
-// import Sync from "./sync";
-import { Event, System, Node, User, Sync } from "../../types";
+import { Node, User } from "../../types";
 import { getDatadir } from "../datadir";
 import Datastore from "@seald-io/nedb";
 import Model from "./_model";
 import StateManager from "../state";
+import { C_Event, C_System, C_Sync } from "@dogma-project/constants-meta";
 
 class NodeModel implements Model {
   stateBridge: StateManager;
@@ -27,7 +27,7 @@ class NodeModel implements Model {
       //   fieldName: "param",
       //   unique: true,
       // });
-      this.stateBridge.emit(Event.Type.nodesDb, System.States.ready);
+      this.stateBridge.emit(C_Event.Type.nodesDb, C_System.States.ready);
     } catch (err) {
       logger.error("config.nodes", err);
     }
@@ -42,10 +42,10 @@ class NodeModel implements Model {
       logger.log("Node Model", "Load node table");
       const data = await this.getAll();
       if (data.length) {
-        this.stateBridge.emit(Event.Type.nodesDb, System.States.full);
-        this.stateBridge.emit(Event.Type.nodes, data);
+        this.stateBridge.emit(C_Event.Type.nodesDb, C_System.States.full);
+        this.stateBridge.emit(C_Event.Type.nodes, data);
       } else {
-        this.stateBridge.emit(Event.Type.nodesDb, System.States.empty);
+        this.stateBridge.emit(C_Event.Type.nodesDb, C_System.States.empty);
       }
     } catch (err) {
       logger.error("node.nedb", err);
@@ -75,7 +75,7 @@ class NodeModel implements Model {
         if (result.affectedDocuments) {
           if (!Array.isArray(result.affectedDocuments)) {
             if (!("sync_id" in result.affectedDocuments)) {
-              const sync_id = generateSyncId(Sync.SIZES.NODE_ID);
+              const sync_id = generateSyncId(C_Sync.SIZES.NODE_ID);
               const res = await this.db.updateAsync(
                 { node_id, user_id },
                 { $set: { sync_id } }
@@ -100,7 +100,7 @@ class NodeModel implements Model {
         for (let i = 0; i < nodes.length; i++) {
           await insert(nodes[i]);
         }
-        this.stateBridge.emit(Event.Type.nodesDb, System.States.reload); // downgrade state to reload database
+        this.stateBridge.emit(C_Event.Type.nodesDb, C_System.States.reload); // downgrade state to reload database
         resolve(true);
       } catch (err) {
         reject(err);
@@ -129,7 +129,7 @@ class NodeModel implements Model {
           { upsert: true }
         );
       }
-      this.stateBridge.emit(Event.Type.nodesDb, System.States.reload); // downgrade state to reload database
+      this.stateBridge.emit(C_Event.Type.nodesDb, C_System.States.reload); // downgrade state to reload database
       // Sync.confirm("nodes", from);
       return true;
     } catch (err) {

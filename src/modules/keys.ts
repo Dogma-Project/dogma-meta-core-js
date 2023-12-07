@@ -3,6 +3,7 @@ import { Keys } from "../types";
 import logger from "./logger";
 import fs from "node:fs";
 import { getDatadir } from "./datadir";
+import { C_Keys } from "@dogma-project/constants-meta";
 
 type result = {
   publicKey: crypto.KeyObject;
@@ -31,7 +32,7 @@ function _generateKeyPair(
 }
 
 export async function createKeyPair(
-  type: Keys.Type,
+  type: C_Keys.Type,
   prefix: string,
   length: Keys.InitialParams["keylength"] = 2048
 ) {
@@ -39,18 +40,18 @@ export async function createKeyPair(
     const dir = getDatadir(prefix);
     const { publicKey, privateKey } = await _generateKeyPair(length);
     const opts: crypto.KeyExportOptions<"pem"> = {
-      type: Keys.FORMATS.TYPE,
-      format: Keys.FORMATS.FORMAT,
+      type: C_Keys.FORMATS.TYPE,
+      format: C_Keys.FORMATS.FORMAT,
     };
     const publicKeyBuffer = publicKey.export(opts);
     const privateKeyBuffer = privateKey.export(opts);
 
     let private_str = "",
       public_str = "";
-    if (type === Keys.Type.masterKey) {
+    if (type === C_Keys.Type.masterKey) {
       private_str = dir.keys + "/master-private.pem";
       public_str = dir.keys + "/master-public.pem";
-    } else if (type === Keys.Type.nodeKey) {
+    } else if (type === C_Keys.Type.nodeKey) {
       private_str = dir.keys + "/node-private.pem";
       public_str = dir.keys + "/node-public.pem";
     } else {

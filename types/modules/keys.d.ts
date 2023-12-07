@@ -1,2 +1,3 @@
 import { Keys } from "../types";
-export declare function createKeyPair(type: Keys.Type, prefix: string, length?: Keys.InitialParams["keylength"]): Promise<boolean>;
+import { C_Keys } from "@dogma-project/constants-meta";
+export declare function createKeyPair(type: C_Keys.Type, prefix: string, length?: Keys.InitialParams["keylength"]): Promise<boolean>;

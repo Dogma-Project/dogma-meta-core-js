@@ -1,22 +1,22 @@
 import logger from "../modules/logger";
 import StateManager from "../modules/state";
-import { Event } from "../types";
+import { C_Event } from "@dogma-project/constants-meta";
 
 const stateManager = new StateManager([
-  Event.Type.server,
-  Event.Type.storageUser,
-  Event.Type.storageNode,
-  Event.Type.configDb,
-  Event.Type.nodesDb,
-  Event.Type.usersDb,
-  Event.Type.messagesDb,
-  Event.Type.localDiscovery,
-  Event.Type.dirStatus,
-  Event.Type.dhtService,
+  C_Event.Type.server,
+  C_Event.Type.storageUser,
+  C_Event.Type.storageNode,
+  C_Event.Type.configDb,
+  C_Event.Type.nodesDb,
+  C_Event.Type.usersDb,
+  C_Event.Type.messagesDb,
+  C_Event.Type.localDiscovery,
+  C_Event.Type.dirStatus,
+  C_Event.Type.dhtService,
 ]);
 
-stateManager.subscribe([Event.Type.services], ([services]) => {
-  const lel = stateManager.state[Event.Type.localDiscovery];
+stateManager.subscribe([C_Event.Type.services], ([services]) => {
+  const lel = stateManager.state[C_Event.Type.localDiscovery];
   logger.debug("TEST", "services", services);
 });
 

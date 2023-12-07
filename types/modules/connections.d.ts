@@ -2,12 +2,13 @@ import { onConnect, closeConnectionByNodeId, closeConnectionsByUserId, sendReque
 import * as Types from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
+import { C_Streams } from "@dogma-project/constants-meta";
 /** @module Connections */
 declare class Connections {
     protected stateBridge: StateManager;
     protected storageBridge: Storage;
     protected handlers: {
-        [key in Types.Streams.MX]?: Types.Streams.DataHandler;
+        [key in C_Streams.MX]?: Types.Streams.DataHandler;
     };
     constructor({ state, storage }: {
         state: StateManager;

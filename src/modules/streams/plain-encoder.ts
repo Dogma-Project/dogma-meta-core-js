@@ -1,6 +1,6 @@
 import internal, { Transform, TransformCallback } from "node:stream";
 import logger from "../logger";
-import { Streams } from "../../types";
+import { C_Streams } from "@dogma-project/constants-meta";
 
 type StreamEncoderParams = {
   id: number;
@@ -14,7 +14,7 @@ class PlainEncoder extends Transform {
   constructor(params: StreamEncoderParams) {
     // add out of range exception
     super(params.opts);
-    this.ss = Buffer.alloc(Streams.SIZES.MX, params.id);
+    this.ss = Buffer.alloc(C_Streams.SIZES.MX, params.id);
     this.id = params.id;
   }
 
@@ -24,7 +24,7 @@ class PlainEncoder extends Transform {
     callback: TransformCallback
   ) {
     try {
-      const len = Buffer.alloc(Streams.SIZES.LEN, 0);
+      const len = Buffer.alloc(C_Streams.SIZES.LEN, 0);
       len.writeUInt16BE(chunk.length);
       const result = Buffer.concat(
         [this.ss, len, chunk],

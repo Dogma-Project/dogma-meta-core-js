@@ -1,7 +1,13 @@
 import net from "node:net";
 import crypto from "node:crypto";
 import EventEmitter from "node:events";
-
+import {
+  C_Connection,
+  C_Streams,
+  C_Keys,
+  C_Event,
+  C_Constants,
+} from "@dogma-project/constants-meta";
 import * as Types from "../types";
 import generateSyncId from "./generateSyncId";
 import logger from "./logger";
@@ -33,9 +39,9 @@ class DogmaSocket extends EventEmitter {
 
   private decoder?: Decoder;
 
-  public readonly direction: Types.Connection.Direction;
-  status: Types.Connection.Status = Types.Connection.Status.notConnected;
-  group: Types.Connection.Group = Types.Connection.Group.unknown;
+  public readonly direction: C_Connection.Direction;
+  status: C_Connection.Status = C_Connection.Status.notConnected;
+  group: C_Connection.Group = C_Connection.Group.unknown;
 
   private readonly outSession: string;
   private inSession?: string;
@@ -56,7 +62,7 @@ class DogmaSocket extends EventEmitter {
 
   constructor(
     socket: net.Socket,
-    direction: Types.Connection.Direction,
+    direction: C_Connection.Direction,
     state: StateManager,
     storage: Storage
   ) {
@@ -74,13 +80,13 @@ class DogmaSocket extends EventEmitter {
     this.socket.on("error", this.onError);
     this.input = {
       handshake: new PlainEncoder({
-        id: Types.Streams.MX.handshake,
+        id: C_Streams.MX.handshake,
       }),
     };
     this.input.handshake.pipe(this.socket); // unencrypted
-    this.status = Types.Connection.Status.connected;
+    this.status = C_Connection.Status.connected;
     this.setDecoder();
-    this.sendHandshake(Types.Connection.Handshake.Stage.init);
+    this.sendHandshake(C_Connection.Stage.init);
     const host = socket.remoteAddress;
     const port = socket.remotePort;
     const family = socket.remoteFamily;
@@ -101,8 +107,8 @@ class DogmaSocket extends EventEmitter {
     if (!this.storageBridge.node.privateKey) return; // edit
     const privateNodeKey = crypto.createPrivateKey({
       key: this.storageBridge.node.privateKey,
-      type: Types.Keys.FORMATS.TYPE,
-      format: Types.Keys.FORMATS.FORMAT,
+      type: C_Keys.FORMATS.TYPE,
+      format: C_Keys.FORMATS.FORMAT,
     });
     this.decoder = new Decoder(privateNodeKey);
     this.decoder.symmetricKey = this.inSymmetricKey;
@@ -117,7 +123,7 @@ class DogmaSocket extends EventEmitter {
       return logger.error("Socket", "Rsa key didn't set");
     }
     this.input.key = new RsaEncoder({
-      id: Types.Streams.MX.key,
+      id: C_Streams.MX.key,
       publicKey: this.publicNodeKey,
     });
     this.input.key.pipe(this.socket);
@@ -129,31 +135,31 @@ class DogmaSocket extends EventEmitter {
     }
 
     this.input.test = new AesEncoder({
-      id: Types.Streams.MX.test,
+      id: C_Streams.MX.test,
       symmetricKey: this.outSymmetricKey,
     });
     this.input.test.pipe(this.socket);
 
     this.input.control = new AesEncoder({
-      id: Types.Streams.MX.control,
+      id: C_Streams.MX.control,
       symmetricKey: this.outSymmetricKey,
     });
     this.input.control.pipe(this.socket);
 
     this.input.messages = new AesEncoder({
-      id: Types.Streams.MX.messages,
+      id: C_Streams.MX.messages,
       symmetricKey: this.outSymmetricKey,
     });
     this.input.messages.pipe(this.socket);
 
     this.input.mail = new AesEncoder({
-      id: Types.Streams.MX.mail,
+      id: C_Streams.MX.mail,
       symmetricKey: this.outSymmetricKey,
     });
     this.input.mail.pipe(this.socket);
 
     this.input.dht = new AesEncoder({
-      id: Types.Streams.MX.dht,
+      id: C_Streams.MX.dht,
       symmetricKey: this.outSymmetricKey,
     });
     this.input.dht.pipe(this.socket);
@@ -167,12 +173,12 @@ class DogmaSocket extends EventEmitter {
       // own user
       if (this.node_id === this.storageBridge.node.id) {
         // own node
-        this.group = Types.Connection.Group.selfNode;
+        this.group = C_Connection.Group.selfNode;
       } else {
-        this.group = Types.Connection.Group.selfUser;
+        this.group = C_Connection.Group.selfUser;
       }
     } else {
-      const users = this.stateBridge.state[Types.Event.Type.users] as
+      const users = this.stateBridge.state[C_Event.Type.users] as
         | Types.User.Model[]
         | undefined;
       if (!users || !Array.isArray(users)) {
@@ -180,9 +186,9 @@ class DogmaSocket extends EventEmitter {
       }
       const inFriends = users.find((user) => user.user_id === this.user_id);
       if (inFriends) {
-        this.group = Types.Connection.Group.friends;
+        this.group = C_Connection.Group.friends;
       } else {
-        this.group = Types.Connection.Group.all;
+        this.group = C_Connection.Group.all;
       }
     }
   }
@@ -192,7 +198,7 @@ class DogmaSocket extends EventEmitter {
   }
 
   private test() {
-    this.input.test && this.input.test.write(Types.Constants.Messages.test);
+    this.input.test && this.input.test.write(C_Constants.Messages.test);
   }
 
   private sendSymmetricKey() {
@@ -225,7 +231,7 @@ class DogmaSocket extends EventEmitter {
     return verification.verify(publicKey, sign, "hex");
   }
 
-  private sendHandshake(stage: Types.Connection.Handshake.Stage) {
+  private sendHandshake(stage: C_Connection.Stage) {
     if (!this.input) return logger.warn("Socket", "Input is not defined"); // edit
     if (!this.storageBridge.user.privateKey) return;
     if (!this.storageBridge.node.privateKey) return;
@@ -234,7 +240,7 @@ class DogmaSocket extends EventEmitter {
     if (!this.storageBridge.user.id) return;
     if (!this.storageBridge.node.id) return;
 
-    if (stage === Types.Connection.Handshake.Stage.init) {
+    if (stage === C_Connection.Stage.init) {
       const request: Types.Connection.Handshake.StageInitRequest = {
         stage,
         protocol: 2,
@@ -243,7 +249,7 @@ class DogmaSocket extends EventEmitter {
         node_id: this.storageBridge.node.id,
       };
       this.input.handshake.write(JSON.stringify(request));
-    } else if (stage === Types.Connection.Handshake.Stage.verification) {
+    } else if (stage === C_Connection.Stage.verification) {
       if (this.inSession === undefined) {
         return logger.warn("Socket", "unknown inSession");
       }
@@ -281,14 +287,12 @@ class DogmaSocket extends EventEmitter {
 
       if (parsed.stage === undefined) return; // edit
 
-      if (parsed.stage === Types.Connection.Handshake.Stage.init) {
+      if (parsed.stage === C_Connection.Stage.init) {
         this.inSession = parsed.session;
         this.unverified_user_id = parsed.user_id;
         this.unverified_node_id = parsed.node_id;
-        this.sendHandshake(Types.Connection.Handshake.Stage.verification);
-      } else if (
-        parsed.stage === Types.Connection.Handshake.Stage.verification
-      ) {
+        this.sendHandshake(C_Connection.Stage.verification);
+      } else if (parsed.stage === C_Connection.Stage.verification) {
         try {
           const publicUserKey = crypto.createPublicKey(parsed.userKey); // edit
           const publicNodeKey = crypto.createPublicKey(parsed.nodeKey); // edit
@@ -349,7 +353,7 @@ class DogmaSocket extends EventEmitter {
 
   protected handleTest(data: Buffer) {
     const msg = data.toString();
-    if (msg === Types.Constants.Messages.test) {
+    if (msg === C_Constants.Messages.test) {
       this.tested = true;
       this.afterTest();
     } else {

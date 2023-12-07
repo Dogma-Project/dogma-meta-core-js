@@ -1,6 +1,6 @@
 import { getArg } from "./arguments";
 import { DEFAULTS } from "../constants";
-import * as Types from "../types";
+import { C_System } from "@dogma-project/constants-meta";
 
 /** @module Logger */
 
@@ -31,7 +31,7 @@ import * as Types from "../types";
 // BgWhite = "\x1b[47m"
 
 const logLevel = () => {
-  const logLevel = getArg(Types.System.Args.loglevel);
+  const logLevel = getArg(C_System.Args.loglevel);
   return logLevel === null ? DEFAULTS.LOG_LEVEL : logLevel;
 };
 
@@ -41,7 +41,7 @@ const logLevel = () => {
  * @param message
  */
 const dogmaError = (type: string, ...message: any) => {
-  if (logLevel() < Types.System.LogLevel.errors) return;
+  if (logLevel() < C_System.LogLevel.errors) return;
   type = type.toUpperCase();
   console.error(`\x1b[31m\x1b[40m[${type}]\x1b[0m`, ...message); // red
 };
@@ -52,7 +52,7 @@ const dogmaError = (type: string, ...message: any) => {
  * @param message
  */
 const dogmaWarning = (type: string, ...message: any) => {
-  if (logLevel() < Types.System.LogLevel.warnings) return;
+  if (logLevel() < C_System.LogLevel.warnings) return;
   type = type.toUpperCase();
   console.warn(`\x1b[33m\x1b[40m[${type}]\x1b[0m`, ...message); // yellow
 };
@@ -63,7 +63,7 @@ const dogmaWarning = (type: string, ...message: any) => {
  * @param message
  */
 const dogmaInfo = (type: string, ...message: any) => {
-  if (logLevel() < Types.System.LogLevel.info) return;
+  if (logLevel() < C_System.LogLevel.info) return;
   type = type.toUpperCase();
   console.info(`\x1b[32m\x1b[40m[${type}]\x1b[0m`, ...message); // blue
 };
@@ -74,7 +74,7 @@ const dogmaInfo = (type: string, ...message: any) => {
  * @param message
  */
 const dogmaLog = (type: string, ...message: any) => {
-  if (logLevel() < Types.System.LogLevel.logs) return;
+  if (logLevel() < C_System.LogLevel.logs) return;
   type = type.toUpperCase();
   console.log(`\x1b[36m\x1b[40m[${type}]\x1b[0m`, ...message); // black
 };
@@ -85,7 +85,7 @@ const dogmaLog = (type: string, ...message: any) => {
  * @param message
  */
 const dogmaDebug = (type: string, ...message: any) => {
-  if (logLevel() < Types.System.LogLevel.debug) return;
+  if (logLevel() < C_System.LogLevel.debug) return;
   type = type.toUpperCase();
   console.debug(`\x1b[35m\x1b[40m[${type}]\x1b[0m`, ...message); //
 };

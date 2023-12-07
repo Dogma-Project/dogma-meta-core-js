@@ -1,11 +1,12 @@
-import { Event, System, Config, Constants } from "../types";
+import { Event, Config } from "../types";
 import logger from "./logger";
+import { C_Event, C_System, C_Constants } from "@dogma-project/constants-meta";
 
-type MapPredicate<T> = T extends Event.Type.Service
-  ? System.States
-  : T extends Event.Type.Config
+type MapPredicate<T> = T extends C_Event.Type.Service
+  ? C_System.States
+  : T extends C_Event.Type.Config
   ? Config.Value<T>
-  : T extends Event.Type.Services
+  : T extends C_Event.Type.Services
   ? Event.ServicesList
   : any;
 
@@ -23,13 +24,13 @@ type Listener<U extends ReadonlyArray<any>> = (
 ) => void;
 
 class StateManager {
-  constructor(private services: Event.Type.Service[] = []) {}
+  constructor(private services: C_Event.Type.Service[] = []) {}
 
   private listeners: {
-    [index: string]: [Event.Type[], any][];
+    [index: string]: [C_Event.Type[], any][];
   } = {};
   public state: {
-    [key in Event.Type]?: MapPredicate<key>;
+    [key in C_Event.Type]?: MapPredicate<key>;
   } = {};
   private trigger = Symbol("trigger");
 
@@ -38,7 +39,7 @@ class StateManager {
    * @param '[array of events]'
    * @param '([array of payloads], type?, action?)'
    */
-  public subscribe = <T extends Event.Type, U extends ReadonlyArray<T>>(
+  public subscribe = <T extends C_Event.Type, U extends ReadonlyArray<T>>(
     type: [...U],
     callback: Listener<U>
   ) => {
@@ -53,22 +54,22 @@ class StateManager {
    * @param type
    * @param payload Any payload
    */
-  public emit(type: Event.Type.ConfigBool, payload: boolean): void;
-  public emit(type: Event.Type.ConfigStr, payload: string): void;
-  public emit(type: Event.Type.ConfigNum, payload: number): void;
+  public emit(type: C_Event.Type.ConfigBool, payload: boolean): void;
+  public emit(type: C_Event.Type.ConfigStr, payload: string): void;
+  public emit(type: C_Event.Type.ConfigNum, payload: number): void;
   public emit(
-    type: Event.Type.Config,
+    type: C_Event.Type.Config,
     payload: number | string | boolean
   ): void;
-  public emit(type: Event.Type.Service, payload: System.States): void;
-  public emit(type: Event.Type.Services, payload: Event.ServicesList): void;
-  public emit(type: Event.Type.Storage, payload: any): void;
-  public emit(type: Event.Type.Action, payload: any): void;
-  public emit(type: Event.Type, payload: typeof this.trigger): void;
-  public emit(type: Event.Type, payload: any) {
-    let action: Event.Action = Event.Action.update;
+  public emit(type: C_Event.Type.Service, payload: C_System.States): void;
+  public emit(type: C_Event.Type.Services, payload: Event.ServicesList): void;
+  public emit(type: C_Event.Type.Storage, payload: any): void;
+  public emit(type: C_Event.Type.Action, payload: any): void;
+  public emit(type: C_Event.Type, payload: typeof this.trigger): void;
+  public emit(type: C_Event.Type, payload: any) {
+    let action: C_Event.Action = C_Event.Action.update;
     if (this.state[type] === undefined) {
-      action = Event.Action.set;
+      action = C_Event.Action.set;
     }
     if (payload !== this.trigger) {
       if (JSON.stringify(this.state[type]) === JSON.stringify(payload)) return;
@@ -81,15 +82,16 @@ class StateManager {
     if (this.listeners[type] === undefined) {
       return logger.debug("state", "There's no handlers for event", type);
     }
-    if (this.services.indexOf(type as Event.Type.Service) > -1) {
+    if (this.services.indexOf(type as C_Event.Type.Service) > -1) {
       // edit
       const services = this.services.map((type) => {
         return {
           service: type,
-          state: (this.state[type] as System.States) || System.States.disabled,
+          state:
+            (this.state[type] as C_System.States) || C_System.States.disabled,
         };
       });
-      this.emit(Event.Type.services, services);
+      this.emit(C_Event.Type.services, services);
     }
     this.listeners[type].forEach((entry) => {
       if (!entry.length) return;
@@ -102,7 +104,7 @@ class StateManager {
     });
   }
 
-  public enforce(type: Event.Type) {
+  public enforce(type: C_Event.Type) {
     this.emit(type, this.trigger);
   }
 }

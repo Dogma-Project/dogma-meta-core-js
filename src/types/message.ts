@@ -1,32 +1,23 @@
-import { Connection } from "./connection";
-import { Streams } from "./streams";
+import {
+  C_Streams,
+  C_Connection,
+  C_Message,
+} from "@dogma-project/constants-meta";
 
 export namespace Message {
-  export enum Type {
-    direct = 0,
-    user = 1,
-    chat = 2,
-  }
-  export enum Action {
-    send = 0,
-    sync = 1,
-    edit = 2,
-    delete = 3,
-  }
-
   export type Model = {
     id: string;
     sync_id: string;
     text: string;
-    direction: Connection.Direction;
+    direction: C_Connection.Direction;
     format: number; // edit
-    type: Type;
+    type: C_Message.Type;
   };
 
   export namespace Send {
     export interface Request {
-      type: Type;
-      action: Action.send;
+      type: C_Message.Type;
+      action: C_Message.Action.send;
       data: Request.Data;
     }
     export namespace Request {
@@ -36,8 +27,8 @@ export namespace Message {
 
   export namespace Delete {
     export interface Request {
-      type: Type;
-      action: Action.delete;
+      type: C_Message.Type;
+      action: C_Message.Action.delete;
       data: Request.Data;
     }
     export namespace Request {
@@ -47,7 +38,7 @@ export namespace Message {
 
   export type Requests = Send.Request | Delete.Request;
   export type Abstract = {
-    class: Streams.MX.messages;
+    class: C_Streams.MX.messages;
     body: Requests;
   };
 }

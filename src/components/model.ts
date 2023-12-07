@@ -1,6 +1,7 @@
+import { C_Event, C_Connection, C_System } from "@dogma-project/constants-meta";
+
 import stateManager from "./state";
 import storage from "./storage";
-import { Connection, Event, System, Constants } from "../types";
 import {
   ConfigModel,
   NodeModel,
@@ -21,9 +22,9 @@ const dhtModel = new DHTModel({ state: stateManager });
 const userModel = new UserModel({ state: stateManager });
 
 stateManager.subscribe(
-  [Event.Type.start, Event.Type.dirStatus, Event.Type.prefix],
+  [C_Event.Type.start, C_Event.Type.dirStatus, C_Event.Type.prefix],
   ([start, homeDir, prefix]) => {
-    if (homeDir === System.States.full) {
+    if (homeDir === C_System.States.full) {
       configModel.init(prefix);
       nodeModel.init(prefix);
       dhtModel.init(prefix);
@@ -32,52 +33,52 @@ stateManager.subscribe(
   }
 );
 
-stateManager.subscribe([Event.Type.configDb], async ([configDb]) => {
+stateManager.subscribe([C_Event.Type.configDb], async ([configDb]) => {
   try {
     switch (configDb) {
-      case System.States.ready:
-      case System.States.reload:
+      case C_System.States.ready:
+      case C_System.States.reload:
         await configModel.loadConfigTable();
         break;
-      case System.States.empty:
+      case C_System.States.empty:
         logger.info("CONFIG MODEL", "DB is empty");
-        if (getArg(System.Args.auto)) {
+        if (getArg(C_System.Args.auto)) {
           logger.log("CONFIG MODEL", "auto generation with defaults");
           await configModel.persistConfig([
             {
-              param: Event.Type.configRouter,
-              value: getArg(System.Args.port) || DEFAULTS.ROUTER,
+              param: C_Event.Type.configRouter,
+              value: getArg(C_System.Args.port) || DEFAULTS.ROUTER,
             },
             {
-              param: Event.Type.configAutoDefine,
+              param: C_Event.Type.configAutoDefine,
               value: true,
             },
             {
-              param: Event.Type.configDhtAnnounce,
-              value: Connection.Group.friends,
+              param: C_Event.Type.configDhtAnnounce,
+              value: C_Connection.Group.friends,
             },
             {
-              param: Event.Type.configDhtLookup,
-              value: Connection.Group.friends,
+              param: C_Event.Type.configDhtLookup,
+              value: C_Connection.Group.friends,
             },
             {
-              param: Event.Type.configDhtBootstrap,
-              value: Connection.Group.friends,
+              param: C_Event.Type.configDhtBootstrap,
+              value: C_Connection.Group.friends,
             },
             {
-              param: Event.Type.configExternal,
+              param: C_Event.Type.configExternal,
               value: DEFAULTS.EXTERNAL,
             },
             {
-              param: Event.Type.configLocalDiscovery,
+              param: C_Event.Type.configLocalDiscovery,
               value: true,
             },
           ]);
         }
         break;
-      case System.States.limited:
-      case System.States.ok:
-      case System.States.full:
+      case C_System.States.limited:
+      case C_System.States.ok:
+      case C_System.States.full:
         // ok
         break;
       default:
@@ -90,16 +91,16 @@ stateManager.subscribe([Event.Type.configDb], async ([configDb]) => {
 });
 
 stateManager.subscribe(
-  [Event.Type.usersDb, Event.Type.storageUser],
+  [C_Event.Type.usersDb, C_Event.Type.storageUser],
   async ([usersDb, storageUser]) => {
     switch (usersDb) {
-      case System.States.ready:
-      case System.States.reload:
+      case C_System.States.ready:
+      case C_System.States.reload:
         userModel.loadUsersTable();
         break;
-      case System.States.empty:
+      case C_System.States.empty:
         logger.info("USER MODEL", "DB is empty");
-        if (storageUser === System.States.full) {
+        if (storageUser === C_System.States.full) {
           logger.log("USER MODEL", "insert own user into database");
           await userModel.persistUsers([
             {
@@ -109,9 +110,9 @@ stateManager.subscribe(
           ]);
         }
         break;
-      case System.States.limited:
-      case System.States.ok:
-      case System.States.full:
+      case C_System.States.limited:
+      case C_System.States.ok:
+      case C_System.States.full:
         // ok
         break;
       default:
@@ -122,18 +123,18 @@ stateManager.subscribe(
 );
 
 stateManager.subscribe(
-  [Event.Type.nodesDb, Event.Type.storageNode, Event.Type.storageUser],
+  [C_Event.Type.nodesDb, C_Event.Type.storageNode, C_Event.Type.storageUser],
   async ([nodesDb, storageNode, storageUser]) => {
     switch (nodesDb) {
-      case System.States.ready:
-      case System.States.reload:
+      case C_System.States.ready:
+      case C_System.States.reload:
         nodeModel.loadNodesTable();
         break;
-      case System.States.empty:
+      case C_System.States.empty:
         logger.info("NODE MODEL", "DB is empty");
         if (
-          storageNode === System.States.full &&
-          storageUser === System.States.full
+          storageNode === C_System.States.full &&
+          storageUser === C_System.States.full
         ) {
           logger.log("NODE MODEL", "insert own node into database");
           await nodeModel.persistNodes([
@@ -145,9 +146,9 @@ stateManager.subscribe(
           ]);
         }
         break;
-      case System.States.limited:
-      case System.States.ok:
-      case System.States.full:
+      case C_System.States.limited:
+      case C_System.States.ok:
+      case C_System.States.full:
         // ok
         break;
       default:

@@ -4,8 +4,7 @@ import * as Types from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
 import Connections from "./connections";
-
-/** @module Client */
+import { C_Event } from "@dogma-project/constants-meta";
 
 export default class Client {
   connectionsBridge: Connections;
@@ -56,7 +55,7 @@ export default class Client {
     const connectNonFriends = true;
 
     if (!connectNonFriends) {
-      const users = this.stateBridge.state[Types.Event.Type.users] as
+      const users = this.stateBridge.state[C_Event.Type.users] as
         | Types.User.Model[]
         | undefined;
       if (!users || !Array.isArray(users)) return;

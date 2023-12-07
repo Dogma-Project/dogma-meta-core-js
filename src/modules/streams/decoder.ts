@@ -2,6 +2,7 @@ import { EventEmitter } from "node:stream";
 import crypto from "node:crypto";
 import { Streams } from "../../types";
 import logger from "../logger";
+import { C_Streams } from "@dogma-project/constants-meta";
 
 class Decoder extends EventEmitter {
   private privateKey: crypto.KeyLike;
@@ -19,10 +20,10 @@ class Decoder extends EventEmitter {
     if (this.buffer.length === 0) return;
     this.decoding = true;
     try {
-      const mx = this.buffer.subarray(0, Streams.SIZES.MX).readUInt8(0);
-      const offset = Streams.SIZES.MX + Streams.SIZES.LEN;
+      const mx = this.buffer.subarray(0, C_Streams.SIZES.MX).readUInt8(0);
+      const offset = C_Streams.SIZES.MX + C_Streams.SIZES.LEN;
       const len = this.buffer
-        .subarray(Streams.SIZES.MX, offset)
+        .subarray(C_Streams.SIZES.MX, offset)
         .readUInt16BE(0);
       let packet = this.buffer.subarray(offset, len + offset);
 
@@ -47,13 +48,13 @@ class Decoder extends EventEmitter {
       let data: Buffer = Buffer.alloc(0);
 
       // decrypt
-      if (mx === Streams.MX.key) {
+      if (mx === C_Streams.MX.key) {
         if (!this.privateKey) {
           this.decoding = false;
           return logger.warn("Decrypt", "Private key not ready");
         }
         data = crypto.privateDecrypt(this.privateKey, packet);
-      } else if (mx === Streams.MX.handshake) {
+      } else if (mx === C_Streams.MX.handshake) {
         // plain
         data = packet;
       } else {

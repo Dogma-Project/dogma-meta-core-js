@@ -1,8 +1,8 @@
+import { C_Event, C_System } from "@dogma-project/constants-meta";
 import LocalDiscovery from "../modules/localDiscovery";
 import logger from "../modules/logger";
 import stateManager from "./state";
 import { DEFAULTS } from "../constants";
-import * as Types from "../types";
 import storage from "./storage";
 
 const disc = new LocalDiscovery({
@@ -10,23 +10,20 @@ const disc = new LocalDiscovery({
   ip: "",
 });
 disc.on("ready", (data) => {
-  stateManager.emit(Types.Event.Type.localDiscovery, Types.System.States.full);
+  stateManager.emit(C_Event.Type.localDiscovery, C_System.States.full);
   logger.info("Local discovery server", "ready", data);
 });
 disc.on("error", (data) => {
-  stateManager.emit(Types.Event.Type.localDiscovery, Types.System.States.error);
+  stateManager.emit(C_Event.Type.localDiscovery, C_System.States.error);
   logger.error("Local discovery server", "error", data);
 });
 disc.on("stop", () => {
-  stateManager.emit(
-    Types.Event.Type.localDiscovery,
-    Types.System.States.disabled
-  );
+  stateManager.emit(C_Event.Type.localDiscovery, C_System.States.disabled);
   logger.info("Local discovery server", "stopped");
 });
 
 stateManager.subscribe(
-  [Types.Event.Type.configLocalDiscovery, Types.Event.Type.start],
+  [C_Event.Type.configLocalDiscovery, C_Event.Type.start],
   ([configLocalDiscovery]) => {
     if (!!configLocalDiscovery) {
       disc.startServer();
@@ -37,15 +34,11 @@ stateManager.subscribe(
 );
 
 stateManager.subscribe(
-  [
-    Types.Event.Type.server,
-    Types.Event.Type.configRouter,
-    Types.Event.Type.localDiscovery,
-  ],
+  [C_Event.Type.server, C_Event.Type.configRouter, C_Event.Type.localDiscovery],
   ([server, configRouter, localDiscovery]) => {
     if (
-      server >= Types.System.States.limited &&
-      localDiscovery === Types.System.States.full
+      server >= C_System.States.limited &&
+      localDiscovery === C_System.States.full
     ) {
       if (!configRouter) return logger.warn("Local discovery", "Unknown port");
       disc.announce({

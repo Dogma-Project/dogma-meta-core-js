@@ -1,7 +1,7 @@
 import internal, { Transform, TransformCallback } from "node:stream";
 import crypto from "node:crypto";
 import logger from "../logger";
-import { Streams } from "../../types";
+import { C_Streams } from "@dogma-project/constants-meta";
 
 type StreamEncoderParams = {
   id: number;
@@ -17,7 +17,7 @@ class RsaEncoder extends Transform {
   constructor(params: StreamEncoderParams) {
     // add out of range exception
     super(params.opts);
-    this.ss = Buffer.alloc(Streams.SIZES.MX, params.id);
+    this.ss = Buffer.alloc(C_Streams.SIZES.MX, params.id);
     this.id = params.id;
     this.publicKey = params.publicKey;
   }
@@ -29,7 +29,7 @@ class RsaEncoder extends Transform {
   ) {
     try {
       chunk = crypto.publicEncrypt(this.publicKey, chunk);
-      const len = Buffer.alloc(Streams.SIZES.LEN, 0);
+      const len = Buffer.alloc(C_Streams.SIZES.LEN, 0);
       len.writeUInt16BE(chunk.length);
       const result = Buffer.concat(
         [this.ss, len, chunk],

@@ -3,23 +3,30 @@
 import { Keys, State, Model, Types, Connections, System } from "../index";
 import { DEFAULTS } from "../constants";
 import logger from "../modules/logger";
-import assert from "node:assert";
+import {
+  C_Event,
+  C_System,
+  C_Streams,
+  C_Message,
+  C_Keys,
+  C_Connection,
+} from "@dogma-project/constants-meta";
 
 const testPrefix = "test-1";
 
-State.stateManager.subscribe([Types.Event.Type.services], ([services]) => {
+State.stateManager.subscribe([C_Event.Type.services], ([services]) => {
   logger.debug("TEST", "services", services);
 });
 
 /**
  * Test messages
  */
-State.stateManager.subscribe([Types.Event.Type.online], ([online]) => {
+State.stateManager.subscribe([C_Event.Type.online], ([online]) => {
   const message: Types.Request = {
-    class: Types.Streams.MX.messages,
+    class: C_Streams.MX.messages,
     body: {
-      type: Types.Message.Type.direct,
-      action: Types.Message.Action.send,
+      type: C_Message.Type.direct,
+      action: C_Message.Action.send,
       data: {
         text: "ok",
       },
@@ -74,39 +81,33 @@ const main = async () => {
   try {
     State.storage.user.name = "Test user";
     State.storage.node.name = "Test node";
-    await Keys.createKeyPair(Types.Keys.Type.masterKey, testPrefix, 2048);
-    State.stateManager.emit(
-      Types.Event.Type.masterKey,
-      Types.System.States.ready
-    );
-    await Keys.createKeyPair(Types.Keys.Type.nodeKey, testPrefix, 1024);
-    State.stateManager.emit(
-      Types.Event.Type.nodeKey,
-      Types.System.States.ready
-    );
+    await Keys.createKeyPair(C_Keys.Type.masterKey, testPrefix, 2048);
+    State.stateManager.emit(C_Event.Type.masterKey, C_System.States.ready);
+    await Keys.createKeyPair(C_Keys.Type.nodeKey, testPrefix, 1024);
+    State.stateManager.emit(C_Event.Type.nodeKey, C_System.States.ready);
     await Model.configModel.persistConfig([
       {
-        param: Types.Event.Type.configRouter,
+        param: C_Event.Type.configRouter,
         value: 34601,
       },
       {
-        param: Types.Event.Type.configAutoDefine,
+        param: C_Event.Type.configAutoDefine,
         value: DEFAULTS.AUTO_DEFINE_IP,
       },
       {
-        param: Types.Event.Type.configDhtAnnounce,
-        value: Types.Connection.Group.friends,
+        param: C_Event.Type.configDhtAnnounce,
+        value: C_Connection.Group.friends,
       },
       {
-        param: Types.Event.Type.configDhtLookup,
-        value: Types.Connection.Group.friends,
+        param: C_Event.Type.configDhtLookup,
+        value: C_Connection.Group.friends,
       },
       {
-        param: Types.Event.Type.configDhtBootstrap,
-        value: Types.Connection.Group.friends,
+        param: C_Event.Type.configDhtBootstrap,
+        value: C_Connection.Group.friends,
       },
       {
-        param: Types.Event.Type.configExternal,
+        param: C_Event.Type.configExternal,
         value: DEFAULTS.EXTERNAL,
       },
     ]);
@@ -117,8 +118,8 @@ const main = async () => {
 
 System.run(testPrefix);
 
-State.stateManager.subscribe([Types.Event.Type.dirStatus], ([homeDir]) => {
-  if (homeDir === Types.System.States.full) {
+State.stateManager.subscribe([C_Event.Type.dirStatus], ([homeDir]) => {
+  if (homeDir === C_System.States.full) {
     main()
       .then(() => {
         logger.debug("TEST", "Start test passed!");
@@ -127,7 +128,7 @@ State.stateManager.subscribe([Types.Event.Type.dirStatus], ([homeDir]) => {
         logger.error("TEST", err);
         logger.debug("TEST", "Start test not passed!");
       });
-  } else if (homeDir === Types.System.States.empty) {
-    State.stateManager.emit(Types.Event.Type.prefix, testPrefix);
+  } else if (homeDir === C_System.States.empty) {
+    State.stateManager.emit(C_Event.Type.prefix, testPrefix);
   }
 });

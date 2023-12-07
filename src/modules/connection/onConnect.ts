@@ -3,12 +3,13 @@ import logger from "../logger";
 import * as Types from "../../types";
 import ConnectionClass from "../connections";
 import DogmaSocket from "../socket";
+import { C_Connection, C_Event } from "@dogma-project/constants-meta";
 
 export default function onConnect(
   this: ConnectionClass,
   socket: net.Socket,
   peer: Types.Connection.Peer, // check
-  direction: Types.Connection.Direction = Types.Connection.Direction.outcoming
+  direction: C_Connection.Direction = C_Connection.Direction.outcoming
 ) {
   const dogmaSocket = new DogmaSocket(
     socket,
@@ -19,7 +20,7 @@ export default function onConnect(
   dogmaSocket.on("offline", () => {
     const { node_id } = dogmaSocket;
     if (!!node_id) {
-      this.stateBridge.emit(Types.Event.Type.offline, node_id);
+      this.stateBridge.emit(C_Event.Type.offline, node_id);
       const index = this.online.indexOf(node_id);
       if (index !== -1) {
         this.online.splice(index, 1);
@@ -30,7 +31,7 @@ export default function onConnect(
   dogmaSocket.on("online", () => {
     const { node_id } = dogmaSocket;
     if (!!node_id) {
-      this.stateBridge.emit(Types.Event.Type.online, node_id);
+      this.stateBridge.emit(C_Event.Type.online, node_id);
       this.online.push(node_id);
       logger.info("connection", "ONLINE", node_id);
     }

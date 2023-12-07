@@ -1,6 +1,4 @@
 import os from "node:os";
-import { getArg } from "./arguments";
-import { System } from "../types";
 
 type datadir = {
   main: string;

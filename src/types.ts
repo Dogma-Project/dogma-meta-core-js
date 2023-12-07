@@ -1,7 +1,6 @@
 import { Certificate } from "./types/certificate";
 import { Config } from "./types/config";
 import { Connection } from "./types/connection";
-import { Constants } from "./types/constants";
 import { DHT } from "./types/dht";
 import { Discovery } from "./types/discovery";
 import { Event } from "./types/event";
@@ -12,7 +11,6 @@ import { Node } from "./types/node";
 import { Response } from "./types/response";
 import { Streams } from "./types/streams";
 import { Sync } from "./types/sync";
-import { System } from "./types/system";
 import { User } from "./types/user";
 
 declare global {
@@ -29,7 +27,6 @@ export {
   Certificate,
   Config,
   Connection,
-  Constants,
   DHT,
   Discovery,
   Event,
@@ -40,6 +37,5 @@ export {
   Response,
   Streams,
   Sync,
-  System,
   User,
 };

@@ -6,6 +6,7 @@ import DogmaSocket from "./socket";
 import StateManager from "./state";
 import Connections from "./connections";
 import { DHTModel } from "./model";
+import { C_Connection, C_DHT } from "@dogma-project/constants-meta";
 type DHTParams = {
     connections: Connections;
     state: StateManager;
@@ -18,7 +19,7 @@ declare class DHT extends EventEmitter {
     storageBridge: Storage;
     modelBridge: DHTModel;
     permissions: {
-        [key in Types.DHT.Type]: Types.Connection.Group;
+        [key in C_DHT.Type]: C_Connection.Group;
     };
     peers: DogmaSocket[];
     constructor({ storage, state, connections, model }: DHTParams);
@@ -27,7 +28,7 @@ declare class DHT extends EventEmitter {
      * @param {Array} peers array of active connections
      */
     setPeers(peers: DogmaSocket[]): void;
-    setPermission(type: Types.DHT.Type, level: Types.Connection.Group): void;
+    setPermission(type: C_DHT.Type, level: C_Connection.Group): void;
     announce(port: number): void;
     private handleAnnounce;
     lookup(user_id: Types.User.Id, node_id?: Types.Node.Id): void;

@@ -3,6 +3,7 @@ import logger from "../logger";
 import * as Types from "../../types";
 import Connections from "../connections";
 import response from "./response";
+import { C_Streams } from "@dogma-project/constants-meta";
 
 export default function send(
   this: Connections,
@@ -14,11 +15,11 @@ export default function send(
     const socket = this.getConnectionByNodeId(node_id);
     if (!socket) return response(1, MSG_CODE.UNKNOWN, "user is offline"); // edit
     switch (request.class) {
-      case Types.Streams.MX.dht:
+      case C_Streams.MX.dht:
         var str = JSON.stringify(request.body);
         socket.input.dht && socket.input.dht.write(str);
         return response(1, MSG_CODE.SUCCESS);
-      case Types.Streams.MX.messages:
+      case C_Streams.MX.messages:
         var str = JSON.stringify(request.body);
         socket.input.messages && socket.input.messages.write(str);
         return response(1, MSG_CODE.SUCCESS);

@@ -1,4 +1,5 @@
 import ConnectionClass from "../connections";
+import { C_Streams } from "@dogma-project/constants-meta";
 import { Streams } from "../../types";
 
 /**
@@ -9,7 +10,7 @@ import { Streams } from "../../types";
  */
 export default function on(
   this: ConnectionClass,
-  event: Streams.MX,
+  event: C_Streams.MX,
   handler: Streams.DataHandler
 ) {
   this.handlers[event] = handler;

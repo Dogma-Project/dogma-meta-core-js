@@ -4,6 +4,7 @@ import { getDatadir } from "../datadir";
 import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 import * as Types from "../../types";
+import { C_Event, C_System, C_Message } from "@dogma-project/constants-meta";
 
 class MessageModel implements Model {
   stateBridge: StateManager;
@@ -25,10 +26,7 @@ class MessageModel implements Model {
         fieldName: "sync_id",
         unique: true,
       });
-      this.stateBridge.emit(
-        Types.Event.Type.messagesDb,
-        Types.System.States.ready
-      );
+      this.stateBridge.emit(C_Event.Type.messagesDb, C_System.States.ready);
     } catch (err) {
       logger.error("messages.nedb", err);
     }
@@ -68,7 +66,7 @@ class MessageModel implements Model {
   }
 
   async push(params: Types.Message.Model) {
-    params.type = params.type || Types.Message.Type.direct;
+    params.type = params.type || C_Message.Type.direct;
     return this.db.insertAsync(params);
   }
 

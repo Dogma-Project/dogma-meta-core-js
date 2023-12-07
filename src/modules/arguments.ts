@@ -1,10 +1,9 @@
-import { System } from "../types";
 const args = process.argv.slice(2);
-
+import { C_System } from "@dogma-project/constants-meta";
 type value = string | number | boolean | null;
 
 type Cache = {
-  [key in System.Args]?: value;
+  [key in C_System.Args]?: value;
 };
 
 const cache: Cache = {};
@@ -14,12 +13,12 @@ const cache: Cache = {};
  * @param type
  * @returns
  */
-export function getArg(type: System.Args.auto): boolean | null;
-export function getArg(type: System.Args.discovery): boolean | null;
-export function getArg(type: System.Args.port): number | null;
-export function getArg(type: System.Args.loglevel): number | null;
-export function getArg(type: System.Args.prefix): string | null;
-export function getArg(type: System.Args): value {
+export function getArg(type: C_System.Args.auto): boolean | null;
+export function getArg(type: C_System.Args.discovery): boolean | null;
+export function getArg(type: C_System.Args.port): number | null;
+export function getArg(type: C_System.Args.loglevel): number | null;
+export function getArg(type: C_System.Args.prefix): string | null;
+export function getArg(type: C_System.Args): value {
   const cached = cache[type];
   if (cached !== undefined) return cached;
   let result;
@@ -49,6 +48,6 @@ export function getArg(type: System.Args): value {
  * @param type
  * @param value
  */
-export function setArg(type: System.Args, value: value) {
+export function setArg(type: C_System.Args, value: value) {
   cache[type] = value;
 }

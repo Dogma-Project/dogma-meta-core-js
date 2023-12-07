@@ -1,6 +1,7 @@
 import * as Types from "../../types";
 import logger from "../logger";
 import DogmaSocket from "../socket";
+import { C_Streams } from "@dogma-project/constants-meta";
 
 export default function onData(
   this: DogmaSocket,
@@ -8,21 +9,21 @@ export default function onData(
 ) {
   const { mx, data } = result;
   switch (mx) {
-    case Types.Streams.MX.handshake:
+    case C_Streams.MX.handshake:
       this.handleHandshake(data);
       break;
-    case Types.Streams.MX.key:
+    case C_Streams.MX.key:
       this.handleSymmetricKey(data);
       break;
-    case Types.Streams.MX.test:
+    case C_Streams.MX.test:
       this.handleTest(data);
       break;
-    case Types.Streams.MX.dht:
-    case Types.Streams.MX.control:
-    case Types.Streams.MX.messages:
-    case Types.Streams.MX.mail:
-    case Types.Streams.MX.web:
-    case Types.Streams.MX.file:
+    case C_Streams.MX.dht:
+    case C_Streams.MX.control:
+    case C_Streams.MX.messages:
+    case C_Streams.MX.mail:
+    case C_Streams.MX.web:
+    case C_Streams.MX.file:
       this.emit("data", result);
       break;
     default:

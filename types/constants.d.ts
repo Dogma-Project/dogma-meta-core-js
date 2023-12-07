@@ -1,21 +1,3 @@
-export declare const API: {
-    OK: number;
-    CANNOTGETCERT: number;
-    INVALIDCERT: number;
-    ADDCERTERROR: number;
-    CREATEDBERROR: number;
-    GETCONFIGERROR: number;
-    CONFIGSAVEERROR: number;
-    CANNOTGETMSG: number;
-    CANNOTPUSHMSG: number;
-    CANNOTGETFRIENDS: number;
-    CANNOTCREATEMK: number;
-    CANNOTCREATENK: number;
-    CANNOTGETSERVICES: number;
-    CANNOTGETCONNECTIONS: number;
-    CANNOTDELETEFRIEND: number;
-    CANNOTDELETEITSELF: number;
-};
 /**
  * @constant
  * @type {Object}
@@ -52,9 +34,6 @@ export declare const MSG_CODE: {
     UNKNOWN: number;
     SUCCESS: number;
     CONFIRMED: number;
-};
-export declare const DESCRIPTOR: {
-    SIZE: number;
 };
 export declare const ATTACHMENTS: {
     FILE: number;

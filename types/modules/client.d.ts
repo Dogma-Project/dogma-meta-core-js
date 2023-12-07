@@ -2,7 +2,6 @@ import * as Types from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
 import Connections from "./connections";
-/** @module Client */
 export default class Client {
     connectionsBridge: Connections;
     stateBridge: StateManager;

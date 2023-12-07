@@ -1,20 +1,19 @@
-import { Event } from "./event";
-import { Constants } from "./constants";
+import { C_Event } from "@dogma-project/constants-meta";
 
 export namespace Config {
-  export type Value<T extends Event.Type.Config> =
-    T extends Event.Type.ConfigStr
+  export type Value<T extends C_Event.Type.Config> =
+    T extends C_Event.Type.ConfigStr
       ? string
-      : T extends Event.Type.ConfigBool
+      : T extends C_Event.Type.ConfigBool
       ? boolean
-      : T extends Event.Type.ConfigNum
+      : T extends C_Event.Type.ConfigNum
       ? number
       : never;
 
   export namespace Model {
     export type Row = {
-      param: Event.Type.Config;
-      value: Value<Event.Type.Config>;
+      param: C_Event.Type.Config;
+      value: Value<C_Event.Type.Config>;
     };
   }
   export type Model = Model.Row | Model.Row[];

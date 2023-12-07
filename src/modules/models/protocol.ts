@@ -4,7 +4,7 @@ import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 import Model from "./_model";
 import StateManager from "../state";
-import { PROTOCOL } from "../../constants";
+import { C_Event, C_System } from "@dogma-project/constants-meta";
 
 class ProtocolModel implements Model {
   stateBridge: StateManager;
@@ -25,10 +25,7 @@ class ProtocolModel implements Model {
       //   fieldName: "param",
       //   unique: true,
       // });
-      this.stateBridge.emit(
-        Types.Event.Type.protocolDb,
-        Types.System.States.ready
-      );
+      this.stateBridge.emit(C_Event.Type.protocolDb, C_System.States.ready);
     } catch (err) {
       logger.error("protocol.nedb", err);
     }

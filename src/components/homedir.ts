@@ -1,34 +1,34 @@
 import stateManager from "./state";
-import { Event, System } from "../types";
 import checkHomeDir from "../modules/checkHomeDir";
 import logger from "../modules/logger";
+import { C_Event, C_System } from "@dogma-project/constants-meta";
 
-stateManager.subscribe([Event.Type.start], () => {
-  stateManager.emit(Event.Type.dirStatus, System.States.ready);
+stateManager.subscribe([C_Event.Type.start], () => {
+  stateManager.emit(C_Event.Type.dirStatus, C_System.States.ready);
   // trigger prefix
 });
 
 stateManager.subscribe(
-  [Event.Type.dirStatus, Event.Type.prefix],
+  [C_Event.Type.dirStatus, C_Event.Type.prefix],
   ([dirStatus, prefix]) => {
-    const state = dirStatus as System.States;
+    const state = dirStatus as C_System.States;
     switch (state) {
-      case System.States.ready:
-      case System.States.reload:
+      case C_System.States.ready:
+      case C_System.States.reload:
         checkHomeDir(prefix)
           .then(() => {
-            stateManager.emit(Event.Type.dirStatus, System.States.full);
+            stateManager.emit(C_Event.Type.dirStatus, C_System.States.full);
           })
           .catch((err: Error | number) => {
             if (err === 1) {
-              stateManager.emit(Event.Type.dirStatus, System.States.empty);
+              stateManager.emit(C_Event.Type.dirStatus, C_System.States.empty);
             } else {
               logger.error("Home Dir", err);
-              stateManager.emit(Event.Type.dirStatus, System.States.error);
+              stateManager.emit(C_Event.Type.dirStatus, C_System.States.error);
             }
           });
         break;
-      case System.States.empty:
+      case C_System.States.empty:
         logger.log("Home Dir", "Prefix is empty");
         break;
       default:

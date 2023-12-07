@@ -4,7 +4,7 @@ import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 import Model from "./_model";
 import StateManager from "../state";
-
+import { C_Event, C_System } from "@dogma-project/constants-meta";
 class ConfigModel implements Model {
   stateBridge: StateManager;
 
@@ -25,10 +25,7 @@ class ConfigModel implements Model {
         fieldName: "param",
         unique: true,
       });
-      this.stateBridge.emit(
-        Types.Event.Type.configDb,
-        Types.System.States.ready
-      );
+      this.stateBridge.emit(C_Event.Type.configDb, C_System.States.ready);
     } catch (err) {
       logger.error("config.nedb", err);
     }
@@ -67,15 +64,9 @@ class ConfigModel implements Model {
         /**
          * @todo edit empty fields check
          */
-        this.stateBridge.emit(
-          Types.Event.Type.configDb,
-          Types.System.States.full
-        );
+        this.stateBridge.emit(C_Event.Type.configDb, C_System.States.full);
       } else {
-        this.stateBridge.emit(
-          Types.Event.Type.configDb,
-          Types.System.States.empty
-        );
+        this.stateBridge.emit(C_Event.Type.configDb, C_System.States.empty);
       }
     } catch (err) {
       logger.error("config.nedb", err);
@@ -92,7 +83,7 @@ class ConfigModel implements Model {
       await this.db.updateAsync({ param: row.param }, row, { upsert: true });
       this.stateBridge.emit(row.param, row.value);
     }
-    this.stateBridge.emit(Types.Event.Type.configDb, Types.System.States.full);
+    this.stateBridge.emit(C_Event.Type.configDb, C_System.States.full);
   }
 }
 

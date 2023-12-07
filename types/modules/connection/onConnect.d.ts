@@ -2,5 +2,6 @@
 import net from "node:net";
 import * as Types from "../../types";
 import ConnectionClass from "../connections";
+import { C_Connection } from "@dogma-project/constants-meta";
 export default function onConnect(this: ConnectionClass, socket: net.Socket, peer: Types.Connection.Peer, // check
-direction?: Types.Connection.Direction): void;
+direction?: C_Connection.Direction): void;

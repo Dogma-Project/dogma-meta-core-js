@@ -1,7 +1,8 @@
 // process.env.prefix = "test-1";
 
 import { Keys, State, Model, Types, Connections, System } from "../index";
-import { DEFAULTS } from "../constants";
+import { C_Defaults } from "@dogma-project/constants-meta";
+
 import logger from "../modules/logger";
 import {
   C_Event,
@@ -88,11 +89,11 @@ const main = async () => {
     await Model.configModel.persistConfig([
       {
         param: C_Event.Type.configRouter,
-        value: 34601,
+        value: C_Defaults.router + 10000,
       },
       {
         param: C_Event.Type.configAutoDefine,
-        value: DEFAULTS.AUTO_DEFINE_IP,
+        value: C_Defaults.autoDefineIp,
       },
       {
         param: C_Event.Type.configDhtAnnounce,
@@ -108,7 +109,7 @@ const main = async () => {
       },
       {
         param: C_Event.Type.configExternal,
-        value: DEFAULTS.EXTERNAL,
+        value: C_Defaults.external,
       },
     ]);
   } catch (err) {

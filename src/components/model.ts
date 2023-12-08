@@ -14,7 +14,7 @@ import {
 } from "../modules/model";
 import logger from "../modules/logger";
 import { getArg } from "../modules/arguments";
-import { DEFAULTS } from "../constants";
+import { C_Defaults } from "@dogma-project/constants-meta";
 
 const configModel = new ConfigModel({ state: stateManager });
 const nodeModel = new NodeModel({ state: stateManager });
@@ -47,11 +47,11 @@ stateManager.subscribe([C_Event.Type.configDb], async ([configDb]) => {
           await configModel.persistConfig([
             {
               param: C_Event.Type.configRouter,
-              value: getArg(C_System.Args.port) || DEFAULTS.ROUTER,
+              value: getArg(C_System.Args.port) || C_Defaults.router,
             },
             {
               param: C_Event.Type.configAutoDefine,
-              value: true,
+              value: C_Defaults.autoDefineIp,
             },
             {
               param: C_Event.Type.configDhtAnnounce,
@@ -67,11 +67,11 @@ stateManager.subscribe([C_Event.Type.configDb], async ([configDb]) => {
             },
             {
               param: C_Event.Type.configExternal,
-              value: DEFAULTS.EXTERNAL,
+              value: C_Defaults.external,
             },
             {
               param: C_Event.Type.configLocalDiscovery,
-              value: true,
+              value: C_Defaults.localDiscovery,
             },
           ]);
         }

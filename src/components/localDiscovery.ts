@@ -1,12 +1,11 @@
-import { C_Event, C_System } from "@dogma-project/constants-meta";
+import { C_Event, C_System, C_Defaults } from "@dogma-project/constants-meta";
 import LocalDiscovery from "../modules/localDiscovery";
 import logger from "../modules/logger";
 import stateManager from "./state";
-import { DEFAULTS } from "../constants";
 import storage from "./storage";
 
 const disc = new LocalDiscovery({
-  port: DEFAULTS.LOCAL_DISCOVERY_PORT,
+  port: C_Defaults.localDiscoveryPort,
   ip: "",
 });
 disc.on("ready", (data) => {

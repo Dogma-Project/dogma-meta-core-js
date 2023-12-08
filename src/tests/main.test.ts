@@ -2,9 +2,9 @@ process.env.loglevel = "1";
 process.env.prefix = "test-0";
 
 import { describe, it } from "node:test";
+import { Keys, State, Model, System } from "../index";
+import { C_Defaults } from "@dogma-project/constants-meta";
 
-import { Keys, State, Model, Types, System } from "../index";
-import { DEFAULTS } from "../constants";
 import {
   C_Event,
   C_System,
@@ -31,11 +31,11 @@ describe("Functional test", () => {
     await Model.configModel.persistConfig([
       {
         param: C_Event.Type.configRouter,
-        value: 34601,
+        value: C_Defaults.router + 10000,
       },
       {
         param: C_Event.Type.configAutoDefine,
-        value: DEFAULTS.AUTO_DEFINE_IP,
+        value: C_Defaults.autoDefineIp,
       },
       {
         param: C_Event.Type.configDhtAnnounce,
@@ -51,11 +51,11 @@ describe("Functional test", () => {
       },
       {
         param: C_Event.Type.configExternal,
-        value: DEFAULTS.EXTERNAL,
+        value: C_Defaults.external,
       },
       {
         param: C_Event.Type.configLocalDiscovery,
-        value: true,
+        value: C_Defaults.localDiscovery,
       },
     ]);
     await Model.configModel.persistConfig({

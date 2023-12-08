@@ -1,6 +1,5 @@
 import { getArg } from "./arguments";
-import { DEFAULTS } from "../constants";
-import { C_System } from "@dogma-project/constants-meta";
+import { C_System, C_Defaults } from "@dogma-project/constants-meta";
 
 /** @module Logger */
 
@@ -32,7 +31,7 @@ import { C_System } from "@dogma-project/constants-meta";
 
 const logLevel = () => {
   const logLevel = getArg(C_System.Args.loglevel);
-  return logLevel === null ? DEFAULTS.LOG_LEVEL : logLevel;
+  return logLevel === null ? C_Defaults.logLevel : logLevel;
 };
 
 /**

@@ -1,16 +1,16 @@
 import * as Types from "../types";
-import { DEFAULTS } from "../constants";
+import { C_Defaults } from "@dogma-project/constants-meta";
 
 class Storage {
   node: Types.Node.Storage = {
     id: null,
-    name: DEFAULTS.NODE_NAME,
+    name: C_Defaults.nodeName,
     privateKey: null,
     publicKey: null,
   };
   user: Types.User.Storage = {
     id: null,
-    name: DEFAULTS.USER_NAME,
+    name: C_Defaults.userName,
     privateKey: null,
     publicKey: null,
   };

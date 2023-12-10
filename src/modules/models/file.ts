@@ -8,6 +8,7 @@ import { C_Event, C_System } from "@dogma-project/constants-meta";
 
 class FileModel implements Model {
   stateBridge: StateManager;
+  encrypt: boolean = false; // edit
   db!: Datastore;
 
   constructor({ state }: { state: StateManager }) {

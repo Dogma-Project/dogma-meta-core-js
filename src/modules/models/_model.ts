@@ -4,6 +4,8 @@ import StateManager from "../state";
 export default interface Model {
   db: Datastore;
   stateBridge: StateManager;
-  init: (prefix: string) => void;
+  encrypt: boolean;
+  encryptionKey?: string;
+  init: (prefix: string, encryptionKey?: string) => void;
   getAll: () => Promise<Record<string, any>[]>;
 }

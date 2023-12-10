@@ -6,21 +6,39 @@ import Datastore from "@seald-io/nedb";
 import Model from "./_model";
 import StateManager from "../state";
 import { C_Event, C_System, C_Sync } from "@dogma-project/constants-meta";
+import EncryptDb from "./dbEncryption/afterSerialization";
+import DecryptDb from "./dbEncryption/beforeDeserialization";
+// import generateCryptoKey from "./dbEncryption/generateCryptoKey";
 
 class UserModel implements Model {
   stateBridge: StateManager;
   db!: Datastore;
+  encrypt = true;
 
   constructor({ state }: { state: StateManager }) {
     this.stateBridge = state;
   }
 
-  async init(prefix: string) {
+  async init(prefix: string, encryptionKey?: string) {
     try {
       logger.log("nedb", "load database", "users");
       this.db = new Datastore({
         filename: getDatadir(prefix).nedb + "/users.db",
         timestampData: true,
+        afterSerialization: (str) => {
+          if (encryptionKey && this.encrypt) {
+            return EncryptDb(str, encryptionKey);
+          } else {
+            return str;
+          }
+        },
+        beforeDeserialization: (str) => {
+          if (encryptionKey) {
+            return DecryptDb(str, encryptionKey);
+          } else {
+            return str;
+          }
+        },
       });
       await this.db.loadDatabaseAsync();
       await this.db.ensureIndexAsync({

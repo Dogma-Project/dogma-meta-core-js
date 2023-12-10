@@ -5,10 +5,11 @@ import StateManager from "../state";
 declare class NodeModel implements Model {
     stateBridge: StateManager;
     db: Datastore;
+    encrypt: boolean;
     constructor({ state }: {
         state: StateManager;
     });
-    init(prefix: string): Promise<void>;
+    init(prefix: string, encryptionKey?: string): Promise<void>;
     getAll(): Promise<Record<string, any>[]>;
     loadNodesTable(): Promise<void>;
     getByUserId(user_id: User.Id): Promise<Record<string, any>[]>;

@@ -4,6 +4,7 @@ import logger from "./logger";
 import fs from "node:fs";
 import { getDatadir } from "./datadir";
 import { C_Keys } from "@dogma-project/constants-meta";
+import generateCryptoKey from "./models/dbEncryption/generateCryptoKey";
 
 type result = {
   publicKey: crypto.KeyObject;
@@ -63,5 +64,45 @@ export async function createKeyPair(
   } catch (err) {
     logger.error("keys", err);
     return Promise.reject(err);
+  }
+}
+
+export async function readOrCreateEncryptionKey(
+  prefix: string,
+  publicKey: Buffer,
+  privateKey: Buffer
+) {
+  const dir = getDatadir(prefix);
+  try {
+    const privateMasterKey = crypto.createPrivateKey({
+      key: privateKey,
+      type: C_Keys.FORMATS.TYPE,
+      format: C_Keys.FORMATS.FORMAT,
+    });
+    const key = await fs.promises.readFile(dir.keys + "/encryption.key");
+    if (!key || !key.length) throw { code: "ENOENT" };
+    const result = crypto.privateDecrypt(privateMasterKey, key);
+    return result.toString();
+  } catch (err: any) {
+    if (err.code === "ENOENT") {
+      try {
+        const publicMasterKey = crypto.createPublicKey({
+          key: publicKey,
+          type: C_Keys.FORMATS.TYPE,
+          format: C_Keys.FORMATS.FORMAT,
+        });
+        const unencryped = generateCryptoKey(32); // edit;
+        const buffer = Buffer.from(unencryped, "utf-8");
+        const encrypted = crypto.publicEncrypt(publicMasterKey, buffer);
+        await fs.promises.writeFile(dir.keys + "/encryption.key", encrypted);
+        return unencryped;
+      } catch (err2: any) {
+        logger.error("KEYS 1", err);
+        return Promise.reject(err2);
+      }
+    } else {
+      logger.error("KEYS", err);
+      return Promise.reject(err);
+    }
   }
 }

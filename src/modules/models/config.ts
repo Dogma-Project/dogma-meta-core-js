@@ -7,7 +7,7 @@ import StateManager from "../state";
 import { C_Event, C_System } from "@dogma-project/constants-meta";
 class ConfigModel implements Model {
   stateBridge: StateManager;
-
+  encrypt: boolean = false;
   db!: Datastore;
 
   constructor({ state }: { state: StateManager }) {

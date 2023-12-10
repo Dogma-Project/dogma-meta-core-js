@@ -1,16 +1,16 @@
 {
   "name": "@dogma-project/core-meta",
-  "version": "0.5.26",
+  "version": "0.6.1",
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
   "scripts": {
     "start": "tsc && node dist/run.js",
-    "auto": "tsc && NODE_ENV=development node dist/run.js --loglevel=5 --auto=true --master=dogma_user --node=dogma_node",
+    "auto": "tsc && NODE_ENV=development node dist/run.js --loglevel=3 --auto=true --master=dogma_user --node=dogma_node",
     "auto2": "tsc && NODE_ENV=development node dist/run.js --loglevel=5 --auto=true --port=24602 --prefix=second  --master=user --node=node",
     "empty": "tsc && NODE_ENV=development node dist/run.js --loglevel=4 --prefix=empty",
     "test": "tsc && NODE_ENV=test node --test dist/",
-    "main-test": "tsc && NODE_ENV=development node dist/tests/main.js --loglevel=5"
+    "main-test": "tsc && NODE_ENV=development node dist/tests/main.js --loglevel=4"
   },
   "author": {
     "name": "Rotegott",
@@ -35,7 +35,7 @@
     "email": "rotegott@dogma-project.org"
   },
   "dependencies": {
-    "@dogma-project/constants-meta": "^0.5.4",
+    "@dogma-project/constants-meta": "^0.5.5",
     "@seald-io/nedb": "^4.0.2",
     "ext-ip": "^0.3.9"
   },

@@ -5,7 +5,7 @@ import storage from "./storage";
 import { getDatadir } from "../modules/datadir";
 import logger from "../modules/logger";
 import { getArg } from "../modules/arguments";
-import { createKeyPair } from "../modules/keys";
+import { createKeyPair, readOrCreateEncryptionKey } from "../modules/keys";
 import { createSha256Hash } from "../modules/hash";
 import { C_Event, C_System, C_Keys } from "@dogma-project/constants-meta";
 
@@ -45,6 +45,19 @@ stateManager.subscribe(
         storage.user.id = createSha256Hash(storage.user.publicKey);
         stateManager.emit(C_Event.Type.storageUser, C_System.States.full);
       }
+      logger.log("KEYS", "Loading encryption key.");
+      readOrCreateEncryptionKey(
+        prefix,
+        storage.user.publicKey!,
+        storage.user.privateKey!
+      )
+        .then((res) => {
+          logger.log("ENCRYPTION KEY", "loaded");
+          stateManager.emit(C_Event.Type.encryptionKey, res);
+        })
+        .catch((err) => {
+          logger.error("ENCRYPTION KEY", "NOT LOADED", err);
+        });
     }
   }
 );

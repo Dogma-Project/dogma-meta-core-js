@@ -5,6 +5,7 @@ import Model from "./_model";
 import { C_DHT } from "@dogma-project/constants-meta";
 declare class DHTModel implements Model {
     stateBridge: StateManager;
+    encrypt: boolean;
     db: Datastore;
     constructor({ state }: {
         state: StateManager;

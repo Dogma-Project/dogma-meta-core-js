@@ -8,6 +8,7 @@ import { C_Event, C_System, C_Message } from "@dogma-project/constants-meta";
 
 class MessageModel implements Model {
   stateBridge: StateManager;
+  encrypt: boolean = true;
   db!: Datastore;
 
   constructor({ state }: { state: StateManager }) {

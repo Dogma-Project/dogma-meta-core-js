@@ -21,14 +21,33 @@ const nodeModel = new NodeModel({ state: stateManager });
 const dhtModel = new DHTModel({ state: stateManager });
 const userModel = new UserModel({ state: stateManager });
 
+/**
+ * Init not encrypted databases
+ */
 stateManager.subscribe(
   [C_Event.Type.start, C_Event.Type.dirStatus, C_Event.Type.prefix],
   ([start, homeDir, prefix]) => {
     if (homeDir === C_System.States.full) {
-      configModel.init(prefix);
-      nodeModel.init(prefix);
       dhtModel.init(prefix);
-      userModel.init(prefix);
+      configModel.init(prefix);
+    }
+  }
+);
+
+/**
+ * Init encrypted databases
+ */
+stateManager.subscribe(
+  [
+    C_Event.Type.start,
+    C_Event.Type.dirStatus,
+    C_Event.Type.prefix,
+    C_Event.Type.encryptionKey,
+  ],
+  ([start, dirStatus, prefix, encryptionKey]) => {
+    if (dirStatus === C_System.States.full) {
+      userModel.init(prefix, encryptionKey);
+      nodeModel.init(prefix, encryptionKey);
     }
   }
 );

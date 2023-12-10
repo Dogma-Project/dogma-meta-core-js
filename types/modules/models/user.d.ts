@@ -5,10 +5,11 @@ import StateManager from "../state";
 declare class UserModel implements Model {
     stateBridge: StateManager;
     db: Datastore;
+    encrypt: boolean;
     constructor({ state }: {
         state: StateManager;
     });
-    init(prefix: string): Promise<void>;
+    init(prefix: string, encryptionKey?: string): Promise<void>;
     getAll(): Promise<Record<string, any>[]>;
     loadUsersTable(): Promise<void>;
     /**

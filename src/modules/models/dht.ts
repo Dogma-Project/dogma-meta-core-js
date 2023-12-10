@@ -5,8 +5,10 @@ import Model from "./_model";
 import { getDatadir } from "../datadir";
 import logger from "../logger";
 import { C_Event, C_System, C_DHT } from "@dogma-project/constants-meta";
+
 class DHTModel implements Model {
   stateBridge: StateManager;
+  encrypt: boolean = false;
   db!: Datastore;
 
   constructor({ state }: { state: StateManager }) {

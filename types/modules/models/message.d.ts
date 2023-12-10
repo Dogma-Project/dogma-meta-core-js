@@ -4,6 +4,7 @@ import Datastore from "@seald-io/nedb";
 import * as Types from "../../types";
 declare class MessageModel implements Model {
     stateBridge: StateManager;
+    encrypt: boolean;
     db: Datastore;
     constructor({ state }: {
         state: StateManager;

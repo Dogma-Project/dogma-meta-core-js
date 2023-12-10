@@ -4,6 +4,7 @@ import Model from "./_model";
 import StateManager from "../state";
 declare class SyncModel implements Model {
     stateBridge: StateManager;
+    encrypt: boolean;
     db: Datastore;
     constructor({ state }: {
         state: StateManager;

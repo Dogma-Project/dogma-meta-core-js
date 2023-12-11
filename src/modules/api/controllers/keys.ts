@@ -1,4 +1,9 @@
-import { C_Event, C_Keys, C_System } from "@dogma-project/constants-meta";
+import {
+  C_API,
+  C_Event,
+  C_Keys,
+  C_System,
+} from "@dogma-project/constants-meta";
 import stateManager from "../../../components/state";
 import storage from "../../../components/storage";
 import { createKeyPair } from "../../keys";
@@ -67,7 +72,7 @@ export default function KeysController(
   data: API.ApiRequest
 ) {
   switch (data.action) {
-    case API.ApiRequestAction.get:
+    case C_API.ApiRequestAction.get:
       // this.response({
       //   type: API.ApiRequestType.keys,
       //   action: API.ApiRequestAction.set,
@@ -76,12 +81,12 @@ export default function KeysController(
       //   },
       // });
       break;
-    case API.ApiRequestAction.set:
+    case C_API.ApiRequestAction.set:
       createKey(data.payload)
         .then((res) => {
           this.response({
-            type: API.ApiRequestType.keys,
-            action: API.ApiRequestAction.result,
+            type: C_API.ApiRequestType.keys,
+            action: C_API.ApiRequestAction.result,
             payload: {
               result: true,
             },

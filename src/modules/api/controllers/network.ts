@@ -2,6 +2,7 @@ import connections from "../../../components/connections";
 import { API } from "../../../types";
 import storage from "../../../components/storage";
 import { nodeModel, userModel } from "../../../components/model";
+import { C_API } from "@dogma-project/constants-meta";
 
 export async function getNetwork() {
   const own_user_id = storage.user.id;
@@ -42,12 +43,12 @@ export default function NetworkController(
   data: API.ApiRequest
 ) {
   switch (data.action) {
-    case API.ApiRequestAction.get:
+    case C_API.ApiRequestAction.get:
       getNetwork()
         .then((res) => {
           this.response({
-            type: API.ApiRequestType.network,
-            action: API.ApiRequestAction.set,
+            type: C_API.ApiRequestType.network,
+            action: C_API.ApiRequestAction.set,
             payload: {
               network: res,
             },

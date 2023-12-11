@@ -1,6 +1,6 @@
 import { API } from "../../../types";
 import stateManager from "../../../components/state";
-import { C_Event } from "@dogma-project/constants-meta";
+import { C_API, C_Event } from "@dogma-project/constants-meta";
 import { configModel } from "../../../components/model";
 import logger from "../../logger";
 
@@ -122,21 +122,21 @@ export default function SettingsController(
   data: API.ApiRequest
 ) {
   switch (data.action) {
-    case API.ApiRequestAction.get:
+    case C_API.ApiRequestAction.get:
       this.response({
-        type: API.ApiRequestType.settings,
-        action: API.ApiRequestAction.set,
+        type: C_API.ApiRequestType.settings,
+        action: C_API.ApiRequestAction.set,
         payload: {
           settings: getConfig(),
         },
       });
       break;
-    case API.ApiRequestAction.set:
+    case C_API.ApiRequestAction.set:
       setConfig(data.payload)
         .then((res) => {
           this.response({
-            type: API.ApiRequestType.settings,
-            action: API.ApiRequestAction.result,
+            type: C_API.ApiRequestType.settings,
+            action: C_API.ApiRequestAction.result,
             payload: {
               settings: res,
             },

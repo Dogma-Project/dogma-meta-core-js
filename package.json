@@ -1,6 +1,6 @@
 {
   "name": "@dogma-project/core-meta",
-  "version": "0.7.12",
+  "version": "0.7.13",
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
   "main": "./dist/manager.js",
   "types": "./types/manager.d.ts",
@@ -37,7 +37,7 @@
     "email": "rotegott@dogma-project.org"
   },
   "dependencies": {
-    "@dogma-project/constants-meta": "^0.5.5",
+    "@dogma-project/constants-meta": "^0.7.1",
     "@seald-io/nedb": "^4.0.2",
     "ext-ip": "^0.3.9",
     "ws": "^8.15.0"

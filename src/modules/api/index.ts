@@ -11,6 +11,7 @@ import {
   SettingsController,
 } from "./controllers";
 import { API } from "../../types";
+import { C_API } from "@dogma-project/constants-meta";
 
 export default class WebSocketApi {
   wss: WebSocketServer;
@@ -96,16 +97,16 @@ export default class WebSocketApi {
       const ws = this as unknown as API.DogmaWebSocket; // edit
       const obj = JSON.parse(data.toString()) as API.ApiRequest;
       switch (obj.type) {
-        case API.ApiRequestType.services:
+        case C_API.ApiRequestType.services:
           ServicesController.call(ws, obj);
           break;
-        case API.ApiRequestType.settings:
+        case C_API.ApiRequestType.settings:
           SettingsController.call(ws, obj);
           break;
-        case API.ApiRequestType.keys:
+        case C_API.ApiRequestType.keys:
           KeysController.call(ws, obj);
           break;
-        case API.ApiRequestType.network:
+        case C_API.ApiRequestType.network:
           NetworkController.call(ws, obj);
           break;
         default:

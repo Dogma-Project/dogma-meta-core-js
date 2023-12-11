@@ -8,6 +8,11 @@ export default function ResponseError(
     message?: string;
   } = {}
 ) {
-  res.writeHead(status, { "Content-Type": "application/json" });
+  res.writeHead(status, {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "*",
+    "Access-Control-Allow-Methods": "*",
+  });
   res.end(JSON.stringify(payload));
 }

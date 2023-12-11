@@ -4,10 +4,12 @@ import ResponseError from "./responses/error";
 import PrefixController from "./controllers/prefix";
 import logger from "../modules/logger";
 import PrefixesController from "./controllers/prefixes";
+import ResponseOptions from "./responses/options";
 
 const Router: RequestListener = (req, res) => {
   try {
     const request = Request(req);
+    if (request.method === "OPTIONS") return ResponseOptions(res);
     switch (request.path[0]) {
       case "prefix":
         PrefixController(request, res);

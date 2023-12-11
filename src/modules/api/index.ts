@@ -4,7 +4,12 @@ import WebSocket, { WebSocketServer } from "ws";
 import logger from "../logger";
 import generateSyncId from "../generateSyncId";
 import { IncomingMessage } from "node:http";
-import { ServicesController, SettingsController } from "./controllers";
+import {
+  KeysController,
+  NetworkController,
+  ServicesController,
+  SettingsController,
+} from "./controllers";
 import { API } from "../../types";
 
 export default class WebSocketApi {
@@ -96,6 +101,12 @@ export default class WebSocketApi {
           break;
         case API.ApiRequestType.settings:
           SettingsController.call(ws, obj);
+          break;
+        case API.ApiRequestType.keys:
+          KeysController.call(ws, obj);
+          break;
+        case API.ApiRequestType.network:
+          NetworkController.call(ws, obj);
           break;
         default:
           // 405

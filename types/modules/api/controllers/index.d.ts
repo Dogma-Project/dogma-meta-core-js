@@ -1,3 +1,5 @@
 import ServicesController from "./services";
 import SettingsController from "./settings";
-export { ServicesController, SettingsController };
+import KeysController from "./keys";
+import NetworkController from "./network";
+export { ServicesController, SettingsController, KeysController, NetworkController, };

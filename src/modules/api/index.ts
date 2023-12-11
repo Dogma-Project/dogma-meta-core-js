@@ -4,15 +4,13 @@ import WebSocket, { WebSocketServer } from "ws";
 import logger from "../logger";
 import generateSyncId from "../generateSyncId";
 import { IncomingMessage } from "node:http";
-
-interface DogmaWebSocket extends WebSocket {
-  dogmaId: string;
-}
+import { ServicesController, SettingsController } from "./controllers";
+import { API } from "../../types";
 
 export default class WebSocketApi {
   wss: WebSocketServer;
 
-  connections: DogmaWebSocket[] = [];
+  connections: API.DogmaWebSocket[] = [];
 
   private minPort = 25600;
   private maxPort = 25999;
@@ -55,9 +53,7 @@ export default class WebSocketApi {
       }
     );
 
-    this.wss.on("connection", (ws: DogmaWebSocket, request: IncomingMessage) =>
-      this.onConnect(ws, request)
-    );
+    this.wss.on("connection", this.onConnect);
 
     this.wss.on("error", (error: Error) => {
       console.error(error);
@@ -71,19 +67,46 @@ export default class WebSocketApi {
     );
   }
 
-  private onConnect(ws: DogmaWebSocket, request: IncomingMessage) {
+  private onConnect = (ws: API.DogmaWebSocket, request: IncomingMessage) => {
     ws.dogmaId = generateSyncId(6);
+    ws.response = (request: API.ApiRequest) => {
+      ws.send(JSON.stringify(request));
+    };
+    // ws.errorresponse = () => {
+
+    // }
     logger.log("WS SOCKET", "connected", ws.dogmaId);
-    ws.on("error", console.error);
-    ws.on("message", function message(data) {
-      console.log("received: %s", data);
-    });
-    ws.send("something");
+    ws.on("error", this.socketOnError);
+    ws.on("message", this.socketOnMessage);
     ws.on("close", (code: number, reason: Buffer) => {
       logger.log("WS SOCKET", "closed", ws.dogmaId, reason.toString());
       this.connections = this.connections.filter(
         (s) => s.dogmaId !== ws.dogmaId
       );
     });
+  };
+
+  private socketOnMessage(data: WebSocket.RawData) {
+    try {
+      const ws = this as unknown as API.DogmaWebSocket; // edit
+      const obj = JSON.parse(data.toString()) as API.ApiRequest;
+      switch (obj.type) {
+        case API.ApiRequestType.services:
+          ServicesController.call(ws, obj);
+          break;
+        case API.ApiRequestType.settings:
+          SettingsController.call(ws, obj);
+          break;
+        default:
+          // 405
+          break;
+      }
+    } catch (err) {
+      console.error(err);
+    }
   }
+
+  private socketOnError = (err: Error) => {
+    logger.warn("WEB SOCKET", err);
+  };
 }

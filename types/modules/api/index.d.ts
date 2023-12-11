@@ -1,10 +1,8 @@
-import WebSocket, { WebSocketServer } from "ws";
-interface DogmaWebSocket extends WebSocket {
-    dogmaId: string;
-}
+import { WebSocketServer } from "ws";
+import { API } from "../../types";
 export default class WebSocketApi {
     wss: WebSocketServer;
-    connections: DogmaWebSocket[];
+    connections: API.DogmaWebSocket[];
     private minPort;
     private maxPort;
     port: number;
@@ -15,5 +13,6 @@ export default class WebSocketApi {
     constructor(port?: number);
     private getRandomPort;
     private onConnect;
+    private socketOnMessage;
+    private socketOnError;
 }
-export {};

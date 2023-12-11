@@ -1,9 +1,9 @@
-import { IncomingMessage, ServerResponse } from "node:http";
 import { System } from "../../types";
 import ResponseError from "../responses/error";
 import RunWorker from "../../run";
 import { C_System } from "@dogma-project/constants-meta";
 import ResponseOk from "../responses/ok";
+import logger from "../../modules/logger";
 
 const workers: {
   [key: string]: RunWorker;
@@ -37,6 +37,32 @@ function put(req: System.API.Request, res: System.API.Response) {
   }
 }
 
+/**
+ * Stops instance from running
+ * @param req
+ * @param res
+ */
+function del(req: System.API.Request, res: System.API.Response) {
+  const prefix = req.path[1];
+  if (prefix in workers) {
+    workers[prefix]
+      .stop()
+      .then((n) => {
+        delete workers[prefix];
+        ResponseOk(res, {
+          result: "ok",
+          number: n,
+        });
+      })
+      .catch((err) => {
+        logger.error("API", err);
+        ResponseError(res, 500, { message: "Instance stop error" });
+      });
+  } else {
+    ResponseError(res, 402, { message: "Instance is not running" });
+  }
+}
+
 export default function PrefixController(
   req: System.API.Request,
   res: System.API.Response
@@ -50,6 +76,9 @@ export default function PrefixController(
           break;
         case "PUT":
           put(req, res);
+          break;
+        case "DELETE":
+          del(req, res);
           break;
         default:
           ResponseError(res, 405, { message: "Method not allowed" });

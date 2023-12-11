@@ -56,4 +56,8 @@ export default class RunWorker {
 
     // this.worker.postMessage("test");
   }
+
+  public stop() {
+    return this.worker.terminate();
+  }
 }

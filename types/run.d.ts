@@ -28,5 +28,6 @@ export default class RunWorker {
     apiPort?: number;
     name: string;
     constructor(data: WorkerData);
+    stop(): Promise<number>;
 }
 export {};

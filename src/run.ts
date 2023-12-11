@@ -38,14 +38,20 @@ export default class RunWorker {
 
   constructor(data: WorkerData) {
     this.name = data.prefix;
-    this.worker = new Worker(path.resolve("dist/worker.js"), {
+    this.worker = new Worker(path.resolve("./dist/worker.js"), {
       workerData: data,
       env: {},
       name: this.name,
     });
     if (data.apiPort) this.apiPort = data.apiPort;
     this.worker.on("message", (message) => {
-      logger.log("Worker", this.name, message);
+      logger.debug("Worker", this.name, message);
+      if (!message || !message.type) return;
+      switch (message.type) {
+        case "api-port":
+          if (message.payload) this.apiPort = message.payload;
+          break;
+      }
     });
 
     // this.worker.postMessage("test");

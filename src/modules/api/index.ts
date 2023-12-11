@@ -1,4 +1,6 @@
+import { parentPort } from "node:worker_threads";
 import WebSocket, { WebSocketServer } from "ws";
+
 import logger from "../logger";
 import generateSyncId from "../generateSyncId";
 import { IncomingMessage } from "node:http";
@@ -24,26 +26,34 @@ export default class WebSocketApi {
   constructor(port?: number) {
     this.port = port || this.port;
 
-    this.wss = new WebSocketServer({
-      port: this.port,
-      perMessageDeflate: {
-        zlibDeflateOptions: {
-          chunkSize: 1024,
-          memLevel: 7,
-          level: 3,
+    this.wss = new WebSocketServer(
+      {
+        port: this.port,
+        perMessageDeflate: {
+          zlibDeflateOptions: {
+            chunkSize: 1024,
+            memLevel: 7,
+            level: 3,
+          },
+          zlibInflateOptions: {
+            chunkSize: 10 * 1024,
+          },
+          clientNoContextTakeover: true,
+          serverNoContextTakeover: true,
+          serverMaxWindowBits: 10,
+          concurrencyLimit: 10,
+          threshold: 1024,
         },
-        zlibInflateOptions: {
-          chunkSize: 10 * 1024,
-        },
-        clientNoContextTakeover: true,
-        serverNoContextTakeover: true,
-        serverMaxWindowBits: 10,
-        concurrencyLimit: 10,
-        threshold: 1024,
       },
-    });
-
-    logger.info("API", "Starting API at port", this.port);
+      () => {
+        logger.info("API", "WS API started on port:", this.port);
+        parentPort?.postMessage({
+          type: "api-port",
+          action: "set",
+          payload: this.port,
+        });
+      }
+    );
 
     this.wss.on("connection", (ws: DogmaWebSocket, request: IncomingMessage) =>
       this.onConnect(ws, request)

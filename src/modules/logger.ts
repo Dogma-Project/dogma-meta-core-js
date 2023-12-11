@@ -30,7 +30,7 @@ import { C_System, C_Defaults } from "@dogma-project/constants-meta";
 // BgWhite = "\x1b[47m"
 
 const logLevel = () => {
-  return workerData.loglevel || C_Defaults.logLevel;
+  return (workerData && workerData.loglevel) || C_Defaults.logLevel;
 };
 
 const prefix = () => {

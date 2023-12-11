@@ -12,6 +12,7 @@ import { Response } from "./types/response";
 import { Streams } from "./types/streams";
 import { Sync } from "./types/sync";
 import { User } from "./types/user";
+import { System } from "./types/system";
 declare global {
     interface String {
         toPlainHex(): string | null;
@@ -22,4 +23,4 @@ declare global {
     var prefix: string;
 }
 export type Request = DHT.Abstract | Message.Abstract;
-export { Certificate, Config, Connection, DHT, Discovery, Event, File, Keys, Message, Node, Response, Streams, Sync, User, };
+export { Certificate, Config, Connection, DHT, Discovery, Event, File, Keys, Message, Node, Response, Streams, Sync, User, System, };

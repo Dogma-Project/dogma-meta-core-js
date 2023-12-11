@@ -1,9 +1,9 @@
 {
   "name": "@dogma-project/core-meta",
-  "version": "0.7.11",
+  "version": "0.7.12",
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
-  "main": "./dist/index.js",
-  "types": "./types/index.d.ts",
+  "main": "./dist/manager.js",
+  "types": "./types/manager.d.ts",
   "scripts": {
     "manager": "tsc && node dist/dev-manager.js",
     "dev": "apiport=24701 prefix=dev loglevel=3 tsc-watch --onSuccess 'node ./dist/dev.js'",

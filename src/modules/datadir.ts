@@ -1,22 +1,17 @@
 import os from "node:os";
+import path from "node:path";
 
 type datadir = {
   main: string;
   data: string;
   nedb: string;
   keys: string;
-  prefix: string;
 };
 
-/**
- * @todo add cache
- * @param prefix
- * @returns
- */
-export function getDatadir(prefix: string): datadir {
-  const main = os.homedir() + "/.dogma-node";
-  const data = main + `/${prefix}`;
-  const nedb = data + "/nedb";
-  const keys = data + "/keys";
-  return { main, data, nedb, keys, prefix };
+export function getDatadir(): datadir {
+  const main = path.join(os.homedir(), "/.dogma-node");
+  const data = path.join(main, `/${global.prefix}`);
+  const nedb = path.join(data, "/nedb");
+  const keys = path.join(data, "/keys");
+  return { main, data, nedb, keys };
 }

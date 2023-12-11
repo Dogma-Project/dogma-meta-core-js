@@ -19,11 +19,11 @@ class UserModel implements Model {
     this.stateBridge = state;
   }
 
-  async init(prefix: string, encryptionKey?: string) {
+  async init(encryptionKey?: string) {
     try {
       logger.log("nedb", "load database", "users");
       this.db = new Datastore({
-        filename: getDatadir(prefix).nedb + "/users.db",
+        filename: getDatadir().nedb + "/users.db",
         timestampData: true,
         afterSerialization: (str) => {
           if (encryptionKey && this.encrypt) {

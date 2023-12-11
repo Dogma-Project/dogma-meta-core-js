@@ -5,6 +5,6 @@ export default interface Model {
     stateBridge: StateManager;
     encrypt: boolean;
     encryptionKey?: string;
-    init: (prefix: string, encryptionKey?: string) => void;
+    init: (encryptionKey?: string) => void;
     getAll: () => Promise<Record<string, any>[]>;
 }

@@ -14,11 +14,11 @@ class ConfigModel implements Model {
     this.stateBridge = state;
   }
 
-  async init(prefix: string) {
+  async init() {
     try {
       logger.log("nedb", "load database", "config");
       this.db = new Datastore({
-        filename: getDatadir(prefix).nedb + "/config.db",
+        filename: getDatadir().nedb + "/config.db",
       });
       await this.db.loadDatabaseAsync();
       await this.db.ensureIndexAsync({

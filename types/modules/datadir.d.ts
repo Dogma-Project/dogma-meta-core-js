@@ -3,12 +3,6 @@ type datadir = {
     data: string;
     nedb: string;
     keys: string;
-    prefix: string;
 };
-/**
- * @todo add cache
- * @param prefix
- * @returns
- */
-export declare function getDatadir(prefix: string): datadir;
+export declare function getDatadir(): datadir;
 export {};

@@ -9,7 +9,6 @@ export declare function getArg(type: C_System.Args.auto): boolean | null;
 export declare function getArg(type: C_System.Args.discovery): boolean | null;
 export declare function getArg(type: C_System.Args.port): number | null;
 export declare function getArg(type: C_System.Args.loglevel): number | null;
-export declare function getArg(type: C_System.Args.prefix): string | null;
 /**
  * @deprecated
  * @param type

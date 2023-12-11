@@ -1,14 +1,14 @@
 {
   "name": "@dogma-project/core-meta",
-  "version": "0.6.1",
+  "version": "0.7.1",
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
   "scripts": {
-    "start": "tsc && node dist/run.js",
-    "auto": "tsc && NODE_ENV=development node dist/run.js --loglevel=3 --auto=true --master=dogma_user --node=dogma_node",
-    "auto2": "tsc && NODE_ENV=development node dist/run.js --loglevel=5 --auto=true --port=24602 --prefix=second  --master=user --node=node",
-    "empty": "tsc && NODE_ENV=development node dist/run.js --loglevel=4 --prefix=empty",
+    "start": "tsc && node dist/manager.js",
+    "dev": "tsc && prefix=dev node dist/dev.js",
+    "dev2": "tsc && prefix=dev2 node dist/dev.js",
+    "empty": "tsc && node dist/dev.js",
     "test": "tsc && NODE_ENV=test node --test dist/",
     "main-test": "tsc && NODE_ENV=development node dist/tests/main.js --loglevel=4"
   },
@@ -37,10 +37,12 @@
   "dependencies": {
     "@dogma-project/constants-meta": "^0.5.5",
     "@seald-io/nedb": "^4.0.2",
-    "ext-ip": "^0.3.9"
+    "ext-ip": "^0.3.9",
+    "ws": "^8.15.0"
   },
   "devDependencies": {
     "@types/node": "^18.17.1",
+    "@types/ws": "^8.5.10",
     "typescript": "^5.2.2"
   }
 }

@@ -1,3 +1,4 @@
+import { workerData } from "node:worker_threads";
 import Client from "../modules/client";
 import connections from "./connections";
 import localDiscovery from "./localDiscovery";
@@ -6,7 +7,6 @@ import dht from "./dht";
 import * as Types from "../types";
 import storage from "./storage";
 import state from "./state";
-import { getArg } from "../modules/arguments";
 import { C_Event, C_System } from "@dogma-project/constants-meta";
 
 const client = new Client({ connections, state, storage });
@@ -31,7 +31,7 @@ dht.on("peers", (data: Types.DHT.LookUp.Answer.Data[]) => {
 let connectFriendsInterval: NodeJS.Timer | undefined;
 let searchFriendsInterval: NodeJS.Timer | undefined;
 
-if (!getArg(C_System.Args.discovery)) {
+if (!workerData.discovery) {
   /**
    * Try to connect friends
    */

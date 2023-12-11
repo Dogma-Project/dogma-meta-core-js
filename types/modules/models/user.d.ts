@@ -9,7 +9,7 @@ declare class UserModel implements Model {
     constructor({ state }: {
         state: StateManager;
     });
-    init(prefix: string, encryptionKey?: string): Promise<void>;
+    init(encryptionKey?: string): Promise<void>;
     getAll(): Promise<Record<string, any>[]>;
     loadUsersTable(): Promise<void>;
     /**

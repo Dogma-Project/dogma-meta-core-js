@@ -15,11 +15,11 @@ class ProtocolModel implements Model {
     this.stateBridge = state;
   }
 
-  async init(prefix: string) {
+  async init() {
     try {
       logger.log("nedb", "load database", "protocol");
       this.db = new Datastore({
-        filename: getDatadir(prefix).nedb + "/protocol.db",
+        filename: getDatadir().nedb + "/protocol.db",
       });
       await this.db.loadDatabaseAsync();
       // await this.db.ensureIndexAsync({

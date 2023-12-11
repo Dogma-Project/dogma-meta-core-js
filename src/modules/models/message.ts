@@ -15,11 +15,11 @@ class MessageModel implements Model {
     this.stateBridge = state;
   }
 
-  async init(prefix: string) {
+  async init() {
     try {
       logger.log("nedb", "load database", "messages");
       this.db = new Datastore({
-        filename: getDatadir(prefix).nedb + "/messages.db",
+        filename: getDatadir().nedb + "/messages.db",
         timestampData: true,
       });
       await this.db.loadDatabaseAsync();

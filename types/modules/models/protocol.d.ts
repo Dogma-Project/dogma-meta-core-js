@@ -8,7 +8,7 @@ declare class ProtocolModel implements Model {
     constructor({ state }: {
         state: StateManager;
     });
-    init(prefix: string): Promise<void>;
+    init(): Promise<void>;
     getAll(): Promise<Record<string, any>[]>;
 }
 export default ProtocolModel;

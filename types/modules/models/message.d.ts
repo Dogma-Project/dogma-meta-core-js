@@ -9,7 +9,7 @@ declare class MessageModel implements Model {
     constructor({ state }: {
         state: StateManager;
     });
-    init(prefix: string): Promise<void>;
+    init(): Promise<void>;
     getAll(): Promise<Record<string, any>[]>;
     getAllByType(type: number): Promise<Record<string, any>[]>;
     get({ id, since, type }: {

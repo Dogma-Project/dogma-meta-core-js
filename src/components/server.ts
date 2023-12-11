@@ -1,3 +1,4 @@
+import { workerData } from "node:worker_threads";
 import Server from "../modules/server";
 import connections from "./connections";
 import stateManager from "./state";
@@ -5,7 +6,6 @@ import storage from "./storage";
 import * as Types from "../types";
 import logger from "../modules/logger";
 import client from "./client";
-import { getArg } from "../modules/arguments";
 import dht from "./dht";
 import { C_Event, C_System } from "@dogma-project/constants-meta";
 const server = new Server({ connections, storage, state: stateManager });
@@ -60,7 +60,7 @@ stateManager.subscribe(
   ],
   ([configRouter]) => {
     logger.log("DEBUG", "Server start");
-    const forced = getArg(C_System.Args.port);
+    const forced = workerData.routerPort;
     if (forced) logger.log("SERVER", "forced to port", forced);
     server.start(forced || configRouter);
   }
@@ -74,8 +74,7 @@ stateManager.subscribe(
   ],
   ([server, configRouter]) => {
     if (server === C_System.States.ok || server === C_System.States.full) {
-      const forced = getArg(C_System.Args.port);
-      dht.announce(forced || configRouter);
+      dht.announce(workerData.routerPort || configRouter);
     }
   }
 );

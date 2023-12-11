@@ -1,11 +1,13 @@
 import fs from "node:fs";
 import { getDatadir } from "./datadir";
 
-export default function checkHomeDir(prefix: string) {
-  if (!prefix) return Promise.reject(1);
+export default function checkHomeDir() {
   try {
-    const dir = getDatadir(prefix);
-    if (prefix === "empty" || prefix.indexOf("test-") > -1) {
+    const dir = getDatadir();
+    if (
+      global.prefix.indexOf("empty-") > -1 ||
+      global.prefix.indexOf("test-") > -1
+    ) {
       fs.rmSync(dir.data, { recursive: true, force: true });
     }
     if (!fs.existsSync(dir.nedb)) fs.mkdirSync(dir.nedb, { recursive: true });

@@ -18,11 +18,11 @@ class NodeModel implements Model {
     this.stateBridge = state;
   }
 
-  async init(prefix: string, encryptionKey?: string) {
+  async init(encryptionKey?: string) {
     try {
       logger.log("nedb", "load database", "nodes");
       this.db = new Datastore({
-        filename: getDatadir(prefix).nedb + "/nodes.db",
+        filename: getDatadir().nedb + "/nodes.db",
         timestampData: true,
         afterSerialization: (str) => {
           if (encryptionKey && this.encrypt) {

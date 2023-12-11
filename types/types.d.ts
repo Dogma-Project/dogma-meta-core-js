@@ -19,6 +19,7 @@ declare global {
     interface Array<T> {
         unique(): Array<T>;
     }
+    var prefix: string;
 }
 export type Request = DHT.Abstract | Message.Abstract;
 export { Certificate, Config, Connection, DHT, Discovery, Event, File, Keys, Message, Node, Response, Streams, Sync, User, };

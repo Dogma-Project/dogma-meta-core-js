@@ -34,11 +34,10 @@ function _generateKeyPair(
 
 export async function createKeyPair(
   type: C_Keys.Type,
-  prefix: string,
   length: Keys.InitialParams["keylength"] = 2048
 ) {
   try {
-    const dir = getDatadir(prefix);
+    const dir = getDatadir();
     const { publicKey, privateKey } = await _generateKeyPair(length);
     const opts: crypto.KeyExportOptions<"pem"> = {
       type: C_Keys.FORMATS.TYPE,
@@ -68,11 +67,10 @@ export async function createKeyPair(
 }
 
 export async function readOrCreateEncryptionKey(
-  prefix: string,
   publicKey: Buffer,
   privateKey: Buffer
 ) {
-  const dir = getDatadir(prefix);
+  const dir = getDatadir();
   try {
     const privateMasterKey = crypto.createPrivateKey({
       key: privateKey,

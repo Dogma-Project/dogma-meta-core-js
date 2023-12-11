@@ -9,7 +9,7 @@ declare class ConfigModel implements Model {
     constructor({ state }: {
         state: StateManager;
     });
-    init(prefix: string): Promise<void>;
+    init(): Promise<void>;
     loadConfigTable(): Promise<void>;
     getAll(): Promise<Record<string, any>[]>;
     persistConfig(config: Types.Config.Model): Promise<void>;

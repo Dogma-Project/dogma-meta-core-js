@@ -1,3 +1,4 @@
+import { C_System } from "@dogma-project/constants-meta";
 import { Certificate } from "./types/certificate";
 import { Config } from "./types/config";
 import { Connection } from "./types/connection";
@@ -20,6 +21,7 @@ declare global {
   interface Array<T> {
     unique(): Array<T>;
   }
+  var prefix: string;
 }
 
 export type Request = DHT.Abstract | Message.Abstract;

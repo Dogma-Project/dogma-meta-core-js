@@ -10,7 +10,7 @@ declare class DHTModel implements Model {
     constructor({ state }: {
         state: StateManager;
     });
-    init(prefix: string): Promise<void>;
+    init(): Promise<void>;
     getAll(): Promise<Record<string, any>[]>;
     get(params: {
         user_id: Types.User.Id;

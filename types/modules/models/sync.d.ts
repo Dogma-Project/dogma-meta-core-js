@@ -9,7 +9,7 @@ declare class SyncModel implements Model {
     constructor({ state }: {
         state: StateManager;
     });
-    init(prefix: string): Promise<void>;
+    init(): Promise<void>;
     getAll(): Promise<Record<string, any>[]>;
     get(db: string, node_id: Types.Node.Id): Promise<Record<string, any>>;
     confirm(db: string, node_id: Types.Node.Id): Promise<{

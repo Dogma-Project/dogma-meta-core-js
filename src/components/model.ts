@@ -1,3 +1,4 @@
+import { workerData } from "node:worker_threads";
 import { C_Event, C_Connection, C_System } from "@dogma-project/constants-meta";
 
 import stateManager from "./state";
@@ -13,7 +14,6 @@ import {
   SyncModel,
 } from "../modules/model";
 import logger from "../modules/logger";
-import { getArg } from "../modules/arguments";
 import { C_Defaults } from "@dogma-project/constants-meta";
 
 const configModel = new ConfigModel({ state: stateManager });
@@ -25,11 +25,11 @@ const userModel = new UserModel({ state: stateManager });
  * Init not encrypted databases
  */
 stateManager.subscribe(
-  [C_Event.Type.start, C_Event.Type.dirStatus, C_Event.Type.prefix],
-  ([start, homeDir, prefix]) => {
+  [C_Event.Type.start, C_Event.Type.dirStatus],
+  ([start, homeDir]) => {
     if (homeDir === C_System.States.full) {
-      dhtModel.init(prefix);
-      configModel.init(prefix);
+      dhtModel.init();
+      configModel.init();
     }
   }
 );
@@ -38,16 +38,11 @@ stateManager.subscribe(
  * Init encrypted databases
  */
 stateManager.subscribe(
-  [
-    C_Event.Type.start,
-    C_Event.Type.dirStatus,
-    C_Event.Type.prefix,
-    C_Event.Type.encryptionKey,
-  ],
-  ([start, dirStatus, prefix, encryptionKey]) => {
+  [C_Event.Type.start, C_Event.Type.dirStatus, C_Event.Type.encryptionKey],
+  ([start, dirStatus, encryptionKey]) => {
     if (dirStatus === C_System.States.full) {
-      userModel.init(prefix, encryptionKey);
-      nodeModel.init(prefix, encryptionKey);
+      userModel.init(encryptionKey);
+      nodeModel.init(encryptionKey);
     }
   }
 );
@@ -61,12 +56,12 @@ stateManager.subscribe([C_Event.Type.configDb], async ([configDb]) => {
         break;
       case C_System.States.empty:
         logger.info("CONFIG MODEL", "DB is empty");
-        if (getArg(C_System.Args.auto)) {
+        if (workerData.auto) {
           logger.log("CONFIG MODEL", "auto generation with defaults");
           await configModel.persistConfig([
             {
               param: C_Event.Type.configRouter,
-              value: getArg(C_System.Args.port) || C_Defaults.router,
+              value: workerData.routerPort || C_Defaults.router,
             },
             {
               param: C_Event.Type.configAutoDefine,

@@ -15,11 +15,11 @@ class SyncModel implements Model {
     this.stateBridge = state;
   }
 
-  async init(prefix: string) {
+  async init() {
     try {
       logger.log("nedb", "load database", "sync");
       this.db = new Datastore({
-        filename: getDatadir(prefix).nedb + "/sync.db",
+        filename: getDatadir().nedb + "/sync.db",
       });
       await this.db.loadDatabaseAsync();
       // await this.db.ensureIndexAsync({

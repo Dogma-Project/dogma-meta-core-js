@@ -1,4 +1,4 @@
-import { getArg } from "./arguments";
+import { workerData } from "node:worker_threads";
 import { C_System, C_Defaults } from "@dogma-project/constants-meta";
 
 /** @module Logger */
@@ -30,8 +30,11 @@ import { C_System, C_Defaults } from "@dogma-project/constants-meta";
 // BgWhite = "\x1b[47m"
 
 const logLevel = () => {
-  const logLevel = getArg(C_System.Args.loglevel);
-  return logLevel === null ? C_Defaults.logLevel : logLevel;
+  return workerData.loglevel || C_Defaults.logLevel;
+};
+
+const prefix = () => {
+  return global.prefix ? `${global.prefix}> ` : "";
 };
 
 /**
@@ -42,7 +45,7 @@ const logLevel = () => {
 const dogmaError = (type: string, ...message: any) => {
   if (logLevel() < C_System.LogLevel.errors) return;
   type = type.toUpperCase();
-  console.error(`\x1b[31m\x1b[40m[${type}]\x1b[0m`, ...message); // red
+  console.error(`${prefix()}\x1b[31m\x1b[40m[${type}]\x1b[0m`, ...message); // red
 };
 
 /**
@@ -53,7 +56,7 @@ const dogmaError = (type: string, ...message: any) => {
 const dogmaWarning = (type: string, ...message: any) => {
   if (logLevel() < C_System.LogLevel.warnings) return;
   type = type.toUpperCase();
-  console.warn(`\x1b[33m\x1b[40m[${type}]\x1b[0m`, ...message); // yellow
+  console.warn(`${prefix()}\x1b[33m\x1b[40m[${type}]\x1b[0m`, ...message); // yellow
 };
 
 /**
@@ -64,7 +67,7 @@ const dogmaWarning = (type: string, ...message: any) => {
 const dogmaInfo = (type: string, ...message: any) => {
   if (logLevel() < C_System.LogLevel.info) return;
   type = type.toUpperCase();
-  console.info(`\x1b[32m\x1b[40m[${type}]\x1b[0m`, ...message); // blue
+  console.info(`${prefix()}\x1b[32m\x1b[40m[${type}]\x1b[0m`, ...message); // blue
 };
 
 /**
@@ -75,7 +78,7 @@ const dogmaInfo = (type: string, ...message: any) => {
 const dogmaLog = (type: string, ...message: any) => {
   if (logLevel() < C_System.LogLevel.logs) return;
   type = type.toUpperCase();
-  console.log(`\x1b[36m\x1b[40m[${type}]\x1b[0m`, ...message); // black
+  console.log(`${prefix()}\x1b[36m\x1b[40m[${type}]\x1b[0m`, ...message); // black
 };
 
 /**
@@ -86,7 +89,7 @@ const dogmaLog = (type: string, ...message: any) => {
 const dogmaDebug = (type: string, ...message: any) => {
   if (logLevel() < C_System.LogLevel.debug) return;
   type = type.toUpperCase();
-  console.debug(`\x1b[35m\x1b[40m[${type}]\x1b[0m`, ...message); //
+  console.debug(`${prefix()}\x1b[35m\x1b[40m[${type}]\x1b[0m`, ...message); //
 };
 
 // dogmaError("TEST", "Error color");

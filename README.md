@@ -23,15 +23,15 @@ This package is a part of **Dogma Meta** Application, which is currently in acti
 ## Installation
 
 ```
-git clone https://github.com/Dogma-Project/dogma-core-js.git
-cd dogma-core-js
+git clone https://github.com/Dogma-Project/dogma-meta-core-js
+cd dogma-meta-core-js
 npm install
 ```
 
 ## Usage
 
 ```
-npm run auto
+npm run manager
 ```
 
 ## Credits

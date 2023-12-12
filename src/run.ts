@@ -1,10 +1,7 @@
 import { C_System } from "@dogma-project/constants-meta";
-// import path from "node:path";
 import { Worker } from "node:worker_threads";
 import generateSyncId from "./modules/generateSyncId";
 import logger from "./modules/logger";
-
-const prefix = "default";
 
 interface WorkerData {
   prefix: string;
@@ -39,7 +36,6 @@ export default class RunWorker {
   constructor(data: WorkerData) {
     this.name = data.prefix;
     const filename = require.resolve("./worker");
-    logger.info("resolve", filename);
     this.worker = new Worker(require.resolve(filename), {
       workerData: data,
       env: {},
@@ -55,8 +51,6 @@ export default class RunWorker {
           break;
       }
     });
-
-    // this.worker.postMessage("test");
   }
 
   public stop() {

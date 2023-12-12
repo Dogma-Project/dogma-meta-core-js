@@ -16,7 +16,6 @@ const stateManager = new StateManager([
 ]);
 
 stateManager.subscribe([C_Event.Type.services], ([services]) => {
-  const lel = stateManager.state[C_Event.Type.localDiscovery];
   logger.debug("TEST", "services", services);
 });
 

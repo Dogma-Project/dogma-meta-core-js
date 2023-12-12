@@ -7,7 +7,7 @@ import * as Types from "../types";
 import logger from "../modules/logger";
 import client from "./client";
 import dht from "./dht";
-import { C_Event, C_System } from "@dogma-project/constants-meta";
+import { C_Defaults, C_Event, C_System } from "@dogma-project/constants-meta";
 const server = new Server({ connections, storage, state: stateManager });
 
 stateManager.subscribe(
@@ -22,8 +22,8 @@ stateManager.subscribe(
     switch (server) {
       case C_System.States.limited:
         const ipv4 =
-          stateManager.state[C_Event.Type.configPublicIpV4] || "8.8.8.8"; // edit
-        const port = configRouter || 12345; // edit
+          stateManager.get(C_Event.Type.configPublicIpV4) || "8.8.8.8"; // edit
+        const port = configRouter || C_Defaults.router;
         const peer: Types.Connection.Peer = {
           host: ipv4,
           port,

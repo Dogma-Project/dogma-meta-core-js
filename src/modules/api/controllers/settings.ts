@@ -6,21 +6,28 @@ import logger from "../../logger";
 
 function getConfig() {
   return {
-    [C_Event.Type.configRouter]: stateManager.state[C_Event.Type.configRouter],
-    [C_Event.Type.configDhtLookup]:
-      stateManager.state[C_Event.Type.configDhtLookup],
-    [C_Event.Type.configDhtAnnounce]:
-      stateManager.state[C_Event.Type.configDhtAnnounce],
-    [C_Event.Type.configDhtBootstrap]:
-      stateManager.state[C_Event.Type.configDhtBootstrap],
-    [C_Event.Type.configAutoDefine]:
-      stateManager.state[C_Event.Type.configAutoDefine],
-    [C_Event.Type.configExternal]:
-      stateManager.state[C_Event.Type.configExternal],
-    [C_Event.Type.configLocalDiscovery]:
-      stateManager.state[C_Event.Type.configLocalDiscovery],
-    [C_Event.Type.configPublicIpV4]:
-      stateManager.state[C_Event.Type.configPublicIpV4],
+    [C_Event.Type.configRouter]: stateManager.get(C_Event.Type.configRouter),
+    [C_Event.Type.configDhtLookup]: stateManager.get(
+      C_Event.Type.configDhtLookup
+    ),
+    [C_Event.Type.configDhtAnnounce]: stateManager.get(
+      C_Event.Type.configDhtAnnounce
+    ),
+    [C_Event.Type.configDhtBootstrap]: stateManager.get(
+      C_Event.Type.configDhtBootstrap
+    ),
+    [C_Event.Type.configAutoDefine]: stateManager.get(
+      C_Event.Type.configAutoDefine
+    ),
+    [C_Event.Type.configExternal]: stateManager.get(
+      C_Event.Type.configExternal
+    ),
+    [C_Event.Type.configLocalDiscovery]: stateManager.get(
+      C_Event.Type.configLocalDiscovery
+    ),
+    [C_Event.Type.configPublicIpV4]: stateManager.get(
+      C_Event.Type.configPublicIpV4
+    ),
   };
 }
 

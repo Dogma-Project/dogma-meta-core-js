@@ -8,7 +8,7 @@ export default function ServicesController(
 ) {
   switch (data.action) {
     case C_API.ApiRequestAction.get:
-      const services = stateManager.state[C_Event.Type.services];
+      const services = stateManager.get(C_Event.Type.services);
       this.response({
         type: C_API.ApiRequestType.services,
         action: C_API.ApiRequestAction.set,

@@ -1,6 +1,6 @@
 import { Event, Config } from "../types";
 import logger from "./logger";
-import { C_Event, C_System, C_Constants } from "@dogma-project/constants-meta";
+import { C_Event, C_System } from "@dogma-project/constants-meta";
 
 type MapPredicate<T> = T extends C_Event.Type.Service
   ? C_System.States
@@ -29,7 +29,7 @@ class StateManager {
   private listeners: {
     [index: string]: [C_Event.Type[], any][];
   } = {};
-  public state: {
+  private state: {
     [key in C_Event.Type]?: MapPredicate<key>;
   } = {};
   private trigger = Symbol("trigger");
@@ -50,9 +50,9 @@ class StateManager {
   };
 
   /**
-   *
+   * Emits state change
    * @param type
-   * @param payload Any payload
+   * @param payload
    */
   public emit(type: C_Event.Type.ConfigBool, payload: boolean): void;
   public emit(type: C_Event.Type.ConfigStr, payload: string): void;
@@ -104,6 +104,10 @@ class StateManager {
     });
   }
 
+  /**
+   *
+   * @param type forces event for some type like its value has changed
+   */
   public enforce(type: C_Event.Type) {
     this.emit(type, this.trigger);
   }
@@ -111,11 +115,10 @@ class StateManager {
   public get(type: C_Event.Type.ConfigBool): boolean | undefined;
   public get(type: C_Event.Type.ConfigStr): string | undefined;
   public get(type: C_Event.Type.ConfigNum): number | undefined;
-
   public get(type: C_Event.Type.Service): C_System.States | undefined;
   public get(type: C_Event.Type.Services): Event.ServicesList | undefined;
-  public get<T>(type: C_Event.Type.Storage): T;
-  public get<T>(type: C_Event.Type.Action): T;
+  public get<T>(type: C_Event.Type.Storage): T | undefined;
+  public get<T>(type: C_Event.Type.Action): T | undefined;
   public get(type: C_Event.Type): any {
     return this.state[type];
   }

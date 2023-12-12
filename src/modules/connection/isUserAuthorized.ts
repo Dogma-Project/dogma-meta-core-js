@@ -6,9 +6,7 @@ export default function isUserAuthorized(
   this: ConnectionClass,
   user_id: string
 ) {
-  const users = this.stateBridge.get<Types.User.Model[] | undefined>(
-    C_Event.Type.users
-  );
+  const users = this.stateBridge.get<Types.User.Model[]>(C_Event.Type.users);
   if (!users) return null;
   const inFriendsList = users.find((user) => user.user_id === user_id);
   if (!inFriendsList) return false;

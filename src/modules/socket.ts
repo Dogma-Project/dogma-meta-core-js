@@ -5,7 +5,6 @@ import {
   C_Connection,
   C_Streams,
   C_Keys,
-  C_Event,
   C_Constants,
 } from "@dogma-project/constants-meta";
 import * as Types from "../types";
@@ -16,7 +15,6 @@ import { onData } from "./socket/index";
 import StateManager from "./state";
 import Storage from "./storage";
 import { createSha256Hash } from "./hash";
-import { workerData } from "node:worker_threads";
 import ConnectionClass from "./connections";
 
 class DogmaSocket extends EventEmitter {

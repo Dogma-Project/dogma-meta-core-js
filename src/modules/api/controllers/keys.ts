@@ -43,7 +43,7 @@ async function createKey({
         // );
         break;
     }
-    const keyState = stateManager.state[keyEvent];
+    const keyState = stateManager.get(keyEvent);
     if (!keyState || keyState > C_System.States.empty) {
       return Promise.reject("KEY_IS_NOT_EMPTY");
       // return next(

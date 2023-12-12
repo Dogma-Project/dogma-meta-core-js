@@ -7,9 +7,7 @@ declare class StateManager {
     private services;
     constructor(services?: C_Event.Type.Service[]);
     private listeners;
-    state: {
-        [key in C_Event.Type]?: MapPredicate<key>;
-    };
+    private state;
     private trigger;
     /**
      *
@@ -18,9 +16,9 @@ declare class StateManager {
      */
     subscribe: <T extends C_Event.Type, U extends readonly T[]>(type: [...U], callback: Listener<U>) => void;
     /**
-     *
+     * Emits state change
      * @param type
-     * @param payload Any payload
+     * @param payload
      */
     emit(type: C_Event.Type.ConfigBool, payload: boolean): void;
     emit(type: C_Event.Type.ConfigStr, payload: string): void;
@@ -31,13 +29,17 @@ declare class StateManager {
     emit(type: C_Event.Type.Storage, payload: any): void;
     emit(type: C_Event.Type.Action, payload: any): void;
     emit(type: C_Event.Type, payload: typeof this.trigger): void;
+    /**
+     *
+     * @param type forces event for some type like its value has changed
+     */
     enforce(type: C_Event.Type): void;
     get(type: C_Event.Type.ConfigBool): boolean | undefined;
     get(type: C_Event.Type.ConfigStr): string | undefined;
     get(type: C_Event.Type.ConfigNum): number | undefined;
     get(type: C_Event.Type.Service): C_System.States | undefined;
     get(type: C_Event.Type.Services): Event.ServicesList | undefined;
-    get<T>(type: C_Event.Type.Storage): T;
-    get<T>(type: C_Event.Type.Action): T;
+    get<T>(type: C_Event.Type.Storage): T | undefined;
+    get<T>(type: C_Event.Type.Action): T | undefined;
 }
 export default StateManager;

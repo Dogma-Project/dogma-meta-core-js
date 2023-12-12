@@ -28,7 +28,11 @@ export default class Client {
   private _connect(peer: Types.Connection.Peer) {
     try {
       const socket = net.connect(peer.port, peer.host, () => {
-        this.connectionsBridge.onConnect(socket, peer);
+        this.connectionsBridge.onConnect(
+          socket,
+          peer,
+          C_Connection.Direction.outcoming
+        );
       });
       socket.on("error", (err: Error) => {
         // determine reason

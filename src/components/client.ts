@@ -59,9 +59,11 @@ if (!workerData.discovery) {
       searchFriendsInterval && clearInterval(searchFriendsInterval);
       if (configDhtLookup) {
         searchFriendsInterval = setInterval(() => {
-          if (users && Array.isArray(users)) {
+          if (users) {
             logger.log("CLIENT", "Trying to search friends", users.length);
-            users.forEach((user: Types.User.Model) => dht.lookup(user.user_id));
+            users.forEach((user: Types.User.Model) => {
+              if (!user.requested) dht.lookup(user.user_id);
+            });
           }
         }, 45000); // edit
       }

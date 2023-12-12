@@ -19,6 +19,7 @@ export async function getNetwork() {
         id: user.user_id,
         name: user.name,
         current: own_user_id && own_user_id === user.user_id,
+        requested: !!user.requested,
         nodes: [],
       });
     });

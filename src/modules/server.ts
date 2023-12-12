@@ -4,7 +4,7 @@ import * as Types from "../types";
 import Connections from "./connections";
 import StateManager from "./state";
 import Storage from "./storage";
-import { C_Event, C_System } from "@dogma-project/constants-meta";
+import { C_Connection, C_Event, C_System } from "@dogma-project/constants-meta";
 /** @module Server */
 
 export default class Server {
@@ -41,7 +41,11 @@ export default class Server {
         address: host + ":" + port,
         version: 4,
       };
-      this.connectionsBridge.onConnect(socket, peer);
+      this.connectionsBridge.onConnect(
+        socket,
+        peer,
+        C_Connection.Direction.incoming
+      );
     });
 
     const host = "0.0.0.0"; // temp

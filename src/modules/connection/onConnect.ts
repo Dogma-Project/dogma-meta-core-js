@@ -8,8 +8,8 @@ import { C_Connection, C_Event } from "@dogma-project/constants-meta";
 export default function onConnect(
   this: ConnectionClass,
   socket: net.Socket,
-  peer: Types.Connection.Peer, // check
-  direction: C_Connection.Direction = C_Connection.Direction.outcoming
+  peer: Types.Connection.Peer,
+  direction: C_Connection.Direction
 ) {
   const dogmaSocket = new DogmaSocket(
     socket,
@@ -38,6 +38,10 @@ export default function onConnect(
   });
   dogmaSocket.on("friendship", () => {
     const { user_id } = dogmaSocket; // add name
+    this.stateBridge.emit(C_Event.Type.friendshipRequest, {
+      user_id,
+      name: "Unknown", // edit
+    });
   });
   dogmaSocket.on("data", (data: Types.Streams.DemuxedResult) => {
     const handler = this.handlers[data.mx];

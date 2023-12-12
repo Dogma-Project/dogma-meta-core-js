@@ -47,6 +47,22 @@ stateManager.subscribe(
   }
 );
 
+stateManager.subscribe(
+  [C_Event.Type.friendshipRequest],
+  ([friendshipRequest]) => {
+    logger.log(
+      "MODEL",
+      "Handled friendship request from",
+      friendshipRequest.user_id
+    );
+    userModel.persistUser({
+      user_id: friendshipRequest.user_id as string,
+      name: friendshipRequest.name as string,
+      requested: true,
+    });
+  }
+);
+
 stateManager.subscribe([C_Event.Type.configDb], async ([configDb]) => {
   try {
     switch (configDb) {

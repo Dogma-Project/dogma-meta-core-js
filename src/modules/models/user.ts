@@ -14,8 +14,8 @@ class UserModel implements Model {
   db!: Datastore;
 
   encrypt = true;
-  private projection = { user_id: 1, name: 1, _id: 0 };
-  private editable = ["name"];
+  private projection = { user_id: 1, name: 1, requested: 1, _id: 0 };
+  private editable = ["name", "requested"];
 
   constructor({ state }: { state: StateManager }) {
     this.stateBridge = state;

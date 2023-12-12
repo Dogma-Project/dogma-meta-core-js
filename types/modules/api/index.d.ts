@@ -3,15 +3,12 @@ import { API } from "../../types";
 export default class WebSocketApi {
     wss: WebSocketServer;
     connections: API.DogmaWebSocket[];
-    private minPort;
-    private maxPort;
     port: number;
     /**
      *
-     * @param port Enforce specific port for WS API
+     * @param port Set specific port for WS API
      */
-    constructor(port?: number);
-    private getRandomPort;
+    constructor(port: number);
     private onConnect;
     private socketOnMessage;
     private socketOnError;

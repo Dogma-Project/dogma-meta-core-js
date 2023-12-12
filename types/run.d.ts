@@ -2,9 +2,9 @@ import { C_System } from "@dogma-project/constants-meta";
 interface WorkerData {
     prefix: string;
     /**
-     * if not specified, port switched randomly
+     * Sets API port
      */
-    apiPort?: number;
+    apiPort: number;
     /**
      * enforces router port ignoring settings
      */
@@ -25,7 +25,7 @@ interface WorkerData {
 export default class RunWorker {
     private worker;
     id: string;
-    apiPort?: number;
+    apiPort: number;
     name: string;
     constructor(data: WorkerData);
     stop(): Promise<number>;

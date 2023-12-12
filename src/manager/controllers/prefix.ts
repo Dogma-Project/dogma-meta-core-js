@@ -4,6 +4,8 @@ import RunWorker from "../../run";
 import { C_System } from "@dogma-project/constants-meta";
 import ResponseOk from "../responses/ok";
 import logger from "../../modules/logger";
+import getRandomPort from "../../modules/api/getRandomPort";
+import CheckPort from "../../modules/portChecker";
 
 const workers: {
   [key: string]: RunWorker;
@@ -20,18 +22,22 @@ function get(req: System.API.Request, res: System.API.Response) {
   }
 }
 
-function put(req: System.API.Request, res: System.API.Response) {
+async function put(req: System.API.Request, res: System.API.Response) {
   const prefix = req.path[1];
   if (!(prefix in workers)) {
-    const apiport = undefined; // edit
+    let port = 0;
+    let open = false;
+    do {
+      port = getRandomPort();
+      open = await CheckPort(port);
+      console.log(port, open);
+    } while (!open);
     workers[prefix] = new RunWorker({
-      apiPort: apiport,
+      apiPort: port,
       prefix,
-      loglevel: C_System.LogLevel.logs, // edit
+      loglevel: C_System.LogLevel.logs,
     });
-    ResponseOk(res, {
-      api: apiport || workers[prefix].apiPort || null, // edit
-    });
+    ResponseOk(res, { api: port });
   } else {
     ResponseError(res, 402, { message: "Instance is already running" });
   }

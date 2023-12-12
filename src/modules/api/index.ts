@@ -1,4 +1,3 @@
-import { parentPort } from "node:worker_threads";
 import WebSocket, { WebSocketServer } from "ws";
 
 import logger from "../logger";
@@ -12,24 +11,21 @@ import {
   SystemController,
 } from "./controllers";
 import { API } from "../../types";
-import { C_API, C_Defaults } from "@dogma-project/constants-meta";
+import { C_API } from "@dogma-project/constants-meta";
 
 export default class WebSocketApi {
   wss: WebSocketServer;
 
   connections: API.DogmaWebSocket[] = [];
 
-  private minPort = C_Defaults.minApiPort;
-  private maxPort = C_Defaults.maxApiPort;
-
-  public port: number = this.getRandomPort();
+  public port: number;
 
   /**
    *
-   * @param port Enforce specific port for WS API
+   * @param port Set specific port for WS API
    */
-  constructor(port?: number) {
-    this.port = port || this.port;
+  constructor(port: number) {
+    this.port = port;
 
     this.wss = new WebSocketServer(
       {
@@ -52,11 +48,11 @@ export default class WebSocketApi {
       },
       () => {
         logger.info("API", "WS API started on port:", this.port);
-        parentPort?.postMessage({
-          type: "api-port",
-          action: "set",
-          payload: this.port,
-        });
+        // parentPort?.postMessage({
+        //   type: "api-port",
+        //   action: "set",
+        //   payload: this.port,
+        // });
       }
     );
 
@@ -65,13 +61,6 @@ export default class WebSocketApi {
     this.wss.on("error", (error: Error) => {
       console.error(error);
     });
-  }
-
-  private getRandomPort() {
-    return (
-      Math.floor(Math.random() * (this.maxPort - this.minPort + 1)) +
-      this.minPort
-    );
   }
 
   private onConnect = (ws: API.DogmaWebSocket, request: IncomingMessage) => {

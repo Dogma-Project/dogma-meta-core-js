@@ -6,9 +6,9 @@ import logger from "./modules/logger";
 interface WorkerData {
   prefix: string;
   /**
-   * if not specified, port switched randomly
+   * Sets API port
    */
-  apiPort?: number;
+  apiPort: number;
   /**
    * enforces router port ignoring settings
    */
@@ -30,7 +30,7 @@ interface WorkerData {
 export default class RunWorker {
   private worker: Worker;
   public id: string = generateSyncId(8);
-  public apiPort?: number;
+  public apiPort: number;
   public name: string;
 
   constructor(data: WorkerData) {
@@ -41,16 +41,24 @@ export default class RunWorker {
       env: {},
       name: this.name,
     });
-    if (data.apiPort) this.apiPort = data.apiPort;
-    this.worker.on("message", (message) => {
-      logger.debug("Worker", this.name, message);
-      if (!message || !message.type) return;
-      switch (message.type) {
-        case "api-port":
-          if (message.payload) this.apiPort = message.payload;
-          break;
-      }
+    this.apiPort = data.apiPort;
+    this.worker.on("exit", (exitCode) => {
+      logger.info(
+        "Instance",
+        `{${data.prefix}}`,
+        "Stopped by user. Exit code:",
+        exitCode
+      );
     });
+    // this.worker.on("message", (message) => {
+    //   logger.debug("Worker", this.name, message);
+    //   if (!message || !message.type) return;
+    //   switch (message.type) {
+    //     case "api-port":
+    //       if (message.payload) this.apiPort = message.payload;
+    //       break;
+    //   }
+    // });
   }
 
   public stop() {

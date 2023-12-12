@@ -37,7 +37,7 @@
     "email": "rotegott@dogma-project.org"
   },
   "dependencies": {
-    "@dogma-project/constants-meta": "^0.7.5",
+    "@dogma-project/constants-meta": "^0.7.6",
     "@seald-io/nedb": "^4.0.2",
     "ext-ip": "^0.3.9",
     "ws": "^8.15.0"

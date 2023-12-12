@@ -2,6 +2,8 @@ import http from "node:http";
 import Router from "./manager/router";
 import logger from "./modules/logger";
 
+process.title = "Dogma Meta Manager";
+
 export default function RunManager(port: number = 24600) {
   const server = http.createServer(Router);
   server.on("clientError", (err, socket) => {

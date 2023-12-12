@@ -9,17 +9,18 @@ import {
   NetworkController,
   ServicesController,
   SettingsController,
+  SystemController,
 } from "./controllers";
 import { API } from "../../types";
-import { C_API } from "@dogma-project/constants-meta";
+import { C_API, C_Defaults } from "@dogma-project/constants-meta";
 
 export default class WebSocketApi {
   wss: WebSocketServer;
 
   connections: API.DogmaWebSocket[] = [];
 
-  private minPort = 25600;
-  private maxPort = 25999;
+  private minPort = C_Defaults.minApiPort;
+  private maxPort = C_Defaults.maxApiPort;
 
   public port: number = this.getRandomPort();
 
@@ -109,8 +110,11 @@ export default class WebSocketApi {
         case C_API.ApiRequestType.network:
           NetworkController.call(ws, obj);
           break;
+        case C_API.ApiRequestType.system:
+          SystemController.call(ws, obj);
+          break;
         default:
-          // 405
+          // 404
           break;
       }
     } catch (err) {

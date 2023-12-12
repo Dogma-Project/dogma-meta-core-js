@@ -7,7 +7,7 @@ import dht from "./dht";
 import * as Types from "../types";
 import storage from "./storage";
 import state from "./state";
-import { C_Event, C_System } from "@dogma-project/constants-meta";
+import { C_Event } from "@dogma-project/constants-meta";
 
 const client = new Client({ connections, state, storage });
 
@@ -38,7 +38,7 @@ if (!workerData.discovery) {
   state.subscribe(
     [C_Event.Type.users, C_Event.Type.nodes, C_Event.Type.nodeKey],
     ([users, nodes, nodeKey]) => {
-      clearInterval(connectFriendsInterval);
+      connectFriendsInterval && clearInterval(connectFriendsInterval);
       connectFriendsInterval = setInterval(() => {
         client.connectFriends(nodes || []);
       }, 45000); // edit
@@ -56,7 +56,7 @@ if (!workerData.discovery) {
       C_Event.Type.dhtService, // check
     ],
     ([configDhtLookup, users, dhtService]) => {
-      clearInterval(searchFriendsInterval);
+      searchFriendsInterval && clearInterval(searchFriendsInterval);
       if (configDhtLookup) {
         searchFriendsInterval = setInterval(() => {
           if (users && Array.isArray(users)) {

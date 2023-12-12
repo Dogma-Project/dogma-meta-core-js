@@ -14,6 +14,7 @@ export default function onConnect(
   const dogmaSocket = new DogmaSocket(
     socket,
     direction,
+    this,
     this.stateBridge,
     this.storageBridge
   );

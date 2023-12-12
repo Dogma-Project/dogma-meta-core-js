@@ -32,5 +32,12 @@ declare class StateManager {
     emit(type: C_Event.Type.Action, payload: any): void;
     emit(type: C_Event.Type, payload: typeof this.trigger): void;
     enforce(type: C_Event.Type): void;
+    get(type: C_Event.Type.ConfigBool): boolean | undefined;
+    get(type: C_Event.Type.ConfigStr): string | undefined;
+    get(type: C_Event.Type.ConfigNum): number | undefined;
+    get(type: C_Event.Type.Service): C_System.States | undefined;
+    get(type: C_Event.Type.Services): Event.ServicesList | undefined;
+    get<T>(type: C_Event.Type.Storage): T;
+    get<T>(type: C_Event.Type.Action): T;
 }
 export default StateManager;

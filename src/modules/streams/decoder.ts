@@ -62,19 +62,20 @@ class Decoder extends EventEmitter {
           this.decoding = false;
           return logger.warn("Decrypt", "Symmetric key not ready");
         }
-        const ivlen = 12;
-        const atlen = 16;
+        const ivlen = 12; // move to constants
+        const atlen = 16; // move to constants
         const metadata = packet.subarray(-ivlen + -atlen);
         const iv = metadata.subarray(0, ivlen);
         const authTag = metadata.subarray(-atlen);
         data = packet.subarray(0, -metadata.length);
         const decipher = crypto.createDecipheriv(
-          "aes-256-gcm",
+          "aes-256-gcm", // move to constants
           this.symmetricKey,
           iv
         );
         decipher.setAuthTag(authTag);
         data = decipher.update(data);
+        // check if need end
         decipher.final();
       }
 

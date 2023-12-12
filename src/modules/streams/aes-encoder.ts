@@ -28,26 +28,20 @@ class AesEncoder extends Transform {
     callback: TransformCallback
   ) {
     try {
-      const iv = crypto.randomBytes(12);
+      const iv = crypto.randomBytes(12); // move to constants
       const cipher = crypto.createCipheriv(
-        "aes-256-gcm",
+        "aes-256-gcm", // move to constants
         this.symmetricKey,
         iv
       );
       const encrypted = cipher.update(chunk);
+      // check if need end();
       cipher.final();
       const authTag = cipher.getAuthTag();
       chunk = Buffer.concat(
         [encrypted, iv, authTag],
         encrypted.length + iv.length + authTag.length
       );
-      // logger.debug(
-      //   "ENCRYPT AES",
-      //   "LENGTH ----------------->",
-      //   encrypted.length,
-      //   iv.length,
-      //   authTag.length
-      // );
       const len = Buffer.alloc(C_Streams.SIZES.LEN, 0);
       len.writeUInt16BE(chunk.length);
       const result = Buffer.concat(

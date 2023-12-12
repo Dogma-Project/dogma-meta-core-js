@@ -8,6 +8,7 @@ export declare namespace User {
         name: string;
         avatar?: string;
         sync_id?: Sync.Id;
+        requested?: true;
     };
     type Storage = {
         id: Id | null;

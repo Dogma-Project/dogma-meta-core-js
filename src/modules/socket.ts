@@ -16,10 +16,13 @@ import { onData } from "./socket/index";
 import StateManager from "./state";
 import Storage from "./storage";
 import { createSha256Hash } from "./hash";
+import { workerData } from "node:worker_threads";
+import ConnectionClass from "./connections";
 
 class DogmaSocket extends EventEmitter {
   protected stateBridge: StateManager;
   protected storageBridge: Storage;
+  protected connectionsBridge: ConnectionClass;
 
   public readonly id: Types.Connection.Id;
   private readonly socket: net.Socket;
@@ -63,15 +66,17 @@ class DogmaSocket extends EventEmitter {
   constructor(
     socket: net.Socket,
     direction: C_Connection.Direction,
+    connections: ConnectionClass,
     state: StateManager,
     storage: Storage
   ) {
     super();
     this.id = generateSyncId(6);
     this.outSession = generateSyncId(12);
-    this.inSymmetricKey = crypto.randomBytes(32);
+    this.inSymmetricKey = crypto.randomBytes(32); // move to constants
 
     this.direction = direction;
+    this.connectionsBridge = connections;
     this.stateBridge = state;
     this.storageBridge = storage;
 
@@ -165,9 +170,12 @@ class DogmaSocket extends EventEmitter {
     this.input.dht.pipe(this.socket);
   }
 
+  /**
+   * Determine connection group and authorization status
+   */
   private setGroup() {
     if (!this.user_id || !this.node_id) {
-      return this.destroy("Own user_id or node_id not defined");
+      return this.destroy("Peer user_id or node_id not defined");
     }
     if (this.user_id === this.storageBridge.user.id) {
       // own user
@@ -177,24 +185,44 @@ class DogmaSocket extends EventEmitter {
       } else {
         this.group = C_Connection.Group.selfUser;
       }
+      this.status = C_Connection.Status.authorized;
     } else {
-      const users = this.stateBridge.state[C_Event.Type.users] as
-        | Types.User.Model[]
-        | undefined;
-      if (!users || !Array.isArray(users)) {
-        return this.destroy("Users data not found");
-      }
-      const inFriends = users.find((user) => user.user_id === this.user_id);
+      const inFriends = this.connectionsBridge.isUserAuthorized(this.user_id);
       if (inFriends) {
         this.group = C_Connection.Group.friends;
+        this.status = C_Connection.Status.authorized;
       } else {
         this.group = C_Connection.Group.all;
+        this.status = C_Connection.Status.notAuthorized;
       }
     }
   }
 
+  /**
+   * @todo complete
+   * Check if not authorized can connect
+   */
   private checkGroup() {
-    //
+    if (this.status === C_Connection.Status.notAuthorized) {
+      if (this.connectionsBridge.allowDiscoveryRequests(this.direction)) {
+        // ok
+      } else if (this.connectionsBridge.allowFriendshipRequests()) {
+        // create request
+        this.destroy("friendship request handled");
+      } else {
+        this.destroy("not allowed!");
+      }
+    } else if (this.status === C_Connection.Status.authorized) {
+      // ok
+      logger.log("Socket", "Connection is authorized", this.id);
+    } else {
+      logger.warn(
+        "Socket",
+        "Something went wrong! Connection group is not determined",
+        this.status
+      );
+      // destroy
+    }
   }
 
   private test() {
@@ -208,7 +236,6 @@ class DogmaSocket extends EventEmitter {
   private onData = onData;
 
   private onClose = async (hadError: boolean) => {
-    // edit
     this.emit("offline", this.node_id);
     logger.info("connection", "closed", this.id);
   };
@@ -347,10 +374,18 @@ class DogmaSocket extends EventEmitter {
     this.test();
   }
 
+  /**
+   * Successfully tested AES encryption
+   */
   private afterTest() {
     this.emit("online", this.node_id);
   }
 
+  /**
+   * @todo skip when discovery
+   * Determine peer is online
+   * @param data
+   */
   protected handleTest(data: Buffer) {
     const msg = data.toString();
     if (msg === C_Constants.Messages.test) {
@@ -362,12 +397,21 @@ class DogmaSocket extends EventEmitter {
     }
   }
 
+  /**
+   * Sets peer symmetric key
+   * @param data
+   */
   protected handleSymmetricKey(data: Buffer) {
     // check and validate
     this.outSymmetricKey = data;
     this.afterSymmetricKey();
   }
 
+  /**
+   * Stop current connection with specific reason
+   * @param reason
+   * @returns
+   */
   public destroy(reason?: string) {
     if (reason) logger.log("Socket", "closed", reason);
     return this.socket.destroy();

@@ -107,6 +107,18 @@ class StateManager {
   public enforce(type: C_Event.Type) {
     this.emit(type, this.trigger);
   }
+
+  public get(type: C_Event.Type.ConfigBool): boolean | undefined;
+  public get(type: C_Event.Type.ConfigStr): string | undefined;
+  public get(type: C_Event.Type.ConfigNum): number | undefined;
+
+  public get(type: C_Event.Type.Service): C_System.States | undefined;
+  public get(type: C_Event.Type.Services): Event.ServicesList | undefined;
+  public get<T>(type: C_Event.Type.Storage): T;
+  public get<T>(type: C_Event.Type.Action): T;
+  public get(type: C_Event.Type): any {
+    return this.state[type];
+  }
 }
 
 export default StateManager;

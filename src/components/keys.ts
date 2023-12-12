@@ -14,7 +14,7 @@ stateManager.subscribe([C_Event.Type.masterKey], ([payload]) => {
   if (payload === C_System.States.empty) {
     logger.info("store", "Master key not found");
     if (workerData.auto) {
-      createKeyPair(C_Keys.Type.masterKey, 4096)
+      createKeyPair(C_Keys.Type.userKey, 4096)
         .then(() => {
           stateManager.emit(C_Event.Type.masterKey, C_System.States.ready);
         })

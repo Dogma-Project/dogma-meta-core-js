@@ -8,9 +8,11 @@ import * as Types from "../types";
 import { RsaEncoder, AesEncoder, PlainEncoder } from "./streams";
 import StateManager from "./state";
 import Storage from "./storage";
+import ConnectionClass from "./connections";
 declare class DogmaSocket extends EventEmitter {
     protected stateBridge: StateManager;
     protected storageBridge: Storage;
+    protected connectionsBridge: ConnectionClass;
     readonly id: Types.Connection.Id;
     private readonly socket;
     input: {
@@ -42,11 +44,18 @@ declare class DogmaSocket extends EventEmitter {
     readonly peer: Types.Connection.Peer;
     onDisconnect?: Function;
     tested: boolean;
-    constructor(socket: net.Socket, direction: C_Connection.Direction, state: StateManager, storage: Storage);
+    constructor(socket: net.Socket, direction: C_Connection.Direction, connections: ConnectionClass, state: StateManager, storage: Storage);
     private setDecoder;
     private setRsaEncoders;
     private setAesEncoders;
+    /**
+     * Determine connection group and authorization status
+     */
     private setGroup;
+    /**
+     * @todo complete
+     * Check if not authorized can connect
+     */
     private checkGroup;
     private test;
     private sendSymmetricKey;
@@ -63,9 +72,26 @@ declare class DogmaSocket extends EventEmitter {
     protected handleHandshake(data: Buffer): void;
     private afterVerification;
     private afterSymmetricKey;
+    /**
+     * Successfully tested AES encryption
+     */
     private afterTest;
+    /**
+     * @todo skip when discovery
+     * Determine peer is online
+     * @param data
+     */
     protected handleTest(data: Buffer): void;
+    /**
+     * Sets peer symmetric key
+     * @param data
+     */
     protected handleSymmetricKey(data: Buffer): void;
+    /**
+     * Stop current connection with specific reason
+     * @param reason
+     * @returns
+     */
     destroy(reason?: string): net.Socket;
 }
 export default DogmaSocket;

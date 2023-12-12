@@ -24,7 +24,7 @@ async function createKey({
   let keyEvent: C_Event.Type;
   try {
     switch (type) {
-      case C_Keys.Type.masterKey:
+      case C_Keys.Type.userKey:
         keyEvent = C_Event.Type.masterKey;
         storage.user.name = name;
         break;

@@ -4,7 +4,7 @@ import * as Types from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
 import Connections from "./connections";
-import { C_Event } from "@dogma-project/constants-meta";
+import { C_Connection, C_Event } from "@dogma-project/constants-meta";
 
 export default class Client {
   connectionsBridge: Connections;
@@ -50,17 +50,18 @@ export default class Client {
     logger.log("Client", "Try peer", node.node_id);
 
     const { user_id, node_id } = node;
-    if (this.connectionsBridge.isNodeOnline(node_id)) return; // add to logs
+    if (this.connectionsBridge.isNodeOnline(node_id)) {
+      return logger.log("Client", "Peer already connected", node.node_id);
+    }
 
-    const connectNonFriends = true;
+    const authorized = this.connectionsBridge.isUserAuthorized(user_id);
+    const connectNonFriends =
+      this.connectionsBridge.allowDiscoveryRequests(
+        C_Connection.Direction.outcoming
+      ) || this.connectionsBridge.allowFriendshipRequests();
 
     if (!connectNonFriends) {
-      const users = this.stateBridge.state[C_Event.Type.users] as
-        | Types.User.Model[]
-        | undefined;
-      if (!users || !Array.isArray(users)) return;
-      const inFriends = users.find((user) => user.user_id === user_id);
-      if (!inFriends) {
+      if (!authorized) {
         return logger.log(
           "client",
           "tryPeer",

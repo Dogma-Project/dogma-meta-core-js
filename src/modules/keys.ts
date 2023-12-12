@@ -39,7 +39,8 @@ export async function createKeyPair(
   try {
     const dir = getDatadir();
     const { publicKey, privateKey } = await _generateKeyPair(length);
-    const opts: crypto.KeyExportOptions<"pem"> = {
+    const opts: crypto.KeyExportOptions<C_Keys.FORMATS.FORMAT> = {
+      // move to constants
       type: C_Keys.FORMATS.TYPE,
       format: C_Keys.FORMATS.FORMAT,
     };
@@ -48,7 +49,7 @@ export async function createKeyPair(
 
     let private_str = "",
       public_str = "";
-    if (type === C_Keys.Type.masterKey) {
+    if (type === C_Keys.Type.userKey) {
       private_str = dir.keys + "/master-private.pem";
       public_str = dir.keys + "/master-public.pem";
     } else if (type === C_Keys.Type.nodeKey) {

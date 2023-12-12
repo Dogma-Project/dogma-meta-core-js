@@ -13,7 +13,12 @@ import {
 import * as Types from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
-import { C_Streams } from "@dogma-project/constants-meta";
+import {
+  C_Connection,
+  C_Event,
+  C_Streams,
+} from "@dogma-project/constants-meta";
+import { workerData } from "node:worker_threads";
 
 /** @module Connections */
 
@@ -47,6 +52,40 @@ class Connections {
   public isNodeOnline = (node_id: Types.Node.Id) => {
     return this.online.indexOf(node_id) > -1;
   };
+  public isUserAuthorized(user_id: string) {
+    const users = this.stateBridge.get<Types.User.Model[] | undefined>(
+      C_Event.Type.users
+    );
+    if (!users) return null;
+    const inFriendsList = users.find((user) => user.user_id === user_id);
+    if (!inFriendsList) return false;
+    return !inFriendsList.requested;
+  }
+
+  public allowDiscoveryRequests(direction: C_Connection.Direction) {
+    if (direction === C_Connection.Direction.incoming) {
+      if (workerData.discovery) return true;
+      const dhtBootstrap = this.stateBridge.get(
+        C_Event.Type.configDhtBootstrap
+      );
+      if (dhtBootstrap && dhtBootstrap === C_Connection.Group.all) return true;
+    } else {
+      if (workerData.discovery) return false;
+      const dhtAnnounce = this.stateBridge.get(C_Event.Type.configDhtAnnounce);
+      if (dhtAnnounce && dhtAnnounce === C_Connection.Group.all) return true;
+      const dhtLookup = this.stateBridge.get(C_Event.Type.configDhtLookup);
+      if (dhtLookup && dhtLookup === C_Connection.Group.all) return true;
+    }
+    return false;
+  }
+
+  /**
+   * @todo implement
+   * @returns
+   */
+  public allowFriendshipRequests() {
+    return true;
+  }
 }
 
 export default Connections;

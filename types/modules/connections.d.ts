@@ -2,7 +2,7 @@ import { onConnect, closeConnectionByNodeId, closeConnectionsByUserId, sendReque
 import * as Types from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
-import { C_Streams } from "@dogma-project/constants-meta";
+import { C_Connection, C_Streams } from "@dogma-project/constants-meta";
 /** @module Connections */
 declare class Connections {
     protected stateBridge: StateManager;
@@ -27,5 +27,12 @@ declare class Connections {
     multicast: typeof multicast;
     on: typeof on;
     isNodeOnline: (node_id: Types.Node.Id) => boolean;
+    isUserAuthorized(user_id: string): boolean | null;
+    allowDiscoveryRequests(direction: C_Connection.Direction): boolean;
+    /**
+     * @todo implement
+     * @returns
+     */
+    allowFriendshipRequests(): boolean;
 }
 export default Connections;

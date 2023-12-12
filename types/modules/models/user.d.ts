@@ -7,6 +7,7 @@ declare class UserModel implements Model {
     db: Datastore;
     encrypt: boolean;
     private projection;
+    private editable;
     constructor({ state }: {
         state: StateManager;
     });

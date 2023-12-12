@@ -8,7 +8,6 @@ import StateManager from "../state";
 import { C_Event, C_System, C_Sync } from "@dogma-project/constants-meta";
 import EncryptDb from "./dbEncryption/afterSerialization";
 import DecryptDb from "./dbEncryption/beforeDeserialization";
-// import generateCryptoKey from "./dbEncryption/generateCryptoKey";
 
 class UserModel implements Model {
   stateBridge: StateManager;
@@ -16,6 +15,7 @@ class UserModel implements Model {
 
   encrypt = true;
   private projection = { user_id: 1, name: 1, _id: 0 };
+  private editable = ["name"];
 
   constructor({ state }: { state: StateManager }) {
     this.stateBridge = state;
@@ -69,8 +69,7 @@ class UserModel implements Model {
         return target[key];
       },
       set(target, key: string, value: string | number | boolean) {
-        const allowed = ["name"]; // edit
-        if (allowed.indexOf(key) > -1) {
+        if (model.editable.indexOf(key) > -1) {
           target[key] = value;
           console.log("SET!!!!!!!!!!!!!!", key, value);
           model.updateUserData(target.user_id, key, value).catch((err) => {

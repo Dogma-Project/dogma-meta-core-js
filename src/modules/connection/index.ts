@@ -8,6 +8,11 @@ import peerFromIP from "./peerFromIP";
 import multicast from "./multicast";
 import getConnectionByNodeId from "./getConnectionByNodeId";
 import getConnectionsByUserId from "./getConnectionsByUserId";
+import allowDiscoveryRequests from "./allowDiscoveryRequests";
+import isNodeOnline from "./isNodeOnline";
+import isUserAuthorized from "./isUserAuthorized";
+import allowFriendshipRequests from "./allowFriendshipRequests";
+
 // import streamToNode from "./streamToNode";
 
 export {
@@ -21,4 +26,8 @@ export {
   multicast,
   getConnectionByNodeId,
   getConnectionsByUserId,
+  allowDiscoveryRequests,
+  isNodeOnline,
+  isUserAuthorized,
+  allowFriendshipRequests,
 };

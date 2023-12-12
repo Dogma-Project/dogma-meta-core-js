@@ -1,8 +1,8 @@
-import { onConnect, closeConnectionByNodeId, closeConnectionsByUserId, sendRequestToNode, sendRequestToUser, on, peerFromIP, multicast, getConnectionByNodeId, getConnectionsByUserId } from "./connection/index";
+import { onConnect, closeConnectionByNodeId, closeConnectionsByUserId, sendRequestToNode, sendRequestToUser, on, peerFromIP, multicast, getConnectionByNodeId, getConnectionsByUserId, isNodeOnline, isUserAuthorized, allowDiscoveryRequests, allowFriendshipRequests } from "./connection/index";
 import * as Types from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
-import { C_Connection, C_Streams } from "@dogma-project/constants-meta";
+import { C_Streams } from "@dogma-project/constants-meta";
 /** @module Connections */
 declare class Connections {
     protected stateBridge: StateManager;
@@ -26,13 +26,9 @@ declare class Connections {
     peerFromIP: typeof peerFromIP;
     multicast: typeof multicast;
     on: typeof on;
-    isNodeOnline: (node_id: Types.Node.Id) => boolean;
-    isUserAuthorized(user_id: string): boolean | null;
-    allowDiscoveryRequests(direction: C_Connection.Direction): boolean;
-    /**
-     * @todo implement
-     * @returns
-     */
-    allowFriendshipRequests(): boolean;
+    isNodeOnline: typeof isNodeOnline;
+    isUserAuthorized: typeof isUserAuthorized;
+    allowDiscoveryRequests: typeof allowDiscoveryRequests;
+    allowFriendshipRequests: typeof allowFriendshipRequests;
 }
 export default Connections;

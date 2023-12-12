@@ -7,8 +7,10 @@ import StateManager from "../state";
 import { C_Event, C_System } from "@dogma-project/constants-meta";
 class ConfigModel implements Model {
   stateBridge: StateManager;
-  encrypt: boolean = false;
   db!: Datastore;
+
+  encrypt = false;
+  private projection = { param: 1, value: 1, _id: 0 };
 
   constructor({ state }: { state: StateManager }) {
     this.stateBridge = state;
@@ -74,7 +76,7 @@ class ConfigModel implements Model {
   }
 
   async getAll() {
-    return this.db.findAsync({});
+    return this.db.findAsync({}).projection(this.projection);
   }
 
   async persistConfig(config: Types.Config.Model) {

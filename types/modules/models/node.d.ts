@@ -6,6 +6,7 @@ declare class NodeModel implements Model {
     stateBridge: StateManager;
     db: Datastore;
     encrypt: boolean;
+    private projection;
     constructor({ state }: {
         state: StateManager;
     });

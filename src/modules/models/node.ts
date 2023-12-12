@@ -12,7 +12,9 @@ import DecryptDb from "./dbEncryption/beforeDeserialization";
 class NodeModel implements Model {
   stateBridge: StateManager;
   db!: Datastore;
-  encrypt: boolean = true;
+
+  encrypt = true;
+  private projection = { user_id: 1, node_id: 1, name: 1, _id: 0 };
 
   constructor({ state }: { state: StateManager }) {
     this.stateBridge = state;
@@ -51,7 +53,7 @@ class NodeModel implements Model {
   }
 
   async getAll() {
-    return this.db.findAsync({});
+    return this.db.findAsync({}).projection(this.projection);
   }
 
   async loadNodesTable() {
@@ -70,7 +72,7 @@ class NodeModel implements Model {
   }
 
   async getByUserId(user_id: User.Id) {
-    return this.db.findAsync({ user_id });
+    return this.db.findAsync({ user_id }).projection(this.projection);
   }
 
   /**

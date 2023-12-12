@@ -6,11 +6,9 @@ import EventEmitter from "node:events";
 import { C_Connection } from "@dogma-project/constants-meta";
 import * as Types from "../types";
 import { RsaEncoder, AesEncoder, PlainEncoder } from "./streams";
-import StateManager from "./state";
 import Storage from "./storage";
 import ConnectionClass from "./connections";
 declare class DogmaSocket extends EventEmitter {
-    protected stateBridge: StateManager;
     protected storageBridge: Storage;
     protected connectionsBridge: ConnectionClass;
     readonly id: Types.Connection.Id;
@@ -44,7 +42,7 @@ declare class DogmaSocket extends EventEmitter {
     readonly peer: Types.Connection.Peer;
     onDisconnect?: Function;
     tested: boolean;
-    constructor(socket: net.Socket, direction: C_Connection.Direction, connections: ConnectionClass, state: StateManager, storage: Storage);
+    constructor(socket: net.Socket, direction: C_Connection.Direction, connections: ConnectionClass, storage: Storage);
     private setDecoder;
     private setRsaEncoders;
     private setAesEncoders;

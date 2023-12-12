@@ -9,17 +9,17 @@ import { createKeyPair, readOrCreateEncryptionKey } from "../modules/keys";
 import { createSha256Hash } from "../modules/hash";
 import { C_Event, C_System, C_Keys } from "@dogma-project/constants-meta";
 
-stateManager.subscribe([C_Event.Type.masterKey], ([payload]) => {
+stateManager.subscribe([C_Event.Type.userKey], ([payload]) => {
   const dir = getDatadir();
   if (payload === C_System.States.empty) {
     logger.info("store", "Master key not found");
     if (workerData.auto) {
       createKeyPair(C_Keys.Type.userKey, 4096)
         .then(() => {
-          stateManager.emit(C_Event.Type.masterKey, C_System.States.ready);
+          stateManager.emit(C_Event.Type.userKey, C_System.States.ready);
         })
         .catch((err) => {
-          stateManager.emit(C_Event.Type.masterKey, C_System.States.error);
+          stateManager.emit(C_Event.Type.userKey, C_System.States.error);
           logger.error("keys:master", err);
         });
     }
@@ -30,10 +30,10 @@ stateManager.subscribe([C_Event.Type.masterKey], ([payload]) => {
         dir.keys + "/master-private.pem"
       );
       storage.user.publicKey = fs.readFileSync(dir.keys + "/master-public.pem");
-      stateManager.emit(C_Event.Type.masterKey, C_System.States.full);
+      stateManager.emit(C_Event.Type.userKey, C_System.States.full);
     } catch (e) {
       // edit
-      stateManager.emit(C_Event.Type.masterKey, C_System.States.empty);
+      stateManager.emit(C_Event.Type.userKey, C_System.States.empty);
     }
   } else if (payload === C_System.States.full) {
     logger.info("KEYS", "master key", "loaded");
@@ -91,7 +91,7 @@ stateManager.subscribe(
   ([start, homeDir]) => {
     if (homeDir === C_System.States.full) {
       logger.log("KEYS", "Start loading keys.");
-      stateManager.emit(C_Event.Type.masterKey, C_System.States.ready);
+      stateManager.emit(C_Event.Type.userKey, C_System.States.ready);
       stateManager.emit(C_Event.Type.nodeKey, C_System.States.ready);
     }
   }

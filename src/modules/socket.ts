@@ -18,7 +18,6 @@ import { createSha256Hash } from "./hash";
 import ConnectionClass from "./connections";
 
 class DogmaSocket extends EventEmitter {
-  protected stateBridge: StateManager;
   protected storageBridge: Storage;
   protected connectionsBridge: ConnectionClass;
 
@@ -65,7 +64,6 @@ class DogmaSocket extends EventEmitter {
     socket: net.Socket,
     direction: C_Connection.Direction,
     connections: ConnectionClass,
-    state: StateManager,
     storage: Storage
   ) {
     super();
@@ -75,7 +73,6 @@ class DogmaSocket extends EventEmitter {
 
     this.direction = direction;
     this.connectionsBridge = connections;
-    this.stateBridge = state;
     this.storageBridge = storage;
 
     this.socket = socket;
@@ -205,8 +202,12 @@ class DogmaSocket extends EventEmitter {
       if (this.connectionsBridge.allowDiscoveryRequests(this.direction)) {
         // ok
       } else if (this.connectionsBridge.allowFriendshipRequests()) {
-        // create request
-        this.destroy("friendship request handled");
+        if (this.direction == C_Connection.Direction.incoming) {
+          this.emit("friendship", true);
+          this.destroy("friendship request handled");
+        } else {
+          // edit
+        }
       } else {
         this.destroy("not allowed!");
       }

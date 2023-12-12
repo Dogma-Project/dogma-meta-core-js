@@ -4,8 +4,9 @@ import Model from "./_model";
 import StateManager from "../state";
 declare class ConfigModel implements Model {
     stateBridge: StateManager;
-    encrypt: boolean;
     db: Datastore;
+    encrypt: boolean;
+    private projection;
     constructor({ state }: {
         state: StateManager;
     });

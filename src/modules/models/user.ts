@@ -13,13 +13,15 @@ import DecryptDb from "./dbEncryption/beforeDeserialization";
 class UserModel implements Model {
   stateBridge: StateManager;
   db!: Datastore;
+
   encrypt = true;
+  private projection = { user_id: 1, name: 1, _id: 0 };
 
   constructor({ state }: { state: StateManager }) {
     this.stateBridge = state;
   }
 
-  async init(encryptionKey?: string) {
+  public async init(encryptionKey?: string) {
     try {
       logger.log("nedb", "load database", "users");
       this.db = new Datastore({
@@ -51,17 +53,46 @@ class UserModel implements Model {
     }
   }
 
-  async getAll() {
-    return this.db.findAsync({});
+  public async getAll() {
+    return this.db.findAsync({}).projection(this.projection);
   }
 
-  async loadUsersTable() {
+  /**
+   * Update some value directly
+   * @param i
+   * @returns
+   */
+  private makeProxy(i: Record<string, any>) {
+    const model = this;
+    const proxyHandler: ProxyHandler<User.Model> = {
+      get(target, key) {
+        return target[key];
+      },
+      set(target, key: string, value: string | number | boolean) {
+        const allowed = ["name"]; // edit
+        if (allowed.indexOf(key) > -1) {
+          target[key] = value;
+          console.log("SET!!!!!!!!!!!!!!", key, value);
+          model.updateUserData(target.user_id, key, value).catch((err) => {
+            logger.error("Proxy", "User model", err);
+          });
+          return true;
+        } else {
+          return false;
+        }
+      },
+    };
+    return new Proxy(i, proxyHandler);
+  }
+
+  public async loadUsersTable() {
     try {
       logger.log("User Model", "Load user table");
       const data = await this.getAll();
       if (data.length) {
+        const users = data.map((i) => this.makeProxy(i));
+        this.stateBridge.emit(C_Event.Type.users, users);
         this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.full);
-        this.stateBridge.emit(C_Event.Type.users, data);
       } else {
         this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.empty);
       }
@@ -71,57 +102,65 @@ class UserModel implements Model {
   }
 
   /**
+   * Persist some user
+   * @param row
+   * @returns
+   */
+  public async persistUser(row: User.Model) {
+    try {
+      const { user_id } = row;
+      const result = await this.db.updateAsync(
+        { user_id },
+        { $set: row },
+        { upsert: true }
+      );
+      const records = result.affectedDocuments;
+      if (records) {
+        const record = !Array.isArray(records) ? records : records[0];
+        if (!("sync_id" in record)) {
+          const sync_id = generateSyncId(C_Sync.SIZES.USER_ID);
+          await this.db.updateAsync({ user_id }, { $set: { sync_id } });
+        }
+        // add warning if length > 1
+        let users = this.stateBridge.get<Record<string, any>[]>(
+          C_Event.Type.users
+        );
+        if (!users) users = [];
+        let actual = users.find((user) => user.user_id === user_id);
+        const proxy = this.makeProxy(record);
+        if (actual) {
+          actual = proxy; // check
+        } else {
+          users.push(proxy);
+        }
+      }
+      this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.full);
+      return result;
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+
+  /**
    *
    * @param users array of users to persist
    * @returns {Promise}
    */
-  persistUsers(users: User.Model[]) {
-    // add validation
-    const insert = async (row: User.Model) => {
-      try {
-        const { user_id } = row;
-        const result = await this.db.updateAsync(
-          { user_id },
-          { $set: row },
-          { upsert: true }
-        );
-        if (result.affectedDocuments) {
-          if (!Array.isArray(result.affectedDocuments)) {
-            if (!("sync_id" in result.affectedDocuments)) {
-              const sync_id = generateSyncId(C_Sync.SIZES.USER_ID);
-              await this.db.updateAsync({ user_id }, { $set: { sync_id } });
-            }
-          } else {
-            logger.warn(
-              "Users model",
-              "upsert multiple",
-              result.affectedDocuments
-            );
-          }
-        }
-        return result;
-      } catch (err) {
-        return Promise.reject(err);
+  public async persistUsers(users: User.Model[]) {
+    try {
+      for (let i = 0; i < users.length; i++) {
+        await this.persistUser(users[i]);
       }
-    };
-
-    return new Promise(async (resolve, reject) => {
-      try {
-        for (let i = 0; i < users.length; i++) {
-          await insert(users[i]);
-        }
-        this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.reload); // downgrade state to reload database
-        resolve(true);
-      } catch (err) {
-        reject(err);
-      }
-    });
+      return true;
+    } catch (err) {
+      return Promise.reject(err);
+    }
   }
 
   /**
    * @todo set to deleted state instead of remove
    */
-  async removeUser(user_id: User.Id) {
+  public async removeUser(user_id: User.Id) {
     try {
       await this.db.removeAsync({ user_id }, { multi: true });
       this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.reload); // downgrade state to reload database
@@ -135,6 +174,25 @@ class UserModel implements Model {
     } catch (err) {
       return Promise.reject(err);
     }
+  }
+
+  /**
+   * Update some data by proxy
+   * @param user_id
+   * @param key
+   * @param value
+   * @returns
+   */
+  private updateUserData(
+    user_id: User.Id,
+    key: string,
+    value: string | boolean | number
+  ) {
+    const query: {
+      [index: typeof key]: typeof value;
+    } = {};
+    query[key] = value;
+    return this.db.updateAsync({ user_id }, { $set: query });
   }
 
   /**

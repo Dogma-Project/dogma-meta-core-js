@@ -15,7 +15,6 @@ export default function onConnect(
     socket,
     direction,
     this,
-    this.stateBridge,
     this.storageBridge
   );
   dogmaSocket.on("offline", () => {
@@ -36,6 +35,9 @@ export default function onConnect(
       this.online.push(node_id);
       logger.info("connection", "ONLINE", node_id);
     }
+  });
+  dogmaSocket.on("friendship", () => {
+    const { user_id } = dogmaSocket; // add name
   });
   dogmaSocket.on("data", (data: Types.Streams.DemuxedResult) => {
     const handler = this.handlers[data.mx];

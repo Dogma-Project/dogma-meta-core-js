@@ -25,7 +25,7 @@
 //     State.storage.user.name = "Test user";
 //     State.storage.node.name = "Test node";
 //     await Keys.createKeyPair(C_Keys.Type.userKey, testPrefix, 2048);
-//     State.stateManager.emit(C_Event.Type.masterKey, C_System.States.ready);
+//     State.stateManager.emit(C_Event.Type.userKey, C_System.States.ready);
 //     await Keys.createKeyPair(C_Keys.Type.nodeKey, testPrefix, 1024);
 //     State.stateManager.emit(C_Event.Type.nodeKey, C_System.States.ready);
 //     await Model.configModel.persistConfig([

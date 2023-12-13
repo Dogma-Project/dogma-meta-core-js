@@ -11,5 +11,6 @@ export default class WebSocketApi {
     constructor(port: number);
     private onConnect;
     private socketOnMessage;
+    broadcast(data: API.ApiRequest): void;
     private socketOnError;
 }

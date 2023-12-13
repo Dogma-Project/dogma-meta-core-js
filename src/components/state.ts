@@ -15,8 +15,4 @@ const stateManager = new StateManager([
   C_Event.Type.dhtService,
 ]);
 
-stateManager.subscribe([C_Event.Type.services], ([services]) => {
-  logger.debug("TEST", "services", services);
-});
-
 export default stateManager;

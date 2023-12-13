@@ -111,6 +111,12 @@ export default class WebSocketApi {
     }
   }
 
+  public broadcast(data: API.ApiRequest) {
+    this.connections.forEach((socket) => {
+      socket.response(data);
+    });
+  }
+
   private socketOnError = (err: Error) => {
     logger.warn("WEB SOCKET", err);
   };

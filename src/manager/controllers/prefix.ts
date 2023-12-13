@@ -39,7 +39,10 @@ async function put(req: System.API.Request, res: System.API.Response) {
     });
     ResponseOk(res, { api: port });
   } else {
-    ResponseError(res, 402, { message: "Instance is already running" });
+    ResponseOk(res, {
+      api: workers[prefix].apiPort,
+      message: "Instance is already running",
+    });
   }
 }
 

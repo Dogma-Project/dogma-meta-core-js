@@ -35,10 +35,30 @@ declare class DogmaSocket extends EventEmitter {
     private readonly inSymmetricKey;
     private publicUserKey?;
     private publicNodeKey?;
+    /**
+     * [Peer] User id
+     */
     user_id?: Types.User.Id;
+    /**
+     * [Peer] Node id
+     */
     node_id?: Types.Node.Id;
+    /**
+     * Non-verified [peer] User id
+     */
     unverified_user_id?: Types.User.Id;
+    /**
+     * Non-verified [peer] Node id
+     */
     unverified_node_id?: Types.Node.Id;
+    /**
+     * [Peer] User name
+     */
+    user_name: Types.User.Name;
+    /**
+     * [Peer] Node name
+     */
+    node_name: Types.User.Name;
     readonly peer: Types.Connection.Peer;
     onDisconnect?: Function;
     tested: boolean;

@@ -31,7 +31,9 @@ export namespace Connection {
       protocol: 2;
       session: string;
       user_id: User.Id;
+      user_name: string;
       node_id: Node.Id;
+      node_name: string;
     };
     export type StageVerificationRequest = {
       stage: C_Connection.Stage.verification;

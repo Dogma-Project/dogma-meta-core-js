@@ -17,7 +17,7 @@ import {
 import * as Types from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
-import { C_Event, C_Streams } from "@dogma-project/constants-meta";
+import { C_Streams } from "@dogma-project/constants-meta";
 
 /** @module Connections */
 

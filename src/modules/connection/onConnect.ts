@@ -29,18 +29,28 @@ export default function onConnect(
     }
   });
   dogmaSocket.on("online", () => {
-    const { node_id } = dogmaSocket;
-    if (!!node_id) {
-      this.stateBridge.emit(C_Event.Type.online, node_id);
+    const { user_id, node_id, user_name, node_name, status, group } =
+      dogmaSocket;
+    if (user_id && node_id) {
+      this.stateBridge.emit(C_Event.Type.online, {
+        user_id,
+        node_id,
+        user_name,
+        node_name,
+        status,
+        group,
+      });
       this.online.push(node_id);
       logger.info("connection", "ONLINE", node_id);
+    } else {
+      dogmaSocket.destroy("Unknown user or node id");
     }
   });
   dogmaSocket.on("friendship", () => {
-    const { user_id } = dogmaSocket; // add name
+    const { user_id, user_name } = dogmaSocket; // add name
     this.stateBridge.emit(C_Event.Type.friendshipRequest, {
       user_id,
-      name: "Unknown", // edit
+      user_name,
     });
   });
   dogmaSocket.on("data", (data: Types.Streams.DemuxedResult) => {

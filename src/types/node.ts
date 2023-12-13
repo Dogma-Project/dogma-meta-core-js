@@ -21,6 +21,10 @@ export namespace Node {
     local_ipv4?: Connection.IPv6;
     local_ipv6?: Connection.IPv6;
     sync_id?: Sync.Id;
+    /**
+     * Timestamp in milliseconds
+     */
+    synced?: number;
   };
   export type Storage = {
     id: Id | null;

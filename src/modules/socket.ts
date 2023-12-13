@@ -12,7 +12,6 @@ import generateSyncId from "./generateSyncId";
 import logger from "./logger";
 import { Decoder, RsaEncoder, AesEncoder, PlainEncoder } from "./streams";
 import { onData } from "./socket/index";
-import StateManager from "./state";
 import Storage from "./storage";
 import { createSha256Hash } from "./hash";
 import ConnectionClass from "./connections";
@@ -51,11 +50,32 @@ class DogmaSocket extends EventEmitter {
 
   private publicUserKey?: crypto.KeyObject;
   private publicNodeKey?: crypto.KeyObject;
+  /**
+   * [Peer] User id
+   */
   public user_id?: Types.User.Id;
+  /**
+   * [Peer] Node id
+   */
   public node_id?: Types.Node.Id;
+  /**
+   * Non-verified [peer] User id
+   */
   public unverified_user_id?: Types.User.Id;
+  /**
+   * Non-verified [peer] Node id
+   */
   public unverified_node_id?: Types.Node.Id;
+  /**
+   * [Peer] User name
+   */
+  public user_name: Types.User.Name = "Unknown Dogma User";
+  /**
+   * [Peer] Node name
+   */
+  public node_name: Types.User.Name = "Unknown Dogma Node";
   public readonly peer: Types.Connection.Peer;
+
   onDisconnect?: Function; // edit
 
   public tested: boolean = false;
@@ -271,8 +291,10 @@ class DogmaSocket extends EventEmitter {
         stage,
         protocol: 2,
         session: this.outSession,
-        user_id: this.storageBridge.user.id,
+        user_id: this.storageBridge.user.id || "",
+        user_name: this.storageBridge.user.name,
         node_id: this.storageBridge.node.id,
+        node_name: this.storageBridge.node.name || "",
       };
       this.input.handshake.write(JSON.stringify(request));
     } else if (stage === C_Connection.Stage.verification) {
@@ -316,7 +338,9 @@ class DogmaSocket extends EventEmitter {
       if (parsed.stage === C_Connection.Stage.init) {
         this.inSession = parsed.session;
         this.unverified_user_id = parsed.user_id;
+        this.user_name = parsed.user_name;
         this.unverified_node_id = parsed.node_id;
+        this.node_name = parsed.node_name;
         this.sendHandshake(C_Connection.Stage.verification);
       } else if (parsed.stage === C_Connection.Stage.verification) {
         try {

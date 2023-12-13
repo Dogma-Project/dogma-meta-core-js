@@ -9,6 +9,7 @@ import "./components/keys";
 import "./components/model";
 import "./components/homedir";
 import "./components/api";
+// import "./components/sync";
 
 process.title = `Dogma Meta ${global.prefix}`;
 global.prefix = workerData.prefix;

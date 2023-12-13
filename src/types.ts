@@ -1,4 +1,3 @@
-import { C_System } from "@dogma-project/constants-meta";
 import { Certificate } from "./types/certificate";
 import { Config } from "./types/config";
 import { Connection } from "./types/connection";

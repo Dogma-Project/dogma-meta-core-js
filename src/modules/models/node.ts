@@ -16,7 +16,7 @@ class NodeModel implements Model {
 
   encrypt = true;
   private projection = { user_id: 1, node_id: 1, name: 1, _id: 0 };
-  private editable = ["name", "public_ipv4", "local_ipv4"];
+  private editable = ["name", "public_ipv4", "local_ipv4", "synced"];
 
   constructor({ state }: { state: StateManager }) {
     this.stateBridge = state;

@@ -15,6 +15,8 @@ import {
 } from "../modules/model";
 import logger from "../modules/logger";
 import { C_Defaults } from "@dogma-project/constants-meta";
+import * as Types from "../types";
+import connections from "./connections";
 
 const configModel = new ConfigModel({ state: stateManager });
 const nodeModel = new NodeModel({ state: stateManager });
@@ -57,11 +59,30 @@ stateManager.subscribe(
     );
     userModel.persistUser({
       user_id: friendshipRequest.user_id as string,
-      name: friendshipRequest.name as string,
+      name: friendshipRequest.user_name as string,
       requested: true,
     });
   }
 );
+
+stateManager.subscribe([C_Event.Type.online], ([online]) => {
+  if (online.node_id === storage.node.id) return; // skip self
+  const authorized = online.status === C_Connection.Status.authorized;
+  if (authorized) {
+    nodeModel
+      .persistNode({
+        user_id: online.user_id as string,
+        node_id: online.node_id as string,
+        name: online.node_name as string,
+      })
+      .then(() => {
+        stateManager.emit(C_Event.Type.sync, online);
+      })
+      .catch((err) => {
+        logger.warn("Model", "online", err);
+      });
+  }
+});
 
 stateManager.subscribe([C_Event.Type.configDb], async ([configDb]) => {
   try {
@@ -166,6 +187,7 @@ stateManager.subscribe(
             user_id: storage.user.id,
             node_id: storage.node.id,
             name: storage.node.name,
+            synced: Date.now(),
           });
         }
         break;

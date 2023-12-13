@@ -68,9 +68,8 @@ export default class WebSocketApi {
     ws.response = (request: API.ApiRequest) => {
       ws.send(JSON.stringify(request));
     };
-    // ws.errorresponse = () => {
-
-    // }
+    this.connections.push(ws);
+    // ws.errorresponse = () => { };
     logger.log("WS SOCKET", "connected", ws.dogmaId);
     ws.on("error", this.socketOnError);
     ws.on("message", this.socketOnMessage);

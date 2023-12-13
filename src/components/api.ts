@@ -8,7 +8,6 @@ import logger from "../modules/logger";
 const wsApi = new WebSocketApi(workerData.apiPort);
 
 stateManager.subscribe([C_Event.Type.services], ([services]) => {
-  logger.log("services", "Broadcast", services.length);
   wsApi.broadcast({
     type: C_API.ApiRequestType.services,
     action: C_API.ApiRequestAction.set,

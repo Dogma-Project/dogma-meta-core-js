@@ -15,15 +15,11 @@ declare class UserModel implements Model {
     getAll(): Promise<Record<string, any>[]>;
     /**
      * Update some value directly
-     * @param i
-     * @returns
      */
     private makeProxy;
     loadUsersTable(): Promise<void>;
     /**
      * Persist some user
-     * @param row
-     * @returns
      */
     persistUser(row: User.Model): Promise<{
         numAffected: number;
@@ -42,10 +38,6 @@ declare class UserModel implements Model {
     removeUser(user_id: User.Id): Promise<boolean>;
     /**
      * Update some data by proxy
-     * @param user_id
-     * @param key
-     * @param value
-     * @returns
      */
     private updateUserData;
     /**

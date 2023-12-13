@@ -7,27 +7,32 @@ declare class NodeModel implements Model {
     db: Datastore;
     encrypt: boolean;
     private projection;
+    private editable;
     constructor({ state }: {
         state: StateManager;
     });
     init(encryptionKey?: string): Promise<void>;
     getAll(): Promise<Record<string, any>[]>;
+    /**
+     * Update some value directly
+     */
+    private makeProxy;
     loadNodesTable(): Promise<void>;
     getByUserId(user_id: User.Id): Promise<Record<string, any>[]>;
-    /**
-     *
-     * @param nodes [{name, node_id, user_id, public_ipv4, router_port}]
-     * @returns {Promise}
-     */
-    persistNodes(nodes: Node.Model[]): Promise<unknown>;
-    setNodePublicIPv4(node_id: Node.Id, ip: string): Promise<{
+    persistNode(row: Node.Model): Promise<{
         numAffected: number;
         affectedDocuments: import("@seald-io/nedb").Document<Record<string, any>> | import("@seald-io/nedb").Document<Record<string, any>>[] | null;
         upsert: boolean;
     }>;
     /**
-     * @todo delete _id
+     *
+     * @param users array of nodes to persist
+     * @returns {Promise}
      */
-    sync(data: Node.Model[], from: Node.Id): Promise<boolean>;
+    persistNodes(nodes: Node.Model[], user_id: User.Id): Promise<boolean>;
+    /**
+     * Update some data by proxy
+     */
+    private updateNodeData;
 }
 export default NodeModel;

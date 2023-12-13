@@ -6,6 +6,7 @@ export declare namespace Node {
     type Id = string;
     type Name = string;
     type Model = {
+        [index: string | symbol]: Id | string | Sync.Id | boolean | undefined | number;
         node_id: Node.Id;
         user_id: User.Id;
         name: string;

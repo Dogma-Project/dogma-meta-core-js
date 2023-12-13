@@ -160,18 +160,13 @@ stateManager.subscribe(
         break;
       case C_System.States.empty:
         logger.info("NODE MODEL", "DB is empty");
-        if (
-          storageNode === C_System.States.full &&
-          storageUser === C_System.States.full
-        ) {
+        if (storage.user.id && storage.node.id) {
           logger.log("NODE MODEL", "insert own node into database");
-          await nodeModel.persistNodes([
-            {
-              user_id: storage.user.id || "",
-              node_id: storage.node.id || "",
-              name: storage.node.name,
-            },
-          ]);
+          await nodeModel.persistNode({
+            user_id: storage.user.id,
+            node_id: storage.node.id,
+            name: storage.node.name,
+          });
         }
         break;
       case C_System.States.limited:

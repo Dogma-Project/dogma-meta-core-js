@@ -8,6 +8,7 @@ import StateManager from "../state";
 import { C_Event, C_System, C_Sync } from "@dogma-project/constants-meta";
 import EncryptDb from "./dbEncryption/afterSerialization";
 import DecryptDb from "./dbEncryption/beforeDeserialization";
+import path from "node:path";
 
 class UserModel implements Model {
   stateBridge: StateManager;
@@ -25,7 +26,7 @@ class UserModel implements Model {
     try {
       logger.log("nedb", "load database", "users");
       this.db = new Datastore({
-        filename: getDatadir().nedb + "/users.db",
+        filename: path.join(getDatadir().nedb, "/users.db"),
         timestampData: true,
         afterSerialization: (str) => {
           if (encryptionKey && this.encrypt) {
@@ -59,8 +60,6 @@ class UserModel implements Model {
 
   /**
    * Update some value directly
-   * @param i
-   * @returns
    */
   private makeProxy(i: Record<string, any>) {
     const model = this;
@@ -102,8 +101,6 @@ class UserModel implements Model {
 
   /**
    * Persist some user
-   * @param row
-   * @returns
    */
   public async persistUser(row: User.Model) {
     try {
@@ -177,10 +174,6 @@ class UserModel implements Model {
 
   /**
    * Update some data by proxy
-   * @param user_id
-   * @param key
-   * @param value
-   * @returns
    */
   private updateUserData(
     user_id: User.Id,
@@ -217,25 +210,6 @@ class UserModel implements Model {
       return Promise.reject(err);
     }
   }
-
-  //   /**
-  //    *
-  //    * @param {String} node_id
-  //    * @returns
-  //    */
-  //   async getSync(node_id: ) {
-  //     try {
-  //       const updated = await Sync.get("users", node_id);
-  //       const time = updated && updated.time ? updated.time : 1;
-  //       const nedbTime = new Date(time);
-  //       return usersDb.findAsync({
-  //         sync_id: { $exists: true },
-  //         updatedAt: { $gt: nedbTime },
-  //       });
-  //     } catch (err) {
-  //       return Promise.reject(err);
-  //     }
-  //     },
 }
 
 export default UserModel;

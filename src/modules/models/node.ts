@@ -8,6 +8,7 @@ import StateManager from "../state";
 import { C_Event, C_System, C_Sync } from "@dogma-project/constants-meta";
 import EncryptDb from "./dbEncryption/afterSerialization";
 import DecryptDb from "./dbEncryption/beforeDeserialization";
+import path from "node:path";
 
 class NodeModel implements Model {
   stateBridge: StateManager;
@@ -15,6 +16,7 @@ class NodeModel implements Model {
 
   encrypt = true;
   private projection = { user_id: 1, node_id: 1, name: 1, _id: 0 };
+  private editable = ["name", "public_ipv4", "local_ipv4"];
 
   constructor({ state }: { state: StateManager }) {
     this.stateBridge = state;
@@ -24,7 +26,7 @@ class NodeModel implements Model {
     try {
       logger.log("nedb", "load database", "nodes");
       this.db = new Datastore({
-        filename: getDatadir().nedb + "/nodes.db",
+        filename: path.join(getDatadir().nedb, "/nodes.db"),
         timestampData: true,
         afterSerialization: (str) => {
           if (encryptionKey && this.encrypt) {
@@ -42,10 +44,6 @@ class NodeModel implements Model {
         },
       });
       await this.db.loadDatabaseAsync();
-      // await this.db.ensureIndexAsync({
-      //   fieldName: "param",
-      //   unique: true,
-      // });
       this.stateBridge.emit(C_Event.Type.nodesDb, C_System.States.ready);
     } catch (err) {
       logger.error("config.nodes", err);
@@ -56,13 +54,41 @@ class NodeModel implements Model {
     return this.db.findAsync({}).projection(this.projection);
   }
 
+  /**
+   * Update some value directly
+   */
+  private makeProxy(i: Record<string, any>) {
+    const model = this;
+    const proxyHandler: ProxyHandler<Node.Model> = {
+      get(target, key) {
+        return target[key];
+      },
+      set(target, key: string, value: string | number | boolean) {
+        if (model.editable.indexOf(key) > -1) {
+          target[key] = value;
+          console.log("SET!!!!!!!!!!!!!!", key, value);
+          model
+            .updateNodeData(target.user_id, target.node_id, key, value)
+            .catch((err) => {
+              logger.error("Proxy", "Node model", err);
+            });
+          return true;
+        } else {
+          return false;
+        }
+      },
+    };
+    return new Proxy(i, proxyHandler);
+  }
+
   async loadNodesTable() {
     try {
       logger.log("Node Model", "Load node table");
       const data = await this.getAll();
       if (data.length) {
+        const nodes = data.map((i) => this.makeProxy(i));
+        this.stateBridge.emit(C_Event.Type.nodes, nodes);
         this.stateBridge.emit(C_Event.Type.nodesDb, C_System.States.full);
-        this.stateBridge.emit(C_Event.Type.nodes, data);
       } else {
         this.stateBridge.emit(C_Event.Type.nodesDb, C_System.States.empty);
       }
@@ -75,102 +101,82 @@ class NodeModel implements Model {
     return this.db.findAsync({ user_id }).projection(this.projection);
   }
 
+  async persistNode(row: Node.Model) {
+    try {
+      const { node_id, user_id } = row;
+      const result = await this.db.updateAsync(
+        { node_id, user_id },
+        { $set: row },
+        { upsert: true }
+      );
+
+      const records = result.affectedDocuments;
+      if (records) {
+        const record = !Array.isArray(records) ? records : records[0];
+        if (!("sync_id" in record)) {
+          const sync_id = generateSyncId(C_Sync.SIZES.NODE_ID);
+          await this.db.updateAsync(
+            { user_id, node_id },
+            { $set: { sync_id } }
+          );
+        }
+        // add warning if length > 1
+        let nodes = this.stateBridge.get<Record<string, any>[]>(
+          C_Event.Type.nodes
+        );
+        if (!nodes) nodes = [];
+        let actual = nodes.find(
+          (node) => node.user_id === user_id && node.node_id === node_id
+        );
+        const proxy = this.makeProxy(record);
+        if (actual) {
+          actual = proxy; // check
+        } else {
+          nodes.push(proxy);
+        }
+      }
+      this.stateBridge.emit(C_Event.Type.nodesDb, C_System.States.full);
+      return result;
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+
   /**
    *
-   * @param nodes [{name, node_id, user_id, public_ipv4, router_port}]
+   * @param users array of nodes to persist
    * @returns {Promise}
    */
-  persistNodes(nodes: Node.Model[]) {
-    // add validation
-
-    const insert = async (row: Node.Model) => {
-      try {
-        const { node_id, user_id } = row;
-        const result = await this.db.updateAsync(
-          { node_id, user_id },
-          { $set: row },
-          { upsert: true }
-        );
-        if (result.affectedDocuments) {
-          if (!Array.isArray(result.affectedDocuments)) {
-            if (!("sync_id" in result.affectedDocuments)) {
-              const sync_id = generateSyncId(C_Sync.SIZES.NODE_ID);
-              const res = await this.db.updateAsync(
-                { node_id, user_id },
-                { $set: { sync_id } }
-              );
-            }
-          } else {
-            logger.warn(
-              "Nodes model",
-              "upsert multiple",
-              result.affectedDocuments
-            );
-          }
-        }
-        return result;
-      } catch (err) {
-        return Promise.reject(err);
-      }
-    };
-
-    return new Promise(async (resolve, reject) => {
-      try {
-        for (let i = 0; i < nodes.length; i++) {
-          await insert(nodes[i]);
-        }
-        this.stateBridge.emit(C_Event.Type.nodesDb, C_System.States.reload); // downgrade state to reload database
-        resolve(true);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
-
-  async setNodePublicIPv4(node_id: Node.Id, ip: string) {
-    return this.db.updateAsync({ node_id }, { $set: { public_ipv4: ip } });
-  }
-
-  /**
-   * @todo delete _id
-   */
-  async sync(data: Node.Model[], from: Node.Id) {
+  public async persistNodes(nodes: Node.Model[], user_id: User.Id) {
     try {
-      for (const row of data) {
-        const { sync_id, user_id, node_id } = row;
-        if (!sync_id) {
-          logger.log("node", "sync", "unknown sync_id", sync_id);
-          continue;
+      for (let i = 0; i < nodes.length; i++) {
+        if (nodes[i].user_id === user_id) {
+          await this.persistNode(nodes[i]);
+        } else {
+          logger.warn("Persist Node", "User not match");
         }
-        await this.db.updateAsync(
-          { $or: [{ $and: [{ user_id }, { node_id }] }, { sync_id }] },
-          row,
-          { upsert: true }
-        );
       }
-      this.stateBridge.emit(C_Event.Type.nodesDb, C_System.States.reload); // downgrade state to reload database
-      // Sync.confirm("nodes", from);
       return true;
     } catch (err) {
       return Promise.reject(err);
     }
   }
 
-  /*
-  async getSync(node_id: Types.Node.Id) {
-    try {
-      const updated = await Sync.get("nodes", node_id);
-      const time = updated && updated.time ? updated.time : 1;
-      const nedbTime = new Date(time);
-      return this.db.findAsync({
-        sync_id: { $exists: true },
-        updatedAt: { $gt: nedbTime },
-      });
-    } catch (err) {
-      return Promise.reject(err);
-    }
+  /**
+   * Update some data by proxy
+   */
+  private updateNodeData(
+    user_id: User.Id,
+    node_id: Node.Id,
+    key: string,
+    value: string | boolean | number
+  ) {
+    const query: {
+      [index: typeof key]: typeof value;
+    } = {};
+    query[key] = value;
+    return this.db.updateAsync({ user_id, node_id }, { $set: query });
   }
-  */
 }
 
 export default NodeModel;

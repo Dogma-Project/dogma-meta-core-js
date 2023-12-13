@@ -6,6 +6,13 @@ export namespace Node {
   export type Id = string;
   export type Name = string;
   export type Model = {
+    [index: string | symbol]:
+      | Id
+      | string
+      | Sync.Id
+      | boolean
+      | undefined
+      | number;
     node_id: Node.Id;
     user_id: User.Id;
     name: string;

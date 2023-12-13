@@ -1,15 +1,15 @@
 {
   "name": "@dogma-project/core-meta",
-  "version": "0.7.31",
+  "version": "0.7.32",
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
   "main": "./dist/manager.js",
   "types": "./types/manager.d.ts",
   "scripts": {
     "manager": "tsc && node dist/dev-manager.js",
-    "dev": "apiport=24701 prefix=dev loglevel=3 tsc-watch --onSuccess 'node ./dist/dev.js'",
-    "dev2": "apiport=24702 prefix=dev2 tsc-watch --onSuccess 'node ./dist/dev.js'",
-    "empty": "apiport=24600 prefix=empty-1 tsc-watch --onSuccess 'node ./dist/dev.js'",
-    "empty2": "apiport=24702 prefix=empty-2 tsc-watch --onSuccess 'node ./dist/dev.js'",
+    "dev": "apiport=24702 prefix=dev loglevel=3 tsc-watch --onSuccess 'node ./dist/dev.js'",
+    "dev2": "apiport=24703 prefix=dev2 tsc-watch --onSuccess 'node ./dist/dev.js'",
+    "empty": "apiport=24702 prefix=empty-1 tsc-watch --onSuccess 'node ./dist/dev.js'",
+    "empty2": "apiport=24703 prefix=empty-2 tsc-watch --onSuccess 'node ./dist/dev.js'",
     "test": "tsc && NODE_ENV=test node --test dist/",
     "main-test": "tsc && NODE_ENV=development node dist/tests/main.js --loglevel=4",
     "build": "tsc --build"

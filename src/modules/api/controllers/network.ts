@@ -12,14 +12,14 @@ export async function getNetwork() {
     const users = await userModel.getAll();
     const nodes = await nodeModel.getAll();
 
-    const result: any[] = []; // edit
+    const result: API.NetworkData[] = [];
 
     users.forEach((user) => {
       result.push({
         id: user.user_id,
         name: user.name,
-        current: own_user_id && own_user_id === user.user_id,
-        requested: !!user.requested,
+        current: (own_user_id && own_user_id === user.user_id) || false,
+        requested: !!user.requested || undefined,
         nodes: [],
       });
     });
@@ -29,13 +29,13 @@ export async function getNetwork() {
         user.nodes.push({
           id: node.node_id,
           name: node.name,
-          current: own_node_id && own_node_id === node.node_id,
+          current: (own_node_id && own_node_id === node.node_id) || false,
           online: connections.isNodeOnline(node.node_id),
         });
     });
     return result;
   } catch (err) {
-    Promise.reject(err);
+    return Promise.reject(err);
   }
 }
 

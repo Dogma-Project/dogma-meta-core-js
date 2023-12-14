@@ -9,5 +9,12 @@ const worker = new RunWorker({
 });
 
 worker.on("notify", (data) => {
-  // logger.debug("NOTIFY 1", data);
+  if (data.type === C_API.ApiRequestType.system) {
+    logger.debug("NOTIFY 1", data);
+  }
+});
+
+worker.send({
+  type: C_API.ApiRequestType.system,
+  action: C_API.ApiRequestAction.get,
 });

@@ -88,6 +88,10 @@ export default class RunWorker extends EventEmitter {
     });
   }
 
+  public send(data: Omit<API.Request, "id">) {
+    this.worker.postMessage(data);
+  }
+
   public stop() {
     return this.worker.terminate();
   }

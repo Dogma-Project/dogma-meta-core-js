@@ -1,6 +1,7 @@
 import { API } from "../../../types";
 import { C_API } from "@dogma-project/constants-meta";
 import process from "node:process";
+import WorkerApi from "../index";
 
 function getSystemInfo() {
   return {
@@ -13,16 +14,14 @@ function getSystemInfo() {
   };
 }
 
-export default function SystemController(
-  this: API.DogmaWebSocket,
-  data: API.ApiRequest
-) {
+export default function SystemController(this: WorkerApi, data: API.Request) {
   switch (data.action) {
     case C_API.ApiRequestAction.get:
       const info = getSystemInfo();
       this.response({
         type: C_API.ApiRequestType.system,
         action: C_API.ApiRequestAction.set,
+        id: data.id,
         payload: {
           system: info,
         },

@@ -12,7 +12,6 @@ import { Response } from "./types/response";
 import { Streams } from "./types/streams";
 import { Sync } from "./types/sync";
 import { User } from "./types/user";
-import { System } from "./types/system";
 import { API } from "./types/api";
 
 declare global {
@@ -41,6 +40,5 @@ export {
   Streams,
   Sync,
   User,
-  System,
   API,
 };

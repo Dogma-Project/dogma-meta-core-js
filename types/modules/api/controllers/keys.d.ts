@@ -1,2 +1,3 @@
 import { API } from "../../../types";
-export default function KeysController(this: API.DogmaWebSocket, data: API.ApiRequest): void;
+import WorkerApi from "../index";
+export default function KeysController(this: WorkerApi, data: API.Request): void;

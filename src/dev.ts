@@ -1,8 +1,13 @@
-import { C_System } from "@dogma-project/constants-meta";
+import { C_API, C_System } from "@dogma-project/constants-meta";
 import RunWorker from "./run";
+import logger from "./modules/logger";
 
 const worker = new RunWorker({
-  apiPort: Number(process.env.apiport) || 24701,
-  prefix: process.env.prefix || "empty-0",
-  loglevel: Number(process.env.loglevel) || C_System.LogLevel.debug,
+  prefix: process.env.prefix || "dev-0",
+  auto: true,
+  loglevel: C_System.LogLevel.info,
+});
+
+worker.on("notify", (data) => {
+  // logger.debug("NOTIFY 1", data);
 });

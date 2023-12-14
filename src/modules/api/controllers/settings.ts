@@ -3,6 +3,7 @@ import stateManager from "../../../components/state";
 import { C_API, C_Event } from "@dogma-project/constants-meta";
 import { configModel } from "../../../components/model";
 import logger from "../../logger";
+import WorkerApi from "../index";
 
 function getConfig() {
   return {
@@ -124,15 +125,13 @@ async function setConfig(body: {} = {}) {
   return count;
 }
 
-export default function SettingsController(
-  this: API.DogmaWebSocket,
-  data: API.ApiRequest
-) {
+export default function SettingsController(this: WorkerApi, data: API.Request) {
   switch (data.action) {
     case C_API.ApiRequestAction.get:
       this.response({
         type: C_API.ApiRequestType.settings,
         action: C_API.ApiRequestAction.set,
+        id: data.id,
         payload: {
           settings: getConfig(),
         },
@@ -144,6 +143,7 @@ export default function SettingsController(
           this.response({
             type: C_API.ApiRequestType.settings,
             action: C_API.ApiRequestAction.result,
+            id: data.id,
             payload: {
               settings: res,
             },

@@ -1,10 +1,9 @@
+/// <reference types="node" />
 import { C_System } from "@dogma-project/constants-meta";
+import { EventEmitter } from "node:stream";
+import { API } from "./types";
 interface WorkerData {
     prefix: string;
-    /**
-     * Sets API port
-     */
-    apiPort: number;
     /**
      * enforces router port ignoring settings
      */
@@ -22,12 +21,16 @@ interface WorkerData {
      */
     loglevel?: C_System.LogLevel;
 }
-export default class RunWorker {
+export default class RunWorker extends EventEmitter {
     private worker;
     id: string;
-    apiPort: number;
     name: string;
     constructor(data: WorkerData);
+    emit(eventName: "exit", exitCode: number): boolean;
+    emit(eventName: "notify", payload: Omit<API.Response, "id">): boolean;
+    on(eventName: "exit", listener: (exitCode: number) => void): this;
+    on(eventName: "notify", listener: (payload: Omit<API.Response, "id">) => void): this;
+    request(data: Omit<API.Request, "id">): Promise<Omit<API.Response, "id">>;
     stop(): Promise<number>;
 }
 export {};

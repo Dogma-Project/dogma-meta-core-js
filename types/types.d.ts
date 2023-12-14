@@ -12,7 +12,6 @@ import { Response } from "./types/response";
 import { Streams } from "./types/streams";
 import { Sync } from "./types/sync";
 import { User } from "./types/user";
-import { System } from "./types/system";
 import { API } from "./types/api";
 declare global {
     interface String {
@@ -24,4 +23,4 @@ declare global {
     var prefix: string;
 }
 export type Request = DHT.Abstract | Message.Abstract;
-export { Certificate, Config, Connection, DHT, Discovery, Event, File, Keys, Message, Node, Response, Streams, Sync, User, System, API, };
+export { Certificate, Config, Connection, DHT, Discovery, Event, File, Keys, Message, Node, Response, Streams, Sync, User, API, };

@@ -9,6 +9,7 @@ import storage from "../../../components/storage";
 import { createKeyPair } from "../../keys";
 import { API } from "../../../types";
 import logger from "../../logger";
+import WorkerApi from "../index";
 
 async function createKey({
   name,
@@ -67,15 +68,13 @@ async function createKey({
   }
 }
 
-export default function KeysController(
-  this: API.DogmaWebSocket,
-  data: API.ApiRequest
-) {
+export default function KeysController(this: WorkerApi, data: API.Request) {
   switch (data.action) {
     case C_API.ApiRequestAction.get:
       // this.response({
       //   type: API.ApiRequestType.keys,
       //   action: API.ApiRequestAction.set,
+      //   id: data.id,
       //   payload: {
       //     settings: getConfig(),
       //   },
@@ -87,6 +86,7 @@ export default function KeysController(
           this.response({
             type: C_API.ApiRequestType.keys,
             action: C_API.ApiRequestAction.result,
+            id: data.id,
             payload: {
               result: true,
             },

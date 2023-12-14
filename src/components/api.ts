@@ -1,14 +1,11 @@
-import { workerData } from "node:worker_threads";
-
-import WebSocketApi from "../modules/api";
+import WorkerApi from "../modules/api";
 import stateManager from "./state";
 import { C_API, C_Event } from "@dogma-project/constants-meta";
-import logger from "../modules/logger";
 
-const wsApi = new WebSocketApi(workerData.apiPort);
+const wsApi = new WorkerApi();
 
 stateManager.subscribe([C_Event.Type.services], ([services]) => {
-  wsApi.broadcast({
+  wsApi.notify({
     type: C_API.ApiRequestType.services,
     action: C_API.ApiRequestAction.set,
     payload: {

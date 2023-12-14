@@ -3,6 +3,7 @@ import { API } from "../../../types";
 import storage from "../../../components/storage";
 import { nodeModel, userModel } from "../../../components/model";
 import { C_API } from "@dogma-project/constants-meta";
+import WorkerApi from "../index";
 
 export async function getNetwork() {
   const own_user_id = storage.user.id;
@@ -39,10 +40,7 @@ export async function getNetwork() {
   }
 }
 
-export default function NetworkController(
-  this: API.DogmaWebSocket,
-  data: API.ApiRequest
-) {
+export default function NetworkController(this: WorkerApi, data: API.Request) {
   switch (data.action) {
     case C_API.ApiRequestAction.get:
       getNetwork()
@@ -50,6 +48,7 @@ export default function NetworkController(
           this.response({
             type: C_API.ApiRequestType.network,
             action: C_API.ApiRequestAction.set,
+            id: data.id,
             payload: {
               network: res,
             },
@@ -58,7 +57,6 @@ export default function NetworkController(
         .catch((err) => {
           // error
         });
-
       break;
   }
 }

@@ -30,7 +30,11 @@ import { C_System, C_Defaults } from "@dogma-project/constants-meta";
 // BgWhite = "\x1b[47m"
 
 const logLevel = () => {
-  return (workerData && workerData.loglevel) || C_Defaults.logLevel;
+  return (
+    (workerData && workerData.loglevel) ||
+    Number(process.env.loglevel) ||
+    C_Defaults.logLevel
+  );
 };
 
 const prefix = () => {
@@ -82,7 +86,7 @@ const dogmaLog = (type: string, ...message: any) => {
 };
 
 /**
- * Magenta messages in console. Level 4.
+ * Magenta messages in console. Level 5.
  * @param type
  * @param message
  */

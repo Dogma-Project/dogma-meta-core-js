@@ -19,6 +19,7 @@ export default function KeysController(this: WorkerApi, data: API.Request) {
       break;
     case C_API.ApiRequestAction.push:
       // import user key
+      logger.debug("IMPORT KEY", data.payload, Buffer.isBuffer(data.payload));
       this.response({
         type: C_API.ApiRequestType.keys,
         action: C_API.ApiRequestAction.result,

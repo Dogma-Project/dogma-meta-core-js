@@ -10,6 +10,7 @@ import path from "node:path";
 
 export default function importUserKey(cert: string) {
   try {
+    logger.debug("Import key 2", cert);
     if (typeof cert !== "string") throw "Cert is not a string";
     const parsed = JSON.parse(
       Buffer.from(cert, "base64").toString()

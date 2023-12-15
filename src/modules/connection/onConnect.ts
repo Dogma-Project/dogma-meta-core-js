@@ -53,8 +53,10 @@ export default function onConnect(
       }
     } else {
       dogmaSocket.destroy("Unknown user or node id");
+      logger.warn("connection", "Unknown user or node id");
     }
   });
+
   dogmaSocket.on("friendship", () => {
     const { user_id, user_name } = dogmaSocket; // add name
     this.stateBridge.emit(C_Event.Type.friendshipRequest, {
@@ -62,10 +64,13 @@ export default function onConnect(
       user_name,
     });
   });
+
   dogmaSocket.on("data", (data: Types.Streams.DemuxedResult) => {
     const handler = this.handlers[data.mx];
     handler && handler(data.data, dogmaSocket, data.descriptor);
   });
+
   this.peers[dogmaSocket.id] = dogmaSocket;
-  logger.info("connection", "connected", dogmaSocket.id, peer.address);
+
+  logger.info("connection", "connected", dogmaSocket.id);
 }

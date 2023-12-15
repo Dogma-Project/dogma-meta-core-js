@@ -4,7 +4,7 @@ import * as Types from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
 import Connections from "./connections";
-import { C_Connection, C_Event } from "@dogma-project/constants-meta";
+import { C_Connection, C_Event, C_System } from "@dogma-project/constants-meta";
 
 export default class Client {
   connectionsBridge: Connections;
@@ -52,6 +52,18 @@ export default class Client {
     node: { user_id: Types.User.Id; node_id: Types.Node.Id }
   ) {
     logger.log("Client", "Try peer", node.node_id);
+
+    const server =
+      this.stateBridge.get(C_Event.Type.server) || C_System.States.disabled;
+    if (server < C_System.States.ok) {
+      return logger.warn("Client", "Not ready to connect");
+    }
+    if (
+      node.user_id === this.storageBridge.user.id &&
+      node.node_id === this.storageBridge.node.id
+    ) {
+      return logger.warn("Client", "Prevent self connection");
+    }
 
     const { user_id, node_id } = node;
     if (this.connectionsBridge.isNodeOnline(node_id)) {

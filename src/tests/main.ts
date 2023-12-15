@@ -24,7 +24,7 @@ let testingImport = false;
 
 workerAuto.on("state", async (data) => {
   if (data.event === C_Event.Type.users) {
-    logger.debug("state", ">>>>>>>", data.payload);
+    // logger.debug("state", ">>>>>>>", data.payload);
     if (data.payload && data.payload.length) {
       if (testingImport === true) return;
       testingImport = true;

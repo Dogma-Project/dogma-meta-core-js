@@ -57,6 +57,8 @@ stateManager.subscribe(
     C_Event.Type.configRouter,
     C_Event.Type.storageNode,
     C_Event.Type.storageUser,
+    C_Event.Type.users,
+    C_Event.Type.nodes,
   ],
   ([configRouter]) => {
     logger.log("DEBUG", "Server start");

@@ -4,7 +4,13 @@ import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 import Model from "./_model";
 import StateManager from "../state";
-import { C_Event, C_System } from "@dogma-project/constants-meta";
+import {
+  C_Connection,
+  C_Defaults,
+  C_Event,
+  C_System,
+} from "@dogma-project/constants-meta";
+import { workerData } from "node:worker_threads";
 class ConfigModel implements Model {
   stateBridge: StateManager;
   db!: Datastore;
@@ -33,26 +39,39 @@ class ConfigModel implements Model {
     }
   }
 
-  // private convertTypes(
-  //   type: Types.Event.Type.Config,
-  //   value: any
-  // ): number | string | boolean {
-  //   switch (type) {
-  //     case Types.Event.Type.configRouter:
-  //     case Types.Event.Type.configDhtAnnounce:
-  //     case Types.Event.Type.configDhtBootstrap:
-  //     case Types.Event.Type.configDhtLookup:
-  //       return Number(value);
-  //     case Types.Event.Type.configExternal:
-  //     case Types.Event.Type.configPublicIpV4:
-  //       return value as string;
-  //     case Types.Event.Type.configAutoDefine:
-  //     case Types.Event.Type.configLocalDiscovery:
-  //       return !!value;
-  //     default:
-  //       return value as string;
-  //   }
-  // }
+  public insertDefaults() {
+    logger.log("CONFIG MODEL", "auto generation with defaults");
+    return this.persistConfig([
+      {
+        param: C_Event.Type.configRouter,
+        value: workerData.routerPort || C_Defaults.router,
+      },
+      {
+        param: C_Event.Type.configAutoDefine,
+        value: C_Defaults.autoDefineIp,
+      },
+      {
+        param: C_Event.Type.configDhtAnnounce,
+        value: C_Connection.Group.friends,
+      },
+      {
+        param: C_Event.Type.configDhtLookup,
+        value: C_Connection.Group.friends,
+      },
+      {
+        param: C_Event.Type.configDhtBootstrap,
+        value: C_Connection.Group.friends,
+      },
+      {
+        param: C_Event.Type.configExternal,
+        value: C_Defaults.external,
+      },
+      {
+        param: C_Event.Type.configLocalDiscovery,
+        value: C_Defaults.localDiscovery,
+      },
+    ]);
+  }
 
   async loadConfigTable() {
     try {

@@ -7,17 +7,14 @@ declare class NodeModel implements Model {
     db: Datastore;
     encrypt: boolean;
     private projection;
-    private editable;
     constructor({ state }: {
         state: StateManager;
     });
     init(encryptionKey?: string): Promise<void>;
     getAll(): Promise<Record<string, any>[]>;
-    /**
-     * Update some value directly
-     */
-    private makeProxy;
+    get(user_id: string, node_id: string): Promise<Record<string, any>>;
     loadNodesTable(): Promise<void>;
+    private loadNode;
     getByUserId(user_id: User.Id): Promise<Record<string, any>[]>;
     persistNode(row: Node.Model): Promise<{
         numAffected: number;
@@ -31,6 +28,7 @@ declare class NodeModel implements Model {
      */
     persistNodes(nodes: Node.Model[], user_id: User.Id): Promise<boolean>;
     /**
+     * @deprecated
      * Update some data by proxy
      */
     private updateNodeData;

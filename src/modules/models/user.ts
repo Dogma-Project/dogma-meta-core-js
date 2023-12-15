@@ -58,37 +58,11 @@ class UserModel implements Model {
     return this.db.findAsync({}).projection(this.projection);
   }
 
-  /**
-   * Update some value directly
-   */
-  private makeProxy(i: Record<string, any>) {
-    const model = this;
-    const proxyHandler: ProxyHandler<User.Model> = {
-      get(target, key) {
-        return target[key];
-      },
-      set(target, key: string, value: string | number | boolean) {
-        if (model.editable.indexOf(key) > -1) {
-          target[key] = value;
-          console.log("SET!!!!!!!!!!!!!!", key, value);
-          model.updateUserData(target.user_id, key, value).catch((err) => {
-            logger.error("Proxy", "User model", err);
-          });
-          return true;
-        } else {
-          return false;
-        }
-      },
-    };
-    return new Proxy(i, proxyHandler);
-  }
-
   public async loadUsersTable() {
     try {
       logger.log("User Model", "Load user table");
-      const data = await this.getAll();
-      if (data.length) {
-        const users = data.map((i) => this.makeProxy(i));
+      const users = await this.getAll();
+      if (users.length) {
         this.stateBridge.emit(C_Event.Type.users, users);
         this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.full);
       } else {
@@ -99,7 +73,30 @@ class UserModel implements Model {
     }
   }
 
+  private async loadUser(_id: string) {
+    try {
+      logger.log("User Model", "Load user", _id);
+      const user = await this.db
+        .findOneAsync({ _id })
+        .projection(this.projection);
+      if (user) {
+        const users =
+          this.stateBridge.get<Record<string, any>[]>(C_Event.Type.users) || [];
+        let actual = users.find((u) => u.user_id === user.user_id);
+        if (actual) {
+          actual = user; // check
+        } else {
+          users.push(user);
+        }
+        this.stateBridge.emit(C_Event.Type.users, users);
+      }
+    } catch (err) {
+      logger.error("node.nedb", "loadUser", err);
+    }
+  }
+
   /**
+   * @todo delete proxy
    * Persist some user
    */
   public async persistUser(row: User.Model) {
@@ -117,18 +114,7 @@ class UserModel implements Model {
           const sync_id = generateSyncId(C_Sync.SIZES.USER_ID);
           await this.db.updateAsync({ user_id }, { $set: { sync_id } });
         }
-        // add warning if length > 1
-        let users = this.stateBridge.get<Record<string, any>[]>(
-          C_Event.Type.users
-        );
-        if (!users) users = [];
-        let actual = users.find((user) => user.user_id === user_id);
-        const proxy = this.makeProxy(record);
-        if (actual) {
-          actual = proxy; // check
-        } else {
-          users.push(proxy);
-        }
+        this.loadUser(record._id);
       }
       this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.full);
       return result;
@@ -170,21 +156,6 @@ class UserModel implements Model {
     } catch (err) {
       return Promise.reject(err);
     }
-  }
-
-  /**
-   * Update some data by proxy
-   */
-  private updateUserData(
-    user_id: User.Id,
-    key: string,
-    value: string | boolean | number
-  ) {
-    const query: {
-      [index: typeof key]: typeof value;
-    } = {};
-    query[key] = value;
-    return this.db.updateAsync({ user_id }, { $set: query });
   }
 
   /**

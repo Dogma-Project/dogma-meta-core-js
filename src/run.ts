@@ -42,16 +42,25 @@ export default class RunWorker extends EventEmitter {
       this.emit("exit", exitCode);
     });
     this.worker.on("message", (message: API.Response) => {
-      if (!message.id) this.emit("notify", message);
+      if ("event" in message) {
+        this.emit("state", message);
+      } else if (!message.id) {
+        this.emit("notify", message);
+      }
     });
   }
 
+  public emit(eventName: "state", payload: API.ResponseEvent): boolean;
   public emit(eventName: "exit", exitCode: number): boolean;
   public emit(eventName: "notify", payload: Omit<API.Response, "id">): boolean;
   public emit(eventName: string, payload: any) {
     return super.emit(eventName, payload);
   }
 
+  public on(
+    eventName: "state",
+    listener: (payload: API.ResponseEvent) => void
+  ): this;
   public on(eventName: "exit", listener: (exitCode: number) => void): this;
   public on(
     eventName: "notify",
@@ -75,7 +84,7 @@ export default class RunWorker extends EventEmitter {
       const minId = 1_000_000;
       const maxId = 9_999_999;
       const id = Math.floor(Math.random() * (maxId - minId) + minId);
-      this.worker.on("message", (message: API.Response) => {
+      this.worker.on("message", (message: API.ResponseRequest) => {
         if (message.id === id) {
           clearTimeout(timeout);
           delete message.id;

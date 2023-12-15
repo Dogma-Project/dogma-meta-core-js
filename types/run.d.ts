@@ -26,8 +26,10 @@ export default class RunWorker extends EventEmitter {
     id: string;
     name: string;
     constructor(data: WorkerData);
+    emit(eventName: "state", payload: API.ResponseEvent): boolean;
     emit(eventName: "exit", exitCode: number): boolean;
     emit(eventName: "notify", payload: Omit<API.Response, "id">): boolean;
+    on(eventName: "state", listener: (payload: API.ResponseEvent) => void): this;
     on(eventName: "exit", listener: (exitCode: number) => void): this;
     on(eventName: "notify", listener: (payload: Omit<API.Response, "id">) => void): this;
     request(data: Omit<API.Request, "id">): Promise<Omit<API.Response, "id">>;

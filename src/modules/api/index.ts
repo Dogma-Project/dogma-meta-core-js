@@ -57,7 +57,7 @@ export default class WorkerApi {
     }
   }
 
-  protected response(data: API.Response) {
+  protected response(data: API.ResponseRequest) {
     if (data.id === undefined) return this.notify(data);
     if (this.parentPort) {
       this.parentPort.postMessage(data);
@@ -66,7 +66,7 @@ export default class WorkerApi {
     }
   }
 
-  public notify(data: Omit<API.Response, "id">) {
+  public notify(data: Omit<API.ResponseRequest, "id">) {
     if (this.parentPort) {
       this.parentPort.postMessage(data);
     } else {

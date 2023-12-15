@@ -70,54 +70,6 @@ class MessageModel implements Model {
     params.type = params.type || C_Message.Type.direct;
     return this.db.insertAsync(params);
   }
-
-  /**
-   *
-   * @param {Array} data
-   * @param {String} from node_id
-   */
-  /*
-  async sync(data, from) {
-    try {
-      for (const row of data) {
-        const { _id, sync_id } = row;
-        if (!sync_id) {
-          logger.debug("node", "sync", "unknown sync_id", _id);
-          continue;
-        }
-        delete row._id;
-        await messagesDb.updateAsync({ sync_id }, row, { upsert: true });
-      }
-      Sync.confirm("messages", from);
-      return true;
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  }
-  */
-
-  /**
-   *
-   * @param {String} node_id
-   * @returns
-   */
-
-  /*
-  async getSync(node_id) {
-    try {
-      const updated = await Sync.get("messages", node_id);
-      const time = updated && updated.time ? updated.time : 1;
-      const nedbTime = new Date(time);
-      return messagesDb.findAsync({
-        sync_id: { $exists: true },
-        updatedAt: { $gt: nedbTime },
-        $not: { direction: MESSAGES.DIRECT },
-      });
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  }
-  */
 }
 
 export default MessageModel;

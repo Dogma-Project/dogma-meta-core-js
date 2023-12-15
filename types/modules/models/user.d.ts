@@ -13,12 +13,10 @@ declare class UserModel implements Model {
     });
     init(encryptionKey?: string): Promise<void>;
     getAll(): Promise<Record<string, any>[]>;
-    /**
-     * Update some value directly
-     */
-    private makeProxy;
     loadUsersTable(): Promise<void>;
+    private loadUser;
     /**
+     * @todo delete proxy
      * Persist some user
      */
     persistUser(row: User.Model): Promise<{
@@ -36,10 +34,6 @@ declare class UserModel implements Model {
      * @todo set to deleted state instead of remove
      */
     removeUser(user_id: User.Id): Promise<boolean>;
-    /**
-     * Update some data by proxy
-     */
-    private updateUserData;
     /**
      * @todo delete _id
      */

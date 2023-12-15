@@ -1,6 +1,7 @@
-import { Event, Config } from "../types";
+import { parentPort } from "node:worker_threads";
+import { Event, Config, API } from "../types";
 import logger from "./logger";
-import { C_Event, C_System } from "@dogma-project/constants-meta";
+import { C_API, C_Event, C_System } from "@dogma-project/constants-meta";
 
 type MapPredicate<T> = T extends C_Event.Type.Service
   ? C_System.States
@@ -67,41 +68,53 @@ class StateManager {
   public emit(type: C_Event.Type.Action, payload: any): void;
   public emit(type: C_Event.Type, payload: typeof this.trigger): void;
   public emit(type: C_Event.Type, payload: any) {
-    let action: C_Event.Action = C_Event.Action.update;
-    if (this.state[type] === undefined) {
-      action = C_Event.Action.set;
-    }
-    if (payload !== this.trigger) {
-      if (JSON.stringify(this.state[type]) === JSON.stringify(payload)) return;
-      this.state[type] = payload; // test
-    } else {
+    try {
+      let action: C_Event.Action = C_Event.Action.update;
       if (this.state[type] === undefined) {
-        this.state[type] = this.trigger;
+        action = C_Event.Action.set;
       }
-    }
-    if (this.listeners[type] === undefined) {
-      return logger.debug("state", "There's no handlers for event", type);
-    }
-    if (this.services.indexOf(type as C_Event.Type.Service) > -1) {
-      // edit
-      const services = this.services.map((type) => {
-        return {
-          service: type,
-          state:
-            (this.state[type] as C_System.States) || C_System.States.disabled,
+      if (payload !== this.trigger) {
+        if (JSON.stringify(this.state[type]) === JSON.stringify(payload))
+          return;
+        this.state[type] = payload; // test
+        const event: API.ResponseEvent = {
+          type: C_API.ApiRequestType.system, // edit !!!!!!!!
+          action: C_API.ApiRequestAction.set,
+          event: type,
+          payload,
         };
+        parentPort?.postMessage(event);
+      } else {
+        if (this.state[type] === undefined) {
+          this.state[type] = this.trigger;
+        }
+      }
+      if (this.listeners[type] === undefined) {
+        return logger.debug("state", "There's no handlers for event", type);
+      }
+      if (this.services.indexOf(type as C_Event.Type.Service) > -1) {
+        // edit
+        const services = this.services.map((type) => {
+          return {
+            service: type,
+            state:
+              (this.state[type] as C_System.States) || C_System.States.disabled,
+          };
+        });
+        this.emit(C_Event.Type.services, services);
+      }
+      this.listeners[type].forEach((entry) => {
+        if (!entry.length) return;
+        let ready = true;
+        const result = entry[0].map((val) => {
+          if (this.state[val] === undefined) ready = false;
+          return this.state[val];
+        });
+        ready && entry[1](result, type, action); // edit
       });
-      this.emit(C_Event.Type.services, services);
+    } catch (err) {
+      logger.error("State manager", err);
     }
-    this.listeners[type].forEach((entry) => {
-      if (!entry.length) return;
-      let ready = true;
-      const result = entry[0].map((val) => {
-        if (this.state[val] === undefined) ready = false;
-        return this.state[val];
-      });
-      ready && entry[1](result, type, action); // edit
-    });
   }
 
   /**

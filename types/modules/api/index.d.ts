@@ -10,6 +10,6 @@ export default class WorkerApi {
     private networkController;
     private systemController;
     private handle;
-    protected response(data: API.Response): void;
-    notify(data: Omit<API.Response, "id">): void;
+    protected response(data: API.ResponseRequest): void;
+    notify(data: Omit<API.ResponseRequest, "id">): void;
 }

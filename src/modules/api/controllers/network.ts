@@ -43,6 +43,7 @@ export async function getNetwork() {
 export default function NetworkController(this: WorkerApi, data: API.Request) {
   switch (data.action) {
     case C_API.ApiRequestAction.get:
+      // get all friends, nodes and friendship requests
       getNetwork()
         .then((res) => {
           this.response({

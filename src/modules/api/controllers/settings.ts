@@ -138,6 +138,7 @@ export default function SettingsController(this: WorkerApi, data: API.Request) {
       });
       break;
     case C_API.ApiRequestAction.set:
+      // set values
       setConfig(data.payload)
         .then((res) => {
           this.response({
@@ -145,7 +146,27 @@ export default function SettingsController(this: WorkerApi, data: API.Request) {
             action: C_API.ApiRequestAction.result,
             id: data.id,
             payload: {
-              settings: res,
+              result: true,
+              upserted: res,
+            },
+          });
+        })
+        .catch((err) => {
+          logger.error("API", "settings", err);
+          // add
+        });
+      break;
+    case C_API.ApiRequestAction.push:
+      // insert defaults
+      configModel
+        .insertDefaults()
+        .then(() => {
+          this.response({
+            type: C_API.ApiRequestType.settings,
+            action: C_API.ApiRequestAction.result,
+            id: data.id,
+            payload: {
+              result: true,
             },
           });
         })

@@ -94,37 +94,7 @@ stateManager.subscribe([C_Event.Type.configDb], async ([configDb]) => {
       case C_System.States.empty:
         logger.info("CONFIG MODEL", "DB is empty");
         if (workerData.auto) {
-          logger.log("CONFIG MODEL", "auto generation with defaults");
-          await configModel.persistConfig([
-            {
-              param: C_Event.Type.configRouter,
-              value: workerData.routerPort || C_Defaults.router,
-            },
-            {
-              param: C_Event.Type.configAutoDefine,
-              value: C_Defaults.autoDefineIp,
-            },
-            {
-              param: C_Event.Type.configDhtAnnounce,
-              value: C_Connection.Group.friends,
-            },
-            {
-              param: C_Event.Type.configDhtLookup,
-              value: C_Connection.Group.friends,
-            },
-            {
-              param: C_Event.Type.configDhtBootstrap,
-              value: C_Connection.Group.friends,
-            },
-            {
-              param: C_Event.Type.configExternal,
-              value: C_Defaults.external,
-            },
-            {
-              param: C_Event.Type.configLocalDiscovery,
-              value: C_Defaults.localDiscovery,
-            },
-          ]);
+          await configModel.insertDefaults();
         }
         break;
       case C_System.States.limited:

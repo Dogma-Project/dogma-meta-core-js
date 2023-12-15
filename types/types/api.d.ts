@@ -1,4 +1,4 @@
-import { C_API } from "@dogma-project/constants-meta";
+import { C_API, C_Event } from "@dogma-project/constants-meta";
 import { User } from "./user";
 import { Node } from "./node";
 export declare namespace API {
@@ -8,12 +8,19 @@ export declare namespace API {
         id?: number;
         payload?: any;
     };
-    type Response = {
+    type ResponseRequest = {
         type: C_API.ApiRequestType;
         action: Omit<C_API.ApiRequestAction, "get" | "delete">;
-        id?: number;
         payload?: any;
+        id?: number;
     };
+    type ResponseEvent = {
+        type: C_API.ApiRequestType;
+        action: Omit<C_API.ApiRequestAction, "get" | "delete">;
+        payload?: any;
+        event: C_Event.Type;
+    };
+    type Response = ResponseRequest | ResponseEvent;
     interface NetworkNodesData {
         id: Node.Id;
         name: Node.Name;

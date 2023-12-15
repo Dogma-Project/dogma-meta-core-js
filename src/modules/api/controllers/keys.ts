@@ -23,7 +23,9 @@ export default function KeysController(this: WorkerApi, data: API.Request) {
         type: C_API.ApiRequestType.keys,
         action: C_API.ApiRequestAction.result,
         id: data.id,
-        payload: importUserKey(data.payload),
+        payload: importUserKey(
+          Buffer.isBuffer(data.payload) ? data.payload.toString() : data.payload
+        ),
       });
       break;
     case C_API.ApiRequestAction.set:

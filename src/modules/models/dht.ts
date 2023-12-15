@@ -45,9 +45,13 @@ class DHTModel implements Model {
       const count = await this.db.countAsync(params);
       if (!count) {
         const { user_id, node_id } = params;
-        await this.db.updateAsync({ user_id, node_id }, params, {
-          upsert: true,
-        });
+        await this.db.updateAsync(
+          { user_id, node_id },
+          { ...params, updated: Date.now() },
+          {
+            upsert: true,
+          }
+        );
         return C_DHT.Response.ok;
       } else {
         return C_DHT.Response.alreadyPresent;

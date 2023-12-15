@@ -24,6 +24,8 @@ export default function onData(
     case C_Streams.MX.mail:
     case C_Streams.MX.web:
     case C_Streams.MX.file:
+    case C_Streams.MX.sync:
+    case C_Streams.MX.relay:
       this.emit("data", result);
       break;
     default:

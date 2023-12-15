@@ -15,14 +15,8 @@ class NodeModel implements Model {
   db!: Datastore;
 
   encrypt = true;
-  private projection = {
-    user_id: 1,
-    node_id: 1,
-    name: 1,
-    public_ipv4: 1,
-    local_ipv4: 1,
-    _id: 0,
-  };
+  private projection = { _id: 0 };
+  public syncType = C_Sync.Type.nodes;
 
   constructor({ state }: { state: StateManager }) {
     this.stateBridge = state;
@@ -33,7 +27,6 @@ class NodeModel implements Model {
       logger.log("nedb", "load database", "nodes");
       this.db = new Datastore({
         filename: path.join(getDatadir().nedb, "/nodes.db"),
-        timestampData: true,
         afterSerialization: (str) => {
           if (encryptionKey && this.encrypt) {
             return EncryptDb(str, encryptionKey);
@@ -58,6 +51,48 @@ class NodeModel implements Model {
 
   public async getAll() {
     return this.db.findAsync({}).projection(this.projection);
+  }
+
+  /**
+   *
+   * @param from Timestamp in milliseconds
+   * @returns
+   */
+  public async getSync(from: number) {
+    return this.db.findAsync({ updated: { $gt: from } }).projection({ _id: 0 });
+  }
+
+  /**
+   * @todo log result
+   * @param data
+   * @returns
+   */
+  public async pushSync(data: Record<string, any>[]) {
+    try {
+      const nodes = this.stateBridge.get<Node.Model[]>(C_Event.Type.nodes);
+      if (!nodes || !nodes.length) {
+        return logger.warn("NODE SYNC", "Can't push sync. Nodes not loaded!");
+      }
+      logger.debug("!!!!!! Nodes", data, nodes);
+      for (const entry of data) {
+        const current = nodes.find(
+          (n) => n.user_id === entry.user_id && n.node_id === entry.node_id
+        );
+        if (!current || entry.updated > (current.updated || 0)) {
+          const result = await this.db.updateAsync(
+            {
+              user_id: entry.user_id,
+              node_id: entry.node_id,
+            },
+            { $set: entry },
+            { upsert: true }
+          );
+          logger.debug("SYNC NODE", "Upserted new value!");
+        }
+      }
+    } catch (err) {
+      return Promise.reject(err);
+    }
   }
 
   public async get(user_id: string, node_id: string) {
@@ -114,7 +149,7 @@ class NodeModel implements Model {
       const { node_id, user_id } = row;
       const result = await this.db.updateAsync(
         { node_id, user_id },
-        { $set: row },
+        { $set: { ...row, updated: Date.now() } },
         { upsert: true }
       );
       const records = result.affectedDocuments;
@@ -124,7 +159,7 @@ class NodeModel implements Model {
           const sync_id = generateSyncId(C_Sync.SIZES.NODE_ID);
           await this.db.updateAsync(
             { user_id, node_id },
-            { $set: { sync_id } }
+            { $set: { sync_id, updated: Date.now() } }
           );
         }
         await this.loadNode(record._id);

@@ -2,17 +2,30 @@ import { User } from "../../types";
 import Datastore from "@seald-io/nedb";
 import Model from "./_model";
 import StateManager from "../state";
+import { C_Sync } from "@dogma-project/constants-meta";
 declare class UserModel implements Model {
     stateBridge: StateManager;
     db: Datastore;
     encrypt: boolean;
     private projection;
-    private editable;
+    syncType: C_Sync.Type;
     constructor({ state }: {
         state: StateManager;
     });
     init(encryptionKey?: string): Promise<void>;
     getAll(): Promise<Record<string, any>[]>;
+    /**
+     *
+     * @param from Timestamp in milliseconds
+     * @returns
+     */
+    getSync(from: number): Promise<Record<string, any>[]>;
+    /**
+     * @todo log result
+     * @param data
+     * @returns
+     */
+    pushSync(data: Record<string, any>[]): Promise<void>;
     loadUsersTable(): Promise<void>;
     private loadUser;
     /**
@@ -34,9 +47,5 @@ declare class UserModel implements Model {
      * @todo set to deleted state instead of remove
      */
     removeUser(user_id: User.Id): Promise<boolean>;
-    /**
-     * @todo delete _id
-     */
-    sync(data: User.Model[], from: User.Id): Promise<boolean>;
 }
 export default UserModel;

@@ -5,3 +5,4 @@ import "./components/keys";
 import "./components/model";
 import "./components/homedir";
 import "./components/api";
+import "./components/sync";

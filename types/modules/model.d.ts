@@ -5,5 +5,4 @@ import UserModel from "./models/user";
 import MessageModel from "./models/message";
 import ProtocolModel from "./models/protocol";
 import FileModel from "./models/file";
-import SyncModel from "./models/sync";
-export { ConfigModel, NodeModel, DHTModel, UserModel, MessageModel, ProtocolModel, FileModel, SyncModel, };
+export { ConfigModel, NodeModel, DHTModel, UserModel, MessageModel, ProtocolModel, FileModel, };

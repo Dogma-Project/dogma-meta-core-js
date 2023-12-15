@@ -21,6 +21,7 @@ declare class DogmaSocket extends EventEmitter {
         messages?: AesEncoder;
         mail?: AesEncoder;
         dht?: AesEncoder;
+        sync?: AesEncoder;
         web?: AesEncoder;
         file?: AesEncoder;
         relay?: AesEncoder;

@@ -23,6 +23,10 @@ export default function send(
         var str = JSON.stringify(request.body);
         socket.input.messages && socket.input.messages.write(str);
         return response(1, C_Constants.MessageCode.success);
+      case C_Streams.MX.sync:
+        var str = JSON.stringify(request.body);
+        socket.input.sync && socket.input.sync.write(str);
+        return response(1, C_Constants.MessageCode.success);
       default:
         request; // dummy
         break;

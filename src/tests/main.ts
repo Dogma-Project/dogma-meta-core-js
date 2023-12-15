@@ -10,14 +10,14 @@ import {
 const workerAuto = new RunWorker({
   prefix: "test-1",
   routerPort: 27834,
-  loglevel: C_System.LogLevel.warnings,
+  loglevel: C_System.LogLevel.debug,
   auto: true,
 });
 
 const workerSecondOwn = new RunWorker({
   prefix: "test-2",
   routerPort: 27835,
-  loglevel: C_System.LogLevel.debug,
+  loglevel: C_System.LogLevel.warnings,
 });
 
 let testingImport = false;
@@ -42,7 +42,7 @@ workerAuto.on("state", async (data) => {
         type: C_API.ApiRequestType.keys,
         action: C_API.ApiRequestAction.set,
         payload: {
-          name: "Dogma test node",
+          name: "Dogma second own node",
           length: 2048,
           type: C_Keys.Type.nodeKey,
         },

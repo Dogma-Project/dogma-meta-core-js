@@ -22,5 +22,5 @@ declare global {
     }
     var prefix: string;
 }
-export type Request = DHT.Abstract | Message.Abstract;
+export type Request = DHT.Abstract | Message.Abstract | Sync.Abstract;
 export { Certificate, Config, Connection, DHT, Discovery, Event, File, Keys, Message, Node, Response, Streams, Sync, User, API, };

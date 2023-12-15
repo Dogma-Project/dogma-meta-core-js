@@ -20,7 +20,6 @@ class MessageModel implements Model {
       logger.log("nedb", "load database", "messages");
       this.db = new Datastore({
         filename: getDatadir().nedb + "/messages.db",
-        timestampData: true,
       });
       await this.db.loadDatabaseAsync();
       await this.db.ensureIndexAsync({

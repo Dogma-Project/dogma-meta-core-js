@@ -31,6 +31,7 @@ class DogmaSocket extends EventEmitter {
     messages?: AesEncoder;
     mail?: AesEncoder;
     dht?: AesEncoder;
+    sync?: AesEncoder;
     web?: AesEncoder; // not implemented
     file?: AesEncoder; // not implemented
     relay?: AesEncoder; // not implemented
@@ -183,6 +184,12 @@ class DogmaSocket extends EventEmitter {
       symmetricKey: this.outSymmetricKey,
     });
     this.input.dht.pipe(this.socket);
+
+    this.input.sync = new AesEncoder({
+      id: C_Streams.MX.sync,
+      symmetricKey: this.outSymmetricKey,
+    });
+    this.input.sync.pipe(this.socket);
   }
 
   /**

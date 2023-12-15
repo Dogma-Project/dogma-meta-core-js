@@ -80,6 +80,7 @@ const dogmaInfo = (type: string, ...message: any) => {
  * @param message
  */
 const dogmaLog = (type: string, ...message: any) => {
+  if (logLevel() === C_System.LogLevel.debug) return;
   if (logLevel() < C_System.LogLevel.logs) return;
   type = type.toUpperCase();
   console.log(`${prefix()}\x1b[36m\x1b[40m[${type}]\x1b[0m`, ...message); // black

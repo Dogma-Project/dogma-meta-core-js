@@ -11,7 +11,6 @@ import {
   MessageModel,
   ProtocolModel,
   FileModel,
-  SyncModel,
 } from "../modules/model";
 import logger from "../modules/logger";
 import { C_Defaults } from "@dogma-project/constants-meta";

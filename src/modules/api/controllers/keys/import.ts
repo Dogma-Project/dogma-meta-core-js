@@ -8,10 +8,18 @@ import logger from "../../../logger";
 import { getDatadir } from "../../../datadir";
 import path from "node:path";
 
-export default function importUserKey(cert: string) {
+export default function importUserKey(cert: string | Buffer | Uint8Array) {
   try {
-    logger.debug("Import key 2", cert);
-    if (typeof cert !== "string") throw "Cert is not a string";
+    if (typeof cert !== "string") {
+      if (cert.constructor === Uint8Array) {
+        cert = Buffer.from(cert.buffer).toString();
+      } else if (cert.constructor === Buffer) {
+        cert = cert.toString();
+      } else {
+        logger.error("import key", "Unknown type", cert?.constructor);
+        return null;
+      }
+    }
     const parsed = JSON.parse(
       Buffer.from(cert, "base64").toString()
     ) as Keys.ExportFormat;

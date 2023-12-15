@@ -397,6 +397,7 @@ class DogmaSocket extends EventEmitter {
     this.checkGroup();
     this.setRsaEncoders();
     this.sendSymmetricKey();
+    this.emit("online", this.node_id);
   }
 
   private afterSymmetricKey() {
@@ -408,7 +409,8 @@ class DogmaSocket extends EventEmitter {
    * Successfully tested AES encryption
    */
   private afterTest() {
-    this.emit("online", this.node_id);
+    if (this.tested) return; // edit !!!!!!!
+    // this.emit("online", this.node_id);
   }
 
   /**

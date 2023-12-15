@@ -32,6 +32,7 @@ export default function onConnect(
     const { user_id, node_id, user_name, node_name, status, group } =
       dogmaSocket;
     if (user_id && node_id) {
+      if (this.online.indexOf(node_id) > -1) return; // check!!!
       this.stateBridge.emit(C_Event.Type.online, {
         user_id,
         node_id,
@@ -41,7 +42,15 @@ export default function onConnect(
         group,
       });
       this.online.push(node_id);
-      logger.info("connection", "ONLINE", node_id);
+      if (node_id !== this.storageBridge.node.id) {
+        logger.info(
+          "connection",
+          "[ONLINE]",
+          this.storageBridge.node.id,
+          "->",
+          node_id
+        );
+      }
     } else {
       dogmaSocket.destroy("Unknown user or node id");
     }

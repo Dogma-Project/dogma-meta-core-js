@@ -17,7 +17,7 @@ const workerAuto = new RunWorker({
 const workerSecondOwn = new RunWorker({
   prefix: "test-2",
   routerPort: 27835,
-  loglevel: C_System.LogLevel.warnings,
+  loglevel: C_System.LogLevel.debug,
 });
 
 let testingImport = false;

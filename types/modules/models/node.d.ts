@@ -25,6 +25,7 @@ declare class NodeModel implements Model {
     loadNodesTable(): Promise<void>;
     getByUserId(user_id: User.Id): Promise<Node.Model[]>;
     /**
+     *
      * @param row
      * @returns
      */
@@ -35,9 +36,24 @@ declare class NodeModel implements Model {
     }>;
     /**
      *
+     * @param row
+     * @returns
+     */
+    silentUpdateNode(row: Node.Model): Promise<{
+        numAffected: number;
+        affectedDocuments: import("@seald-io/nedb").Document<Node.Model> | import("@seald-io/nedb").Document<Node.Model>[] | null;
+        upsert: boolean;
+    }>;
+    /**
+     *
      * @param users array of nodes to persist
      * @returns {Promise}
      */
     persistNodes(nodes: Node.Model[], user_id: User.Id): Promise<boolean>;
+    removeNode(user_id: User.Id, node_id: Node.Id): Promise<{
+        numAffected: number;
+        affectedDocuments: import("@seald-io/nedb").Document<Node.Model> | import("@seald-io/nedb").Document<Node.Model>[] | null;
+        upsert: boolean;
+    }>;
 }
 export default NodeModel;

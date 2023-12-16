@@ -9,6 +9,7 @@ import {
   SettingsController,
   SystemController,
 } from "./controllers";
+import NodeController from "./controllers/node";
 
 export default class WorkerApi {
   parentPort: MessagePort | null;
@@ -29,6 +30,7 @@ export default class WorkerApi {
   private keysController = KeysController;
   private networkController = NetworkController;
   private systemController = SystemController;
+  private nodeController = NodeController;
 
   private handle(data: API.Request) {
     try {
@@ -47,6 +49,13 @@ export default class WorkerApi {
           break;
         case C_API.ApiRequestType.system:
           this.systemController(data);
+          break;
+        case C_API.ApiRequestType.user:
+          // get user
+          break;
+        case C_API.ApiRequestType.node:
+          // get node
+          this.nodeController(data);
           break;
         default:
           // 404

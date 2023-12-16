@@ -28,7 +28,12 @@ export declare namespace Sync {
         type: C_Sync.Type;
     }
     type Response = ResponseFull | ResponsePartial;
-    type Data = Request | Response;
+    interface Notify {
+        action: C_Sync.Action.notify;
+        type: C_Sync.Type;
+        time: number;
+    }
+    type Data = Request | Response | Notify;
     type Abstract = {
         class: C_Streams.MX.sync;
         body: Data;

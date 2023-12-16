@@ -8,7 +8,6 @@ import { C_Event, C_System, C_Sync } from "@dogma-project/constants-meta";
 import EncryptDb from "./dbEncryption/afterSerialization";
 import DecryptDb from "./dbEncryption/beforeDeserialization";
 import path from "node:path";
-import { createSha1Hash } from "../hash";
 
 class NodeModel implements Model {
   stateBridge: StateManager;
@@ -123,6 +122,7 @@ class NodeModel implements Model {
   }
 
   /**
+   *
    * @param row
    * @returns
    */
@@ -134,8 +134,25 @@ class NodeModel implements Model {
         { $set: { ...row, updated: Date.now() } },
         { upsert: true }
       );
-      this.stateBridge.emit(C_Event.Type.nodesDb, C_System.States.full);
+      this.stateBridge.emit(C_Event.Type.nodesDb, C_System.States.reload);
       return result;
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+
+  /**
+   *
+   * @param row
+   * @returns
+   */
+  public async silentUpdateNode(row: Node.Model) {
+    try {
+      const { node_id, user_id } = row;
+      return this.db.updateAsync<Node.Model>(
+        { node_id, user_id },
+        { $set: row }
+      );
     } catch (err) {
       return Promise.reject(err);
     }
@@ -159,6 +176,13 @@ class NodeModel implements Model {
     } catch (err) {
       return Promise.reject(err);
     }
+  }
+
+  public async removeNode(user_id: User.Id, node_id: Node.Id) {
+    return this.db.updateAsync<Node.Model>(
+      { user_id, node_id },
+      { user_id, node_id, deleted: true, updated: Date.now() }
+    );
   }
 }
 

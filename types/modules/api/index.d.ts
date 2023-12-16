@@ -9,6 +9,7 @@ export default class WorkerApi {
     private keysController;
     private networkController;
     private systemController;
+    private nodeController;
     private handle;
     protected response(data: API.ResponseRequest): void;
     notify(data: Omit<API.ResponseRequest, "id">): void;

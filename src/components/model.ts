@@ -13,9 +13,6 @@ import {
   FileModel,
 } from "../modules/model";
 import logger from "../modules/logger";
-import { C_Defaults } from "@dogma-project/constants-meta";
-import * as Types from "../types";
-import connections from "./connections";
 
 const configModel = new ConfigModel({ state: stateManager });
 const nodeModel = new NodeModel({ state: stateManager });

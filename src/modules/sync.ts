@@ -7,6 +7,7 @@ import StateManager from "./state";
 import Connections from "./connections";
 import { C_Connection, C_Streams, C_Sync } from "@dogma-project/constants-meta";
 import Model from "./models/_model";
+import { NodeModel } from "./model";
 
 type SyncParams = {
   connections: Connections;
@@ -64,12 +65,7 @@ class Sync extends EventEmitter {
    */
   private async handle(request: Types.Sync.Data, socket: DogmaSocket) {
     try {
-      // logger.debug(
-      //   "SYNC HANDLE",
-      //   Date.now(),
-      //   request.time,
-      //   Date.now() - request.time
-      // );
+      logger.debug("HANDLE SYNC REQUEST", request);
       switch (request.action) {
         case C_Sync.Action.get:
           const result: Types.Sync.Result = {};
@@ -102,8 +98,6 @@ class Sync extends EventEmitter {
         case C_Sync.Action.push:
           try {
             if (request.payload) {
-              logger.debug("SYNC", "PUSH!!!", request.payload);
-              logger.debug("Sync", "OWN NODE", this.storageBridge.node.id);
               for (const key in request.payload) {
                 const syncType = Number(key) as C_Sync.Type;
                 const model = this.models.find((m) => m.syncType === syncType);
@@ -129,6 +123,31 @@ class Sync extends EventEmitter {
             logger.error("Sync", err);
           }
           break;
+        case C_Sync.Action.notify:
+          // send sync requst
+
+          const { user_id, node_id } = socket;
+          if (user_id && node_id && request.type !== undefined) {
+            const model = this.models[C_Sync.Type.nodes] as NodeModel;
+            model
+              .get(user_id, node_id)
+              .then((res) => {
+                this.request(
+                  {
+                    action: C_Sync.Action.get,
+                    from: res.synced || 0,
+                    type: request.type,
+                    time: Date.now(),
+                  },
+                  node_id
+                );
+              })
+              .catch((err) => {
+                logger.error("SYNC", err);
+              });
+          }
+
+          break;
       }
     } catch (err) {
       logger.error("HANDLE SYNC", err);
@@ -147,6 +166,8 @@ class Sync extends EventEmitter {
    * Send sync request
    */
   public request(request: Types.Sync.Request, node_id: Types.Node.Id) {
+    logger.debug("SEND SYNC REQUEST", request);
+
     this.connectionsBridge.sendRequestToNode(
       {
         class: C_Streams.MX.sync,
@@ -159,7 +180,8 @@ class Sync extends EventEmitter {
   /**
    * Send some sync data to all own nodes
    */
-  public notify(request: Types.Sync.Response) {
+  public multicast(request: Types.Sync.Notify) {
+    logger.debug("SYNC MULTICAST", request);
     this.connectionsBridge.multicast(
       {
         class: C_Streams.MX.sync,

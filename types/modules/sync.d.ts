@@ -45,6 +45,6 @@ declare class Sync extends EventEmitter {
     /**
      * Send some sync data to all own nodes
      */
-    notify(request: Types.Sync.Response): void;
+    multicast(request: Types.Sync.Notify): void;
 }
 export default Sync;

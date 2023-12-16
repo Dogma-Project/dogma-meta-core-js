@@ -33,7 +33,13 @@ export namespace Sync {
   }
   export type Response = ResponseFull | ResponsePartial;
 
-  export type Data = Request | Response;
+  export interface Notify {
+    action: C_Sync.Action.notify;
+    type: C_Sync.Type;
+    time: number;
+  }
+
+  export type Data = Request | Response | Notify;
 
   export type Abstract = {
     class: C_Streams.MX.sync;

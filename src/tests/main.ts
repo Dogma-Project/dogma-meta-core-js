@@ -38,6 +38,7 @@ workerAuto.on("state", async (data) => {
         payload: cert.payload,
       });
       logger.debug("IMPORT", "USER KEY", res);
+
       const res2 = await workerSecondOwn.request({
         type: C_API.ApiRequestType.keys,
         action: C_API.ApiRequestAction.set,
@@ -48,11 +49,49 @@ workerAuto.on("state", async (data) => {
         },
       });
       logger.debug("CREATE NODE", res2);
+
       const res3 = await workerSecondOwn.request({
         type: C_API.ApiRequestType.settings,
         action: C_API.ApiRequestAction.push,
       });
       logger.debug("CREATE SETTINGS", res3);
+
+      const res4 = await workerAuto.request({
+        type: C_API.ApiRequestType.node,
+        action: C_API.ApiRequestAction.get,
+      });
+      logger.debug("OWN NODE", res4);
+
+      const res5 = await workerAuto.request({
+        type: C_API.ApiRequestType.node,
+        action: C_API.ApiRequestAction.get,
+        payload: {
+          user_id: res4.payload.user_id,
+          node_id: res4.payload.node_id,
+        },
+      });
+      logger.debug("GET NODE BY ID", res5);
+
+      const res6 = await workerAuto.request({
+        type: C_API.ApiRequestType.node,
+        action: C_API.ApiRequestAction.set,
+        payload: {
+          user_id: res4.payload.user_id,
+          node_id: res4.payload.node_id,
+          name: "Edited Node Name",
+        },
+      });
+      logger.debug("EDIT NODE NAME", res6);
+
+      const res7 = await workerAuto.request({
+        type: C_API.ApiRequestType.node,
+        action: C_API.ApiRequestAction.delete,
+        payload: {
+          user_id: res4.payload.user_id,
+          node_id: res4.payload.node_id,
+        },
+      });
+      logger.debug("DELETE NODE NAME", res7);
     }
   }
 });

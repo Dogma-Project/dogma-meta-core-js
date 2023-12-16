@@ -73,7 +73,7 @@ class UserModel implements Model {
   public async getSync(from: number) {
     return this.db
       .findAsync<User.Model>({ updated: { $gt: from } })
-      .projection({ _id: 0 });
+      .projection(this.projection);
   }
 
   public async pushSync(data: Record<string, any>[]) {
@@ -127,7 +127,7 @@ class UserModel implements Model {
         { $set: { ...row, updated: Date.now() } },
         { upsert: true }
       );
-      this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.full);
+      this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.reload);
       return result;
     } catch (err) {
       return Promise.reject(err);
@@ -150,10 +150,15 @@ class UserModel implements Model {
     }
   }
 
+  /**
+   * @todo delete all nodes
+   * @param user_id
+   * @returns
+   */
   public async removeUser(user_id: User.Id) {
     return this.db.updateAsync<User.Model>(
-      { _id: user_id },
-      { deleted: true, updated: Date.now() }
+      { user_id },
+      { user_id, deleted: true, updated: Date.now() }
     );
   }
 }

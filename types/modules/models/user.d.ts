@@ -13,28 +13,22 @@ declare class UserModel implements Model {
         state: StateManager;
     });
     init(encryptionKey?: string): Promise<void>;
-    getAll(): Promise<Record<string, any>[]>;
+    getAll(): Promise<User.Model[]>;
+    get(user_id: User.Id): Promise<User.Model>;
     /**
      *
      * @param from Timestamp in milliseconds
      * @returns
      */
-    getSync(from: number): Promise<Record<string, any>[]>;
-    /**
-     * @todo log result
-     * @param data
-     * @returns
-     */
-    pushSync(data: Record<string, any>[]): Promise<void>;
+    getSync(from: number): Promise<User.Model[]>;
+    pushSync(data: Record<string, any>[]): Promise<undefined>;
     loadUsersTable(): Promise<void>;
-    private loadUser;
     /**
-     * @todo delete proxy
      * Persist some user
      */
     persistUser(row: User.Model): Promise<{
         numAffected: number;
-        affectedDocuments: import("@seald-io/nedb").Document<Record<string, any>> | import("@seald-io/nedb").Document<Record<string, any>>[] | null;
+        affectedDocuments: import("@seald-io/nedb").Document<User.Model> | import("@seald-io/nedb").Document<User.Model>[] | null;
         upsert: boolean;
     }>;
     /**
@@ -43,9 +37,10 @@ declare class UserModel implements Model {
      * @returns {Promise}
      */
     persistUsers(users: User.Model[]): Promise<boolean>;
-    /**
-     * @todo set to deleted state instead of remove
-     */
-    removeUser(user_id: User.Id): Promise<boolean>;
+    removeUser(user_id: User.Id): Promise<{
+        numAffected: number;
+        affectedDocuments: import("@seald-io/nedb").Document<User.Model> | import("@seald-io/nedb").Document<User.Model>[] | null;
+        upsert: boolean;
+    }>;
 }
 export default UserModel;

@@ -20,7 +20,6 @@ export namespace Node {
     public_ipv6?: Connection.IPv4;
     local_ipv4?: Connection.IPv6;
     local_ipv6?: Connection.IPv6;
-    sync_id?: Sync.Id;
     /**
      * Timestamp in milliseconds
      */

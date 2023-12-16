@@ -57,14 +57,19 @@ stateManager.subscribe(
     C_Event.Type.configRouter,
     C_Event.Type.storageNode,
     C_Event.Type.storageUser,
-    C_Event.Type.users,
-    C_Event.Type.nodes,
+    C_Event.Type.usersDb,
+    C_Event.Type.nodesDb,
   ],
-  ([configRouter]) => {
-    logger.log("DEBUG", "Server start");
-    const forced = workerData.routerPort;
-    if (forced) logger.log("SERVER", "forced to port", forced);
-    server.start(forced || configRouter);
+  ([configRouter, storageNode, storageUser]) => {
+    if (
+      storageUser === C_System.States.full &&
+      storageNode === C_System.States.full
+    ) {
+      logger.log("DEBUG", "Server start");
+      const forced = workerData.routerPort;
+      if (forced) logger.log("SERVER", "forced to port", forced);
+      server.start(forced || configRouter);
+    }
   }
 );
 

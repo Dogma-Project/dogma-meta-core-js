@@ -195,28 +195,35 @@ class DogmaSocket extends EventEmitter {
   /**
    * Determine connection group and authorization status
    */
-  private setGroup() {
-    if (!this.user_id || !this.node_id) {
-      return this.destroy("Peer user_id or node_id not defined");
-    }
-    if (this.user_id === this.storageBridge.user.id) {
-      // own user
-      if (this.node_id === this.storageBridge.node.id) {
-        // own node
-        this.group = C_Connection.Group.selfNode;
-      } else {
-        this.group = C_Connection.Group.selfUser;
+  private async setGroup() {
+    try {
+      if (!this.user_id || !this.node_id) {
+        this.destroy("Peer user_id or node_id not defined");
+        return Promise.reject(null);
       }
-      this.status = C_Connection.Status.authorized;
-    } else {
-      const inFriends = this.connectionsBridge.isUserAuthorized(this.user_id);
-      if (inFriends) {
-        this.group = C_Connection.Group.friends;
+      if (this.user_id === this.storageBridge.user.id) {
+        // own user
+        if (this.node_id === this.storageBridge.node.id) {
+          // own node
+          this.group = C_Connection.Group.selfNode;
+        } else {
+          this.group = C_Connection.Group.selfUser;
+        }
         this.status = C_Connection.Status.authorized;
       } else {
-        this.group = C_Connection.Group.all;
-        this.status = C_Connection.Status.notAuthorized;
+        const inFriends = await this.connectionsBridge.isUserAuthorized(
+          this.user_id
+        );
+        if (inFriends) {
+          this.group = C_Connection.Group.friends;
+          this.status = C_Connection.Status.authorized;
+        } else {
+          this.group = C_Connection.Group.all;
+          this.status = C_Connection.Status.notAuthorized;
+        }
       }
+    } catch (err) {
+      return Promise.reject(err);
     }
   }
 
@@ -377,11 +384,15 @@ class DogmaSocket extends EventEmitter {
     }
   }
 
-  private afterVerification() {
-    this.setGroup();
-    this.checkGroup();
-    this.setRsaEncoders();
-    this.sendSymmetricKey();
+  private async afterVerification() {
+    try {
+      await this.setGroup();
+      this.checkGroup();
+      this.setRsaEncoders();
+      this.sendSymmetricKey();
+    } catch (err) {
+      logger.error("afterVerification", err);
+    }
   }
 
   private afterSymmetricKey() {

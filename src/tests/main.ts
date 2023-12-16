@@ -23,9 +23,9 @@ const workerSecondOwn = new RunWorker({
 let testingImport = false;
 
 workerAuto.on("state", async (data) => {
-  if (data.event === C_Event.Type.users) {
-    // logger.debug("state", ">>>>>>>", data.payload);
-    if (data.payload && data.payload.length) {
+  if (data.event === C_Event.Type.usersDb) {
+    logger.debug("state", ">>>>>>>", data.payload);
+    if (data.payload && data.payload === C_System.States.full) {
       if (testingImport === true) return;
       testingImport = true;
       const cert = await workerAuto.request({

@@ -7,9 +7,14 @@ import dht from "./dht";
 import * as Types from "../types";
 import storage from "./storage";
 import state from "./state";
-import { C_Event } from "@dogma-project/constants-meta";
+import { C_Event, C_Sync, C_System } from "@dogma-project/constants-meta";
+import { userModel, nodeModel } from "./model";
 
-const client = new Client({ connections, state, storage });
+const models: Types.Model.All = {};
+models[C_Sync.Type.nodes] = nodeModel;
+models[C_Sync.Type.users] = userModel;
+
+const client = new Client({ connections, state, storage, models });
 
 localDiscovery.on("candidate", (data: Types.Discovery.Candidate) => {
   const { type, user_id, node_id, local_ipv4 } = data;
@@ -36,11 +41,13 @@ if (!workerData.discovery) {
    * Try to connect friends
    */
   state.subscribe(
-    [C_Event.Type.users, C_Event.Type.nodes, C_Event.Type.nodeKey],
-    ([users, nodes, nodeKey]) => {
+    [C_Event.Type.usersDb, C_Event.Type.nodesDb, C_Event.Type.nodeKey], // change to server
+    ([usersDb, nodesDb, nodeKey]) => {
       connectFriendsInterval && clearInterval(connectFriendsInterval);
       connectFriendsInterval = setInterval(() => {
-        client.connectFriends(nodes || []);
+        if (nodesDb === C_System.States.full) {
+          client.connectFriends().catch(console.error);
+        }
       }, 45000); // edit
     }
   );
@@ -52,18 +59,23 @@ if (!workerData.discovery) {
   state.subscribe(
     [
       C_Event.Type.configDhtLookup,
-      C_Event.Type.users,
+      C_Event.Type.usersDb,
       C_Event.Type.dhtService, // check
     ],
-    ([configDhtLookup, users, dhtService]) => {
+    ([configDhtLookup, usersDb, dhtService]) => {
       searchFriendsInterval && clearInterval(searchFriendsInterval);
-      if (configDhtLookup) {
-        searchFriendsInterval = setInterval(() => {
-          if (users) {
-            logger.log("CLIENT", "Trying to search friends", users.length);
-            users.forEach((user: Types.User.Model) => {
-              if (!user.requested) dht.lookup(user.user_id);
-            });
+      if (configDhtLookup && usersDb === C_System.States.full) {
+        searchFriendsInterval = setInterval(async () => {
+          try {
+            const users = await userModel.getAll();
+            if (users.length) {
+              logger.log("CLIENT", "Trying to search friends", users.length);
+              users.forEach((user: Types.User.Model) => {
+                if (!user.requested) dht.lookup(user.user_id);
+              });
+            }
+          } catch (err) {
+            logger.error("dht lookup request", err);
           }
         }, 45000); // edit
       }

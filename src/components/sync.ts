@@ -29,11 +29,9 @@ SyncModule.on(
 );
 
 stateManager.subscribe(
-  [C_Event.Type.sync, C_Event.Type.nodes],
-  ([sync, nodes]) => {
-    const node = (nodes as Types.Node.Model[]).find(
-      (n) => n.user_id === sync.user_id && n.node_id === sync.node_id
-    );
+  [C_Event.Type.sync, C_Event.Type.nodesDb],
+  async ([sync, nodesDb]) => {
+    const node = await nodeModel.get(sync.user_id, sync.node_id);
     if (!node) return;
     const { synced } = node;
     SyncModule.request(

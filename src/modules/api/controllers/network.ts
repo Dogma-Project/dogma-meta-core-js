@@ -29,7 +29,7 @@ export async function getNetwork() {
       if (user)
         user.nodes.push({
           id: node.node_id,
-          name: node.name,
+          name: node.name || "",
           current: (own_node_id && own_node_id === node.node_id) || false,
           online: connections.isNodeOnline(node.node_id),
         });

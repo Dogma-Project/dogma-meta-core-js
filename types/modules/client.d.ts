@@ -6,10 +6,12 @@ export default class Client {
     connectionsBridge: Connections;
     stateBridge: StateManager;
     storageBridge: Storage;
-    constructor({ connections, state, storage, }: {
+    modelsBridge: Types.Model.All;
+    constructor({ connections, state, storage, models, }: {
         connections: Connections;
         state: StateManager;
         storage: Storage;
+        models: Types.Model.All;
     });
     private _connect;
     /**
@@ -19,7 +21,7 @@ export default class Client {
     tryPeer(peer: Types.Connection.Peer, node: {
         user_id: Types.User.Id;
         node_id: Types.Node.Id;
-    }): void;
+    }): Promise<void>;
     test(peer: Types.Connection.Peer, cb: (result: boolean) => void): void;
-    connectFriends(nodes: Types.Node.Model[]): void;
+    connectFriends(): Promise<void>;
 }

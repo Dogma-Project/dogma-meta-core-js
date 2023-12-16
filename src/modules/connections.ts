@@ -24,13 +24,24 @@ import { C_Streams } from "@dogma-project/constants-meta";
 class Connections {
   protected stateBridge: StateManager;
   protected storageBridge: Storage;
+  protected modelsBridge: Types.Model.All;
+
   protected handlers: {
     [key in C_Streams.MX]?: Types.Streams.DataHandler;
   } = {};
 
-  constructor({ state, storage }: { state: StateManager; storage: Storage }) {
+  constructor({
+    state,
+    storage,
+    models,
+  }: {
+    state: StateManager;
+    storage: Storage;
+    models: Types.Model.All;
+  }) {
     this.stateBridge = state;
     this.storageBridge = storage;
+    this.modelsBridge = models;
   }
 
   protected peers: Types.Connection.SocketArray = {};

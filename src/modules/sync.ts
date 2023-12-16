@@ -102,7 +102,7 @@ class Sync extends EventEmitter {
         case C_Sync.Action.push:
           try {
             if (request.payload) {
-              // logger.debug("SYNC", "PUSH!!!", request.payload);
+              logger.debug("SYNC", "PUSH!!!", request.payload);
               logger.debug("Sync", "OWN NODE", this.storageBridge.node.id);
               for (const key in request.payload) {
                 const syncType = Number(key) as C_Sync.Type;

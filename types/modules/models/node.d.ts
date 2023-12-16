@@ -13,26 +13,24 @@ declare class NodeModel implements Model {
         state: StateManager;
     });
     init(encryptionKey?: string): Promise<void>;
-    getAll(): Promise<Record<string, any>[]>;
+    getAll(): Promise<Node.Model[]>;
     /**
      *
      * @param from Timestamp in milliseconds
      * @returns
      */
-    getSync(from: number): Promise<Record<string, any>[]>;
+    getSync(from: number): Promise<Node.Model[]>;
+    pushSync(data: Record<string, any>[]): Promise<undefined>;
+    get(user_id: string, node_id: string): Promise<Node.Model>;
+    loadNodesTable(): Promise<void>;
+    getByUserId(user_id: User.Id): Promise<Node.Model[]>;
     /**
-     * @todo log result
-     * @param data
+     * @param row
      * @returns
      */
-    pushSync(data: Record<string, any>[]): Promise<void>;
-    get(user_id: string, node_id: string): Promise<Record<string, any>>;
-    loadNodesTable(): Promise<void>;
-    private loadNode;
-    getByUserId(user_id: User.Id): Promise<Record<string, any>[]>;
     persistNode(row: Node.Model): Promise<{
         numAffected: number;
-        affectedDocuments: import("@seald-io/nedb").Document<Record<string, any>> | import("@seald-io/nedb").Document<Record<string, any>>[] | null;
+        affectedDocuments: import("@seald-io/nedb").Document<Node.Model> | import("@seald-io/nedb").Document<Node.Model>[] | null;
         upsert: boolean;
     }>;
     /**
@@ -41,10 +39,5 @@ declare class NodeModel implements Model {
      * @returns {Promise}
      */
     persistNodes(nodes: Node.Model[], user_id: User.Id): Promise<boolean>;
-    /**
-     * @deprecated
-     * Update some data by proxy
-     */
-    private updateNodeData;
 }
 export default NodeModel;

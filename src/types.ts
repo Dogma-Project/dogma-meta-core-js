@@ -13,6 +13,7 @@ import { Streams } from "./types/streams";
 import { Sync } from "./types/sync";
 import { User } from "./types/user";
 import { API } from "./types/api";
+import { Model } from "./types/model";
 
 declare global {
   interface String {
@@ -41,4 +42,5 @@ export {
   Sync,
   User,
   API,
+  Model,
 };

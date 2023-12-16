@@ -4,25 +4,34 @@ import * as Types from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
 import Connections from "./connections";
-import { C_Connection, C_Event, C_System } from "@dogma-project/constants-meta";
+import {
+  C_Connection,
+  C_Event,
+  C_Sync,
+  C_System,
+} from "@dogma-project/constants-meta";
 
 export default class Client {
   connectionsBridge: Connections;
   stateBridge: StateManager;
   storageBridge: Storage;
+  modelsBridge: Types.Model.All;
 
   constructor({
     connections,
     state,
     storage,
+    models,
   }: {
     connections: Connections;
     state: StateManager;
     storage: Storage;
+    models: Types.Model.All;
   }) {
     this.connectionsBridge = connections;
     this.stateBridge = state;
     this.storageBridge = storage;
+    this.modelsBridge = models;
   }
 
   private _connect(peer: Types.Connection.Peer) {
@@ -47,47 +56,51 @@ export default class Client {
    *
    * @todo edit
    */
-  tryPeer(
+  public async tryPeer(
     peer: Types.Connection.Peer,
     node: { user_id: Types.User.Id; node_id: Types.Node.Id }
   ) {
     logger.log("Client", "Try peer", node.node_id);
 
-    const server =
-      this.stateBridge.get(C_Event.Type.server) || C_System.States.disabled;
-    if (server < C_System.States.ok) {
-      return logger.warn("Client", "Not ready to connect");
-    }
-    if (
-      node.user_id === this.storageBridge.user.id &&
-      node.node_id === this.storageBridge.node.id
-    ) {
-      return logger.warn("Client", "Prevent self connection");
-    }
-
-    const { user_id, node_id } = node;
-    if (this.connectionsBridge.isNodeOnline(node_id)) {
-      return logger.log("Client", "Peer already connected", node.node_id);
-    }
-
-    const authorized = this.connectionsBridge.isUserAuthorized(user_id);
-    const connectNonFriends =
-      this.connectionsBridge.allowDiscoveryRequests(
-        C_Connection.Direction.outcoming
-      ) || this.connectionsBridge.allowFriendshipRequests();
-
-    if (!connectNonFriends) {
-      if (!authorized) {
-        return logger.log(
-          "client",
-          "tryPeer",
-          user_id,
-          "not in the friends list"
-        );
+    try {
+      const server =
+        this.stateBridge.get(C_Event.Type.server) || C_System.States.disabled;
+      if (server < C_System.States.ok) {
+        return logger.warn("Client", "Not ready to connect");
       }
-    }
+      if (
+        node.user_id === this.storageBridge.user.id &&
+        node.node_id === this.storageBridge.node.id
+      ) {
+        return logger.warn("Client", "Prevent self connection");
+      }
 
-    this._connect(peer);
+      const { user_id, node_id } = node;
+      if (this.connectionsBridge.isNodeOnline(node_id)) {
+        return logger.log("Client", "Peer already connected", node.node_id);
+      }
+
+      const authorized = await this.connectionsBridge.isUserAuthorized(user_id);
+      const connectNonFriends =
+        this.connectionsBridge.allowDiscoveryRequests(
+          C_Connection.Direction.outcoming
+        ) || this.connectionsBridge.allowFriendshipRequests();
+
+      if (!connectNonFriends) {
+        if (!authorized) {
+          return logger.log(
+            "client",
+            "tryPeer",
+            user_id,
+            "not in the friends list"
+          );
+        }
+      }
+
+      this._connect(peer);
+    } catch (err) {
+      logger.error("Client", err);
+    }
   }
 
   test(peer: Types.Connection.Peer, cb: (result: boolean) => void) {
@@ -126,7 +139,10 @@ export default class Client {
     }
   }
 
-  connectFriends(nodes: Types.Node.Model[]) {
+  public async connectFriends() {
+    const nodesModel = this.modelsBridge[C_Sync.Type.nodes];
+    if (!nodesModel) return;
+    const nodes = await nodesModel.getAll();
     if (nodes.length) {
       logger.log("CLIENT", "Trying to connect friends", nodes.length);
       nodes.forEach((node) => {

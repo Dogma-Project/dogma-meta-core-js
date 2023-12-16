@@ -10,12 +10,19 @@ export default function KeysController(this: WorkerApi, data: API.Request) {
   switch (data.action) {
     case C_API.ApiRequestAction.get:
       // export user key
-      this.response({
-        type: C_API.ApiRequestType.keys,
-        action: C_API.ApiRequestAction.result,
-        id: data.id,
-        payload: exportUserKey(),
-      });
+      exportUserKey()
+        .then((res) => {
+          this.response({
+            type: C_API.ApiRequestType.keys,
+            action: C_API.ApiRequestAction.result,
+            id: data.id,
+            payload: res,
+          });
+        })
+        .catch((err) => {
+          logger.error("API KEYS", err);
+        });
+
       break;
     case C_API.ApiRequestAction.push:
       // import user key

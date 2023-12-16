@@ -1,14 +1,18 @@
 import ConnectionClass from "../connections";
 import * as Types from "../../types";
-import { C_Event } from "@dogma-project/constants-meta";
+import { C_Event, C_Sync } from "@dogma-project/constants-meta";
+import logger from "../logger";
 
-export default function isUserAuthorized(
+export default async function isUserAuthorized(
   this: ConnectionClass,
   user_id: string
 ) {
-  const users = this.stateBridge.get<Types.User.Model[]>(C_Event.Type.users);
-  if (!users) return null;
-  const inFriendsList = users.find((user) => user.user_id === user_id);
-  if (!inFriendsList) return false;
+  const model = this.modelsBridge[C_Sync.Type.users];
+  if (!model) {
+    logger.warn("Connections", "Users model not loaded");
+    return null;
+  }
+  const inFriendsList = await model.get(user_id);
+  if (!inFriendsList || !inFriendsList.user_id) return false;
   return !inFriendsList.requested;
 }

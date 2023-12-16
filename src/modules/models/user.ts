@@ -1,4 +1,3 @@
-import generateSyncId from "../generateSyncId";
 import { User } from "../../types";
 import logger from "../logger";
 import { getDatadir } from "../datadir";
@@ -46,6 +45,7 @@ class UserModel implements Model {
       await this.db.ensureIndexAsync({
         fieldName: "user_id",
         unique: true,
+        sparse: true,
       });
       this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.ready);
     } catch (err) {
@@ -54,7 +54,15 @@ class UserModel implements Model {
   }
 
   public async getAll() {
-    return this.db.findAsync({}).projection(this.projection);
+    return this.db
+      .findAsync<User.Model>({ deleted: { $ne: true } })
+      .projection(this.projection);
+  }
+
+  public async get(user_id: User.Id) {
+    return this.db
+      .findOneAsync<User.Model>({ user_id })
+      .projection(this.projection);
   }
 
   /**
@@ -63,32 +71,30 @@ class UserModel implements Model {
    * @returns
    */
   public async getSync(from: number) {
-    return this.db.findAsync({ updated: { $gt: from } }).projection({ _id: 0 });
+    return this.db
+      .findAsync<User.Model>({ updated: { $gt: from } })
+      .projection({ _id: 0 });
   }
 
-  /**
-   * @todo log result
-   * @param data
-   * @returns
-   */
   public async pushSync(data: Record<string, any>[]) {
     try {
-      const users = this.stateBridge.get<User.Model[]>(C_Event.Type.users);
-      if (!users || !users.length) {
-        return logger.warn("USER SYNC", "Can't push sync. Users not loaded!");
-      }
-      logger.debug("!!!!!! User", data, users);
       for (const entry of data) {
-        const current = users.find((u) => u.user_id === entry.user_id);
-        if (!current || entry.updated > (current.updated || 0)) {
+        try {
           const result = await this.db.updateAsync(
             {
               user_id: entry.user_id,
+              updated: { $lt: entry.updated },
             },
-            { $set: entry },
+            data,
             { upsert: true }
           );
-          logger.debug("SYNC USER", "Upserted new value!");
+          logger.debug("SYNC USER", "Upserted new value!", result);
+        } catch (err: any) {
+          if (err.errorType && err.errorType === "uniqueViolated") {
+            logger.warn("SYNC USER", "SKIP SYNC", entry.updated);
+          } else {
+            logger.error("SYNC USER", err);
+          }
         }
       }
     } catch (err) {
@@ -99,9 +105,8 @@ class UserModel implements Model {
   public async loadUsersTable() {
     try {
       logger.log("User Model", "Load user table");
-      const users = await this.getAll();
-      if (users.length) {
-        this.stateBridge.emit(C_Event.Type.users, users);
+      const count = await this.db.countAsync({ deleted: { $ne: true } });
+      if (count) {
         this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.full);
       } else {
         this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.empty);
@@ -111,52 +116,17 @@ class UserModel implements Model {
     }
   }
 
-  private async loadUser(_id: string) {
-    try {
-      logger.log("User Model", "Load user", _id);
-      const user = await this.db
-        .findOneAsync({ _id })
-        .projection(this.projection);
-      if (user) {
-        const users =
-          this.stateBridge.get<Record<string, any>[]>(C_Event.Type.users) || [];
-        let actual = users.find((u) => u.user_id === user.user_id);
-        if (actual) {
-          actual = user; // check
-        } else {
-          users.push(user);
-        }
-        this.stateBridge.emit(C_Event.Type.users, users);
-      }
-    } catch (err) {
-      logger.error("user.nedb", "loadUser", err);
-    }
-  }
-
   /**
-   * @todo delete proxy
    * Persist some user
    */
   public async persistUser(row: User.Model) {
     try {
       const { user_id } = row;
-      const result = await this.db.updateAsync(
+      const result = await this.db.updateAsync<User.Model>(
         { user_id },
         { $set: { ...row, updated: Date.now() } },
         { upsert: true }
       );
-      const records = result.affectedDocuments;
-      if (records) {
-        const record = !Array.isArray(records) ? records : records[0];
-        if (!("sync_id" in record)) {
-          const sync_id = generateSyncId(C_Sync.SIZES.USER_ID);
-          await this.db.updateAsync(
-            { user_id },
-            { $set: { sync_id, updated: Date.now() } }
-          );
-        }
-        this.loadUser(record._id);
-      }
       this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.full);
       return result;
     } catch (err) {
@@ -180,23 +150,11 @@ class UserModel implements Model {
     }
   }
 
-  /**
-   * @todo set to deleted state instead of remove
-   */
   public async removeUser(user_id: User.Id) {
-    try {
-      await this.db.removeAsync({ user_id }, { multi: true });
-      this.stateBridge.emit(C_Event.Type.usersDb, C_System.States.reload); // downgrade state to reload database
-
-      /*
-      await nodesDb.removeAsync({ user_id }, { multi: true });
-      this.stateBridge.emit("nodes-db", Types.System.States.reload); // downgrade state to reload database
-      */
-
-      return true;
-    } catch (err) {
-      return Promise.reject(err);
-    }
+    return this.db.updateAsync<User.Model>(
+      { _id: user_id },
+      { deleted: true, updated: Date.now() }
+    );
   }
 }
 

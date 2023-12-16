@@ -7,12 +7,14 @@ import { C_Streams } from "@dogma-project/constants-meta";
 declare class Connections {
     protected stateBridge: StateManager;
     protected storageBridge: Storage;
+    protected modelsBridge: Types.Model.All;
     protected handlers: {
         [key in C_Streams.MX]?: Types.Streams.DataHandler;
     };
-    constructor({ state, storage }: {
+    constructor({ state, storage, models, }: {
         state: StateManager;
         storage: Storage;
+        models: Types.Model.All;
     });
     protected peers: Types.Connection.SocketArray;
     protected online: Types.Node.Id[];

@@ -22,10 +22,6 @@ class FileModel implements Model {
         filename: getDatadir().nedb + "/files.db",
       });
       await this.db.loadDatabaseAsync();
-      // await this.db.ensureIndexAsync({
-      //   fieldName: "param",
-      //   unique: true,
-      // });
       this.stateBridge.emit(C_Event.Type.filesDb, C_System.States.ready);
     } catch (err) {
       logger.error("files.nedb", err);

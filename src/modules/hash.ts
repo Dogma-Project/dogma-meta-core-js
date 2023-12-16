@@ -1,6 +1,12 @@
 import { C_Keys } from "@dogma-project/constants-meta";
 import crypto from "node:crypto";
 
+export const createSha1Hash = (data: crypto.BinaryLike | string) => {
+  const hash = crypto.createHash("sha1");
+  hash.update(data);
+  return hash.digest("hex");
+};
+
 export const createSha256Hash = (data: crypto.BinaryLike | string) => {
   const hash = crypto.createHash(C_Keys.HASH);
   hash.update(data);

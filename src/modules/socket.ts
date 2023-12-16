@@ -13,7 +13,7 @@ import logger from "./logger";
 import { Decoder, RsaEncoder, AesEncoder, PlainEncoder } from "./streams";
 import { onData } from "./socket/index";
 import Storage from "./storage";
-import { createSha256Hash } from "./hash";
+import { createSha256Hash, signSha256Hash, verifySha256Hash } from "./hash";
 import ConnectionClass from "./connections";
 
 class DogmaSocket extends EventEmitter {
@@ -270,20 +270,6 @@ class DogmaSocket extends EventEmitter {
     logger.error("connection", this.id, err.name, err.message);
   };
 
-  private sign(data: string, privateKey: crypto.KeyLike) {
-    const signature = crypto.createSign("sha256");
-    signature.update(data);
-    signature.end();
-    return signature.sign(privateKey, "hex");
-  }
-
-  private verify(data: string, publicKey: crypto.KeyLike, sign: string) {
-    const verification = crypto.createVerify("sha256");
-    verification.update(data);
-    verification.end();
-    return verification.verify(publicKey, sign, "hex");
-  }
-
   private sendHandshake(stage: C_Connection.Stage) {
     if (!this.input) return logger.warn("Socket", "Input is not defined"); // edit
     if (!this.storageBridge.user.privateKey) return;
@@ -309,14 +295,18 @@ class DogmaSocket extends EventEmitter {
         return logger.warn("Socket", "unknown inSession");
       }
 
-      const userSign = this.sign(
+      const userSign = signSha256Hash(
         this.inSession,
         this.storageBridge.user.privateKey
       );
-      const nodeSign = this.sign(
+      const nodeSign = signSha256Hash(
         this.inSession,
         this.storageBridge.node.privateKey
       );
+
+      if (!userSign || !nodeSign) {
+        return this.destroy("Can't sign session code");
+      }
 
       const request: Types.Connection.Handshake.StageVerificationRequest = {
         stage,
@@ -354,22 +344,17 @@ class DogmaSocket extends EventEmitter {
           const publicUserKey = crypto.createPublicKey(parsed.userKey); // edit
           const publicNodeKey = crypto.createPublicKey(parsed.nodeKey); // edit
 
-          const verifyUser = this.verify(
-            this.outSession,
-            publicUserKey,
-            parsed.userSign
-          );
-          if (!verifyUser)
+          if (
+            !verifySha256Hash(this.outSession, publicUserKey, parsed.userSign)
+          ) {
             return logger.log("Socket", "User not verified", this.id);
+          }
 
-          const verifyNode = this.verify(
-            this.outSession,
-            publicNodeKey,
-            parsed.nodeSign
-          );
-
-          if (!verifyNode)
+          if (
+            !verifySha256Hash(this.outSession, publicNodeKey, parsed.nodeSign)
+          ) {
             return logger.log("Socket", "Node not verified", this.id);
+          }
 
           this.publicUserKey = publicUserKey;
           this.publicNodeKey = publicNodeKey;
@@ -397,20 +382,11 @@ class DogmaSocket extends EventEmitter {
     this.checkGroup();
     this.setRsaEncoders();
     this.sendSymmetricKey();
-    this.emit("online", this.node_id);
   }
 
   private afterSymmetricKey() {
     this.setAesEncoders();
     this.test();
-  }
-
-  /**
-   * Successfully tested AES encryption
-   */
-  private afterTest() {
-    if (this.tested) return; // edit !!!!!!!
-    // this.emit("online", this.node_id);
   }
 
   /**
@@ -421,8 +397,8 @@ class DogmaSocket extends EventEmitter {
   protected handleTest(data: Buffer) {
     const msg = data.toString();
     if (msg === C_Constants.Messages.test) {
+      !this.tested && this.emit("online", this.node_id);
       this.tested = true;
-      this.afterTest();
     } else {
       logger.warn("Socket", "Unknown test data", msg, msg.length);
       this.destroy();

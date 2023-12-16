@@ -81,8 +81,6 @@ declare class DogmaSocket extends EventEmitter {
     private onData;
     private onClose;
     private onError;
-    private sign;
-    private verify;
     private sendHandshake;
     /**
      *
@@ -91,10 +89,6 @@ declare class DogmaSocket extends EventEmitter {
     protected handleHandshake(data: Buffer): void;
     private afterVerification;
     private afterSymmetricKey;
-    /**
-     * Successfully tested AES encryption
-     */
-    private afterTest;
     /**
      * @todo skip when discovery
      * Determine peer is online

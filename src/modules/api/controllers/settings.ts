@@ -126,6 +126,8 @@ async function setConfig(body: {} = {}) {
 }
 
 export default function SettingsController(this: WorkerApi, data: API.Request) {
+  logger.debug("API", "[SETTINGS]", data);
+
   switch (data.action) {
     case C_API.ApiRequestAction.get:
       this.response({
@@ -153,7 +155,12 @@ export default function SettingsController(this: WorkerApi, data: API.Request) {
         })
         .catch((err) => {
           logger.error("API", "settings", err);
-          // add
+          this.error({
+            type: C_API.ApiRequestType.settings,
+            action: C_API.ApiRequestAction.error,
+            id: data.id,
+            payload: err,
+          });
         });
       break;
     case C_API.ApiRequestAction.push:
@@ -172,7 +179,12 @@ export default function SettingsController(this: WorkerApi, data: API.Request) {
         })
         .catch((err) => {
           logger.error("API", "settings", err);
-          // add
+          this.error({
+            type: C_API.ApiRequestType.settings,
+            action: C_API.ApiRequestAction.error,
+            id: data.id,
+            payload: err,
+          });
         });
       break;
     default:

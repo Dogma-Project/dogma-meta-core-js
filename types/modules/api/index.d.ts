@@ -11,6 +11,7 @@ export default class WorkerApi {
     private systemController;
     private nodeController;
     private handle;
+    notify(data: Omit<API.ResponseRequest, "id"> | API.ResponseError): void;
     protected response(data: API.ResponseRequest): void;
-    notify(data: Omit<API.ResponseRequest, "id">): void;
+    protected error(data: API.ResponseError): void;
 }

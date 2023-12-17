@@ -8,8 +8,8 @@ import {
   ServicesController,
   SettingsController,
   SystemController,
+  NodeController,
 } from "./controllers";
-import NodeController from "./controllers/node";
 
 export default class WorkerApi {
   parentPort: MessagePort | null;
@@ -66,20 +66,29 @@ export default class WorkerApi {
     }
   }
 
+  public notify(data: Omit<API.ResponseRequest, "id"> | API.ResponseError) {
+    if (this.parentPort) {
+      this.parentPort.postMessage(data);
+    } else {
+      logger.warn("API", "NOTIFY", "Parent port not available!");
+    }
+  }
+
   protected response(data: API.ResponseRequest) {
     if (data.id === undefined) return this.notify(data);
     if (this.parentPort) {
       this.parentPort.postMessage(data);
     } else {
-      logger.warn("API", "REQUEST", "Parent port not available!");
+      logger.warn("API", "RESPONSE", "Parent port not available!");
     }
   }
 
-  public notify(data: Omit<API.ResponseRequest, "id">) {
+  protected error(data: API.ResponseError) {
+    if (data.id === undefined) return this.notify(data);
     if (this.parentPort) {
       this.parentPort.postMessage(data);
     } else {
-      logger.warn("API", "REQUEST", "Parent port not available!");
+      logger.warn("API", "ERROR", "Parent port not available!");
     }
   }
 }

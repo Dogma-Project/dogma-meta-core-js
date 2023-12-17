@@ -4,21 +4,27 @@ import { Node } from "./node";
 export declare namespace API {
     type Request = {
         type: C_API.ApiRequestType;
-        action: Omit<C_API.ApiRequestAction, "result">;
+        action: C_API.ApiRequestAction.get | C_API.ApiRequestAction.push | C_API.ApiRequestAction.set | C_API.ApiRequestAction.delete;
         id?: number;
         payload?: any;
     };
     type ResponseRequest = {
         type: C_API.ApiRequestType;
-        action: Omit<C_API.ApiRequestAction, "get" | "delete">;
-        payload?: any;
+        action: C_API.ApiRequestAction.set | C_API.ApiRequestAction.result;
         id?: number;
+        payload?: any;
     };
     type ResponseEvent = {
         type: C_API.ApiRequestType;
-        action: Omit<C_API.ApiRequestAction, "get" | "delete">;
+        action: C_API.ApiRequestAction.set | C_API.ApiRequestAction.result;
         payload?: any;
         event: C_Event.Type;
+    };
+    type ResponseError = {
+        type: C_API.ApiRequestType;
+        action: C_API.ApiRequestAction.error;
+        id?: number;
+        payload?: any;
     };
     type Response = ResponseRequest | ResponseEvent;
     interface NetworkNodesData {

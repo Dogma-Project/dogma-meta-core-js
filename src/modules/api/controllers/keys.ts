@@ -21,6 +21,12 @@ export default function KeysController(this: WorkerApi, data: API.Request) {
         })
         .catch((err) => {
           logger.error("API KEYS", err);
+          this.error({
+            type: C_API.ApiRequestType.keys,
+            action: C_API.ApiRequestAction.error,
+            id: data.id,
+            payload: err,
+          });
         });
 
       break;
@@ -48,7 +54,12 @@ export default function KeysController(this: WorkerApi, data: API.Request) {
         })
         .catch((err) => {
           logger.error("API", "keys", err);
-          // add
+          this.error({
+            type: C_API.ApiRequestType.keys,
+            action: C_API.ApiRequestAction.error,
+            id: data.id,
+            payload: err,
+          });
         });
       break;
     default:

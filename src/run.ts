@@ -1,4 +1,4 @@
-import { C_System } from "@dogma-project/constants-meta";
+import { C_API, C_System } from "@dogma-project/constants-meta";
 import { Worker } from "node:worker_threads";
 import { EventEmitter } from "node:stream";
 import generateSyncId from "./modules/generateSyncId";
@@ -41,11 +41,15 @@ export default class RunWorker extends EventEmitter {
     this.worker.on("exit", (exitCode) => {
       this.emit("exit", exitCode);
     });
-    this.worker.on("message", (message: API.Response) => {
+    this.worker.on("message", (message: API.Response | API.ResponseError) => {
       if ("event" in message) {
         this.emit("state", message);
       } else if (!message.id) {
-        this.emit("notify", message);
+        if (message.action === C_API.ApiRequestAction.error) {
+          this.emit("error", message);
+        } else {
+          this.emit("notify", message);
+        }
       }
     });
   }
@@ -53,6 +57,10 @@ export default class RunWorker extends EventEmitter {
   public emit(eventName: "state", payload: API.ResponseEvent): boolean;
   public emit(eventName: "exit", exitCode: number): boolean;
   public emit(eventName: "notify", payload: Omit<API.Response, "id">): boolean;
+  public emit(
+    eventName: "error",
+    payload: Omit<API.ResponseError, "id">
+  ): boolean;
   public emit(eventName: string, payload: any) {
     return super.emit(eventName, payload);
   }
@@ -84,13 +92,20 @@ export default class RunWorker extends EventEmitter {
       const minId = 1_000_000;
       const maxId = 9_999_999;
       const id = Math.floor(Math.random() * (maxId - minId) + minId);
-      this.worker.on("message", (message: API.ResponseRequest) => {
-        if (message.id === id) {
-          clearTimeout(timeout);
-          delete message.id;
-          resolve(message);
+      this.worker.on(
+        "message",
+        (message: API.ResponseRequest | API.ResponseError) => {
+          if (message.id === id) {
+            clearTimeout(timeout);
+            delete message.id;
+            if (message.action !== C_API.ApiRequestAction.error) {
+              resolve(message);
+            } else {
+              reject(message);
+            }
+          }
         }
-      });
+      );
       this.worker.on("error", (error: Error) => reject(error));
       this.worker.on("messageerror", (error: Error) => reject(error));
       this.worker.postMessage({ ...data, id });

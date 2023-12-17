@@ -1,5 +1,5 @@
 import { describe } from "node:test";
-import assert from "node:assert";
+import assert, { strictEqual } from "node:assert";
 
 import logger from "../modules/logger";
 import RunWorker from "../run";
@@ -159,6 +159,14 @@ workerAuto.on("state", async (data) => {
             assert.strictEqual(err.type, C_API.ApiRequestType.user);
             assert.strictEqual(err.action, C_API.ApiRequestAction.error);
           });
+
+        const getNetwork = await workerAuto.request({
+          type: C_API.ApiRequestType.network,
+          action: C_API.ApiRequestAction.get,
+        });
+        assert.strictEqual(getNetwork.type, C_API.ApiRequestType.network);
+        assert.strictEqual(getNetwork.action, C_API.ApiRequestAction.set);
+        strictEqual(getNetwork.payload.network.length, 2);
 
         logger.debug("TEST", "FINISHED");
         process.exit();

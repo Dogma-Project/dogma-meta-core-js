@@ -10,6 +10,7 @@ export default class WorkerApi {
     private networkController;
     private systemController;
     private nodeController;
+    private userController;
     private handle;
     notify(data: Omit<API.ResponseRequest, "id"> | API.ResponseError): void;
     protected response(data: API.ResponseRequest): void;

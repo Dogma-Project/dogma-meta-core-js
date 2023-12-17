@@ -100,7 +100,7 @@ export async function readOrCreateEncryptionKey(
         return Promise.reject(err2);
       }
     } else {
-      logger.error("KEYS", err);
+      logger.error("KEYS 2", err);
       return Promise.reject(err);
     }
   }

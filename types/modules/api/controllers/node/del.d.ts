@@ -1,7 +1,6 @@
 import { Node, User } from "../../../../types";
 /**
- * If user_id and node_id not defined, returns own node
- * @todo can't delete own node
+ *
  * @param params
  */
 export default function DeleteNode(params: {

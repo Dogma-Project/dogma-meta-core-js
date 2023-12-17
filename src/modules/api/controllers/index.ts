@@ -4,6 +4,7 @@ import KeysController from "./keys";
 import NetworkController from "./network";
 import SystemController from "./system";
 import NodeController from "./node";
+import UserController from "./user";
 
 export {
   ServicesController,
@@ -12,4 +13,5 @@ export {
   NetworkController,
   SystemController,
   NodeController,
+  UserController,
 };

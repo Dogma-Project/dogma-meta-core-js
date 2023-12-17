@@ -9,6 +9,7 @@ import {
   SettingsController,
   SystemController,
   NodeController,
+  UserController,
 } from "./controllers";
 
 export default class WorkerApi {
@@ -31,6 +32,7 @@ export default class WorkerApi {
   private networkController = NetworkController;
   private systemController = SystemController;
   private nodeController = NodeController;
+  private userController = UserController;
 
   private handle(data: API.Request) {
     try {
@@ -51,10 +53,9 @@ export default class WorkerApi {
           this.systemController(data);
           break;
         case C_API.ApiRequestType.user:
-          // get user
+          this.userController(data);
           break;
         case C_API.ApiRequestType.node:
-          // get node
           this.nodeController(data);
           break;
         default:

@@ -1,6 +1,6 @@
 {
   "name": "@dogma-project/core-meta",
-  "version": "0.8.26",
+  "version": "0.8.28",
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
   "main": "./dist/run.js",
   "types": "./types/run.d.ts",
@@ -10,9 +10,9 @@
     "empty": "prefix=empty-1 tsc-watch --onSuccess 'node ./dist/dev.js'",
     "empty2": "prefix=empty-2 tsc-watch --onSuccess 'node ./dist/dev.js'",
     "test": "tsc && loglevel=5 node --test dist/",
-    "main-test": "loglevel=5 tsc-watch --onSuccess 'node ./dist/tests/main.js'",
     "update-constants": "npm install @dogma-project/constants-meta@latest",
-    "build": "tsc --build"
+    "build": "tsc --build",
+    "c:build": "rm -rf ./dist/* && rm -rf ./types/* && npm run build"
   },
   "author": {
     "name": "Rotegott",

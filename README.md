@@ -31,7 +31,7 @@ npm install
 ## Usage
 
 ```
-npm run manager
+npm run dev
 ```
 
 ## Credits

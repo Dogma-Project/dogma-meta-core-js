@@ -30,8 +30,13 @@ class Sync extends EventEmitter {
     this.storageBridge = storage;
     this.models = models;
 
+    /**
+     * @todo add validation
+     */
     this.connectionsBridge.on(C_Streams.MX.sync, (data, socket) => {
-      // add validation
+      if (socket.group !== C_Connection.Group.selfUser) {
+        return logger.warn("ON SYNC", "Not own user!", socket.group);
+      }
       try {
         const str = data.toString();
         const parsed = JSON.parse(str) as Types.Sync.Data;
@@ -58,7 +63,6 @@ class Sync extends EventEmitter {
 
   /**
    * Handle all
-   * @todo check permissions !!! only for own nodes
    * @todo handle timeshift
    * @param request
    * @param socket
@@ -67,6 +71,9 @@ class Sync extends EventEmitter {
     try {
       logger.debug("HANDLE SYNC REQUEST", request);
       switch (request.action) {
+        /**
+         *
+         */
         case C_Sync.Action.get:
           const result: Types.Sync.Result = {};
           if ("type" in request) {
@@ -95,6 +102,10 @@ class Sync extends EventEmitter {
             socket
           );
           break;
+
+        /**
+         *
+         */
         case C_Sync.Action.push:
           try {
             if (request.payload) {
@@ -123,9 +134,11 @@ class Sync extends EventEmitter {
             logger.error("Sync", err);
           }
           break;
-        case C_Sync.Action.notify:
-          // send sync requst
 
+        /**
+         * send sync requst
+         */
+        case C_Sync.Action.notify:
           const { user_id, node_id } = socket;
           if (user_id && node_id && request.type !== undefined) {
             const model = this.models[C_Sync.Type.nodes] as NodeModel;
@@ -167,7 +180,6 @@ class Sync extends EventEmitter {
    */
   public request(request: Types.Sync.Request, node_id: Types.Node.Id) {
     logger.debug("SEND SYNC REQUEST", request);
-
     this.connectionsBridge.sendRequestToNode(
       {
         class: C_Streams.MX.sync,

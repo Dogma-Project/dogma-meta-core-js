@@ -4,7 +4,6 @@ import storage from "./storage";
 import logger from "../modules/logger";
 import Sync from "../modules/sync";
 import connections from "./connections";
-import * as Types from "../types";
 import { userModel, nodeModel } from "./model";
 
 const SyncModule = new Sync({
@@ -45,10 +44,6 @@ stateManager.subscribe(
         sync.node_id
       );
     }
-
-    // logger.error("PRE", sync);
-    // logger.error("PRE 2", nodes);
-    // send request
   }
 );
 

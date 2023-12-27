@@ -43,7 +43,7 @@ workerAuto.on("state", async (data) => {
         const importResult = await workerSecondOwn.request({
           type: C_API.ApiRequestType.keys,
           action: C_API.ApiRequestAction.push,
-          payload: cert.payload,
+          payload: { b64: cert.payload },
         });
         assert.deepStrictEqual(importResult, {
           type: 2,

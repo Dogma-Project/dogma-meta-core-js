@@ -3,6 +3,7 @@ import { Worker } from "node:worker_threads";
 import { EventEmitter } from "node:stream";
 import generateSyncId from "./modules/generateSyncId";
 import { API } from "./types";
+// import logger from "./modules/logger";
 
 interface WorkerData {
   prefix: string;
@@ -33,6 +34,7 @@ export default class RunWorker extends EventEmitter {
     super();
     this.name = data.prefix;
     const filename = require.resolve("./worker");
+    // logger.info("Worker resolved", filename);
     this.worker = new Worker(require.resolve(filename), {
       workerData: data,
       env: {},
@@ -120,3 +122,5 @@ export default class RunWorker extends EventEmitter {
     return this.worker.terminate();
   }
 }
+
+module.exports = RunWorker;

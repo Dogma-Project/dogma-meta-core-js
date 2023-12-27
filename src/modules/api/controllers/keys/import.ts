@@ -3,25 +3,21 @@ import fs from "node:fs";
 
 import { C_Event, C_Keys, C_System } from "@dogma-project/constants-meta";
 import stateManager from "../../../../components/state";
-import { Keys } from "../../../../types";
+import { Certificate, Keys } from "../../../../types";
 import logger from "../../../logger";
 import { getDatadir } from "../../../datadir";
 import path from "node:path";
 
-export default function importUserKey(cert: string | Buffer | Uint8Array) {
+export default function importUserKey(cert: Certificate.Import) {
   try {
-    if (typeof cert !== "string") {
-      if (cert.constructor === Uint8Array) {
-        cert = Buffer.from(cert.buffer).toString();
-      } else if (cert.constructor === Buffer) {
-        cert = cert.toString();
-      } else {
-        logger.error("import key", "Unknown type", cert?.constructor);
-        return null;
-      }
+    let str: string;
+    if ("path" in cert) {
+      str = fs.readFileSync(cert.path).toString();
+    } else {
+      str = cert.b64;
     }
     const parsed = JSON.parse(
-      Buffer.from(cert, "base64").toString()
+      Buffer.from(str, "base64").toString()
     ) as Keys.ExportFormat;
     // logger.info("import", parsed);
     const privateKeyBuffer = Buffer.from(parsed.key, "hex");

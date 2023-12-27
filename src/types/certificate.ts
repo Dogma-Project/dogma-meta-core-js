@@ -18,4 +18,6 @@ export namespace Certificate {
       own: boolean;
     };
   }
+
+  export type Import = { path: string } | { b64: string };
 }

@@ -29,6 +29,7 @@ export default class RunWorker extends EventEmitter {
   private worker: Worker;
   public id: string = generateSyncId(8);
   public name: string;
+  private stack = new Map<number, [Function, Function]>();
 
   constructor(data: WorkerData) {
     super();
@@ -46,11 +47,22 @@ export default class RunWorker extends EventEmitter {
     this.worker.on("message", (message: API.Response | API.ResponseError) => {
       if ("event" in message) {
         this.emit("state", message);
-      } else if (!message.id) {
-        if (message.action === C_API.ApiRequestAction.error) {
-          this.emit("error", message);
+      } else {
+        if (message.id === undefined) {
+          if (message.action === C_API.ApiRequestAction.error) {
+            this.emit("error", message);
+          } else {
+            this.emit("notify", message);
+          }
         } else {
-          this.emit("notify", message);
+          const handlers = this.stack.get(message.id);
+          if (handlers) {
+            if (message.action === C_API.ApiRequestAction.error) {
+              handlers[1](message);
+            } else {
+              handlers[0](message);
+            }
+          }
         }
       }
     });
@@ -83,33 +95,36 @@ export default class RunWorker extends EventEmitter {
     return super.on(eventName, listener);
   }
 
+  /**
+   * @todo rewrite function to stack
+   * @param data
+   * @returns
+   */
   public async request(
     data: Omit<API.Request, "id">
   ): Promise<Omit<API.Response, "id">> {
     return new Promise((resolve, reject) => {
-      const timeout = setTimeout(
-        () => reject(new Error("Timeout exceeded")),
-        10_000
-      );
       const minId = 1_000_000;
       const maxId = 9_999_999;
       const id = Math.floor(Math.random() * (maxId - minId) + minId);
-      this.worker.on(
-        "message",
-        (message: API.ResponseRequest | API.ResponseError) => {
-          if (message.id === id) {
-            clearTimeout(timeout);
-            delete message.id;
-            if (message.action !== C_API.ApiRequestAction.error) {
-              resolve(message);
-            } else {
-              reject(message);
-            }
-          }
-        }
-      );
-      this.worker.on("error", (error: Error) => reject(error));
-      this.worker.on("messageerror", (error: Error) => reject(error));
+      const timeout = setTimeout(() => {
+        reject(new Error("Timeout exceeded"));
+        this.stack.delete(id);
+      }, 10_000);
+      this.stack.set(id, [
+        (msg: API.ResponseRequest) => {
+          clearTimeout(timeout);
+          delete msg.id;
+          resolve(msg);
+          this.stack.delete(id);
+        },
+        (msg: API.ResponseError) => {
+          clearTimeout(timeout);
+          delete msg.id;
+          reject(msg);
+          this.stack.delete(id);
+        },
+      ]);
       this.worker.postMessage({ ...data, id });
     });
   }

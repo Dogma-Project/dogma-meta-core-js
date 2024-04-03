@@ -3,11 +3,11 @@ import { Event, Config, API } from "../types";
 import logger from "./logger";
 import { C_API, C_Event, C_System } from "../constants";
 
-type MapPredicate<T> = T extends C_Event.Type.Service
+type MapPredicate<T> = T extends Event.Type.Service
   ? Event.ServiceState
-  : T extends C_Event.Type.Config
+  : T extends Event.Type.Config
   ? Config.Value<T>
-  : T extends C_Event.Type.Services
+  : T extends Event.Type.Services
   ? Event.ServicesList
   : any;
 
@@ -25,13 +25,13 @@ type Listener<U extends ReadonlyArray<any>> = (
 ) => void;
 
 class StateManager {
-  constructor(private services: C_Event.Type.Service[] = []) {}
+  constructor(private services: Event.Type.Service[] = []) {}
 
   private listeners: {
-    [index: string]: [C_Event.Type[], any][];
+    [index: string]: [Event.Types[], any][];
   } = {};
   private state: {
-    [key in C_Event.Type]?: MapPredicate<key>;
+    [key in Event.Types]?: MapPredicate<key>;
   } = {};
   private trigger = Symbol("trigger");
 
@@ -40,7 +40,7 @@ class StateManager {
    * @param '[array of events]'
    * @param '([array of payloads], type?, action?)'
    */
-  public subscribe = <T extends C_Event.Type, U extends ReadonlyArray<T>>(
+  public subscribe = <T extends Event.Types, U extends ReadonlyArray<T>>(
     type: [...U],
     callback: Listener<U>
   ) => {
@@ -55,21 +55,21 @@ class StateManager {
    * @param type
    * @param payload
    */
-  public emit(type: C_Event.Type.ConfigBool, payload: boolean): void;
-  public emit(type: C_Event.Type.ConfigStr, payload: string): void;
-  public emit(type: C_Event.Type.ConfigNum, payload: number): void;
+  public emit(type: Event.Type.ConfigBool, payload: boolean): void;
+  public emit(type: Event.Type.ConfigStr, payload: string): void;
+  public emit(type: Event.Type.ConfigNum, payload: number): void;
   public emit(
-    type: C_Event.Type.Config,
+    type: Event.Type.Config,
     payload: number | string | boolean
   ): void;
-  public emit(type: C_Event.Type.Service, payload: Event.ServiceState): void;
-  public emit(type: C_Event.Type.Services, payload: Event.ServicesList): void;
-  public emit(type: C_Event.Type.Storage, payload: any): void;
-  public emit(type: C_Event.Type.Action, payload: any): void;
-  public emit(type: C_Event.Type, payload: typeof this.trigger): void;
-  public emit(type: C_Event.Type, payload: any) {
+  public emit(type: Event.Type.Service, payload: Event.ServiceState): void;
+  public emit(type: Event.Type.Services, payload: Event.ServicesList): void;
+  public emit(type: Event.Type.Storage, payload: any): void;
+  public emit(type: Event.Type.Action, payload: any): void;
+  public emit(type: Event.Types, payload: typeof this.trigger): void;
+  public emit(type: Event.Types, payload: any) {
     try {
-      let action: C_Event.Action = C_Event.Action.update;
+      let action: Event.Actions = C_Event.Action.update;
       if (this.state[type] === undefined) {
         action = C_Event.Action.set;
       }
@@ -92,7 +92,7 @@ class StateManager {
       if (this.listeners[type] === undefined) {
         return logger.debug("state", "There's no handlers for event", type);
       }
-      if (this.services.indexOf(type as C_Event.Type.Service) > -1) {
+      if (this.services.indexOf(type as Event.Type.Service) > -1) {
         // edit
         const services = this.services.map((type) => {
           return {
@@ -122,18 +122,18 @@ class StateManager {
    *
    * @param type forces event for some type like its value has changed
    */
-  public enforce(type: C_Event.Type) {
+  public enforce(type: Event.Types) {
     this.emit(type, this.trigger);
   }
 
-  public get(type: C_Event.Type.ConfigBool): boolean | undefined;
-  public get(type: C_Event.Type.ConfigStr): string | undefined;
-  public get(type: C_Event.Type.ConfigNum): number | undefined;
-  public get(type: C_Event.Type.Service): Event.ServiceState | undefined;
-  public get(type: C_Event.Type.Services): Event.ServicesList | undefined;
-  public get<T>(type: C_Event.Type.Storage): T | undefined;
-  public get<T>(type: C_Event.Type.Action): T | undefined;
-  public get(type: C_Event.Type): any {
+  public get(type: Event.Type.ConfigBool): boolean | undefined;
+  public get(type: Event.Type.ConfigStr): string | undefined;
+  public get(type: Event.Type.ConfigNum): number | undefined;
+  public get(type: Event.Type.Service): Event.ServiceState | undefined;
+  public get(type: Event.Type.Services): Event.ServicesList | undefined;
+  public get<T>(type: Event.Type.Storage): T | undefined;
+  public get<T>(type: Event.Type.Action): T | undefined;
+  public get(type: Event.Types): any {
     return this.state[type];
   }
 }

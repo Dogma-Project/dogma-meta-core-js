@@ -3,6 +3,7 @@ import storage from "../../../../components/storage";
 import stateManager from "../../../../components/state";
 import { createKeyPair } from "../../../keys";
 import { Keys } from "../../../../types";
+import { Event } from "../../../../types";
 
 export default async function createKey({
   name,
@@ -15,7 +16,7 @@ export default async function createKey({
 }) {
   // add validation
 
-  let keyEvent: C_Event.Type;
+  let keyEvent: Event.Type.Service;
   try {
     switch (type) {
       case C_Keys.Type.userKey:

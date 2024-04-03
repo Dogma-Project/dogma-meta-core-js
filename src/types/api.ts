@@ -1,12 +1,14 @@
-import { C_API, C_Event } from "../constants";
+import { C_API } from "../constants";
 import { User } from "./user";
 import { Node } from "./node";
+import { Event } from "./event";
 import { ValuesOf } from "./_main";
 
 export namespace API {
+  export type Type = ValuesOf<typeof C_API.ApiRequestType>;
+
   export type Request = {
-    type: ValuesOf<typeof C_API.ApiRequestType>;
-    // action: Omit<ValuesOf<typeof C_API.ApiRequestAction>, "result" | "error">;
+    type: Type;
     action:
       | typeof C_API.ApiRequestAction.get
       | typeof C_API.ApiRequestAction.push
@@ -16,8 +18,7 @@ export namespace API {
     payload?: any;
   };
   export type ResponseRequest = {
-    type: ValuesOf<typeof C_API.ApiRequestType>;
-    // action: Omit<C_API.ApiRequestAction, "get" | "delete" | "error">;
+    type: Type;
     action:
       | typeof C_API.ApiRequestAction.set
       | typeof C_API.ApiRequestAction.result;
@@ -25,15 +26,15 @@ export namespace API {
     payload?: any;
   };
   export type ResponseEvent = {
-    type: ValuesOf<typeof C_API.ApiRequestType>;
+    type: Type;
     action:
       | typeof C_API.ApiRequestAction.set
       | typeof C_API.ApiRequestAction.result;
     payload?: any;
-    event: C_Event.Type;
+    event: Event.Types;
   };
   export type ResponseError = {
-    type: ValuesOf<typeof C_API.ApiRequestType>;
+    type: Type;
     action: typeof C_API.ApiRequestAction.error;
     id?: number;
     payload?: any;

@@ -3,7 +3,13 @@ import { Sync } from "./sync";
 export namespace User {
   export type Id = string;
   export type Name = string;
-  export interface Model {
+
+  export interface ExportModel {
+    name: string;
+    avatar?: string;
+  }
+
+  export interface Model extends ExportModel {
     [index: string | symbol]:
       | Id
       | string
@@ -12,10 +18,9 @@ export namespace User {
       | undefined
       | number;
     user_id: Id;
-    name: string;
-    avatar?: string;
     requested?: true;
   }
+
   export type Storage = {
     id: Id | null;
     name: Name;

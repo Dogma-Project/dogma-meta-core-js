@@ -146,7 +146,7 @@ class NodeModel implements Model {
    * @param row
    * @returns
    */
-  public async silentUpdateNode(row: Node.Model) {
+  public async silentUpdateNode(row: Omit<Node.Model, "name">) {
     try {
       const { node_id, user_id } = row;
       return this.db.updateAsync<Node.Model>(

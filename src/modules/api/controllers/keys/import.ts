@@ -3,12 +3,12 @@ import fs from "node:fs";
 
 import { C_Event, C_Keys, C_System } from "@dogma-project/constants-meta";
 import stateManager from "../../../../components/state";
-import { Certificate, Keys } from "../../../../types";
+import { Keys } from "../../../../types";
 import logger from "../../../logger";
 import { getDatadir } from "../../../datadir";
 import path from "node:path";
 
-export default function importUserKey(cert: Certificate.Import) {
+export default function importUserKey(cert: Keys.Import) {
   try {
     let str: string;
     if ("path" in cert) {

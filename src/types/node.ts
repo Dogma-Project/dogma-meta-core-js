@@ -5,7 +5,15 @@ import { Sync } from "./sync";
 export namespace Node {
   export type Id = string;
   export type Name = string;
-  export type Model = {
+
+  export interface ExportModel {
+    name: string;
+    public_ipv4?: Connection.IPv4;
+    public_ipv6?: Connection.IPv4;
+    tor_addr?: string; // edit
+  }
+
+  export interface Model extends ExportModel {
     [index: string | symbol]:
       | Id
       | string
@@ -15,9 +23,6 @@ export namespace Node {
       | number;
     node_id: Node.Id;
     user_id: User.Id;
-    name?: string;
-    public_ipv4?: Connection.IPv4;
-    public_ipv6?: Connection.IPv4;
     local_ipv4?: Connection.IPv6;
     local_ipv6?: Connection.IPv6;
     /**
@@ -28,7 +33,8 @@ export namespace Node {
      * Timestamp in milliseconds
      */
     synced?: number;
-  };
+  }
+
   export type Storage = {
     id: Id | null;
     name: Name;

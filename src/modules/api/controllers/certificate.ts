@@ -1,9 +1,10 @@
-import { C_API } from "@dogma-project/constants-meta";
-import { API } from "../../../types";
+import { API, Constants } from "../../../types";
 import WorkerApi from "../index";
 import logger from "../../logger";
 import getCertificate from "./certificate/get";
 import pushCertificate from "./certificate/push";
+
+const { C_API } = Constants;
 
 export default function CertificateController(
   this: WorkerApi,

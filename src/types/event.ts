@@ -1,4 +1,4 @@
-import { C_System, C_Event } from "@dogma-project/constants-meta";
+import { C_System, C_Event } from "./constants";
 
 export namespace Event {
   export type Payload = any[];

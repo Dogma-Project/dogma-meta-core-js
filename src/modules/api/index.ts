@@ -1,7 +1,7 @@
 import logger from "../logger";
-import { C_API } from "@dogma-project/constants-meta";
 import { parentPort, MessagePort } from "node:worker_threads";
-import { API } from "../../types";
+import { API, Constants } from "../../types";
+
 import {
   KeysController,
   NetworkController,
@@ -12,6 +12,8 @@ import {
   UserController,
   CertificateController,
 } from "./controllers";
+
+const { C_API } = Constants;
 
 export default class WorkerApi {
   parentPort: MessagePort | null;

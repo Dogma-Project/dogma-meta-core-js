@@ -4,7 +4,7 @@ import * as Types from "../../types";
 import Model from "./_model";
 import { getDatadir } from "../datadir";
 import logger from "../logger";
-import { C_Event, C_System, C_DHT } from "@dogma-project/constants-meta";
+import { C_Event, C_System, C_DHT } from "../../types/constants";
 
 class DHTModel implements Model {
   stateBridge: StateManager;

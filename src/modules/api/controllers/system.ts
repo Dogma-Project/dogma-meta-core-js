@@ -1,5 +1,5 @@
 import { API } from "../../../types";
-import { C_API } from "@dogma-project/constants-meta";
+import { C_API } from "../../../types/constants";
 import process from "node:process";
 import WorkerApi from "../index";
 

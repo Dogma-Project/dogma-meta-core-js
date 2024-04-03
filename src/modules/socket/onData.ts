@@ -1,7 +1,7 @@
 import * as Types from "../../types";
 import logger from "../logger";
 import DogmaSocket from "../socket";
-import { C_Streams } from "@dogma-project/constants-meta";
+import { C_Streams } from "../../types/constants";
 
 export default function onData(
   this: DogmaSocket,

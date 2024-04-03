@@ -3,12 +3,7 @@ import assert, { strictEqual } from "node:assert";
 
 import logger from "../modules/logger";
 import RunWorker from "../run";
-import {
-  C_API,
-  C_Event,
-  C_Keys,
-  C_System,
-} from "@dogma-project/constants-meta";
+import { C_API, C_Event, C_Keys, C_System } from "../types/constants";
 
 const workerAuto = new RunWorker({
   prefix: "test-1",

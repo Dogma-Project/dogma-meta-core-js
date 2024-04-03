@@ -1,5 +1,5 @@
 import ConnectionClass from "../connections";
-import { C_Streams } from "@dogma-project/constants-meta";
+import { C_Streams } from "../../types/constants";
 import { Streams } from "../../types";
 
 /**

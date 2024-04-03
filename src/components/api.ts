@@ -1,6 +1,6 @@
 import WorkerApi from "../modules/api";
 import stateManager from "./state";
-import { C_API, C_Event } from "@dogma-project/constants-meta";
+import { C_API, C_Event } from "../types/constants";
 
 const wsApi = new WorkerApi();
 

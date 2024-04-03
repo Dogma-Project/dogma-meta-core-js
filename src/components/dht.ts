@@ -4,12 +4,7 @@ import stateManager from "./state";
 import storage from "./storage";
 import * as Types from "../types";
 import { dhtModel } from "./model";
-import {
-  C_Event,
-  C_DHT,
-  C_Connection,
-  C_System,
-} from "@dogma-project/constants-meta";
+import { C_Event, C_DHT, C_Connection, C_System } from "../types/constants";
 
 const dht = new DHT({
   state: stateManager,

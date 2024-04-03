@@ -1,7 +1,7 @@
 import internal, { Transform, TransformCallback } from "node:stream";
 import crypto from "node:crypto";
 import logger from "../logger";
-import { C_Streams } from "@dogma-project/constants-meta";
+import { C_Streams } from "../../types/constants";
 
 type StreamEncoderParams = {
   id: number;

@@ -1,7 +1,7 @@
 import { Connection } from "./connection";
 import { Node } from "./node";
 import { User } from "./user";
-import { C_DHT, C_Streams } from "@dogma-project/constants-meta";
+import { C_DHT, C_Streams } from "./constants";
 
 export namespace DHT {
   export type Model = {

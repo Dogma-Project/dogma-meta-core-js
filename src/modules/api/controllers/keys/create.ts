@@ -1,4 +1,4 @@
-import { C_Event, C_Keys, C_System } from "@dogma-project/constants-meta";
+import { C_Event, C_Keys, C_System } from "../../../../types/constants";
 import storage from "../../../../components/storage";
 import stateManager from "../../../../components/state";
 import { createKeyPair } from "../../../keys";

@@ -4,7 +4,7 @@ import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 import Model from "./_model";
 import StateManager from "../state";
-import { C_Event, C_System } from "@dogma-project/constants-meta";
+import { C_Event, C_System } from "../../types/constants";
 
 class FileModel implements Model {
   stateBridge: StateManager;

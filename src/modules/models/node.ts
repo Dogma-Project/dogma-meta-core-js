@@ -4,7 +4,7 @@ import { getDatadir } from "../datadir";
 import Datastore from "@seald-io/nedb";
 import Model from "./_model";
 import StateManager from "../state";
-import { C_Event, C_System, C_Sync } from "@dogma-project/constants-meta";
+import { C_Event, C_System, C_Sync } from "../../types/constants";
 import EncryptDb from "./dbEncryption/afterSerialization";
 import DecryptDb from "./dbEncryption/beforeDeserialization";
 import path from "node:path";

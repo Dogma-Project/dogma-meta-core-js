@@ -1,6 +1,6 @@
 import { API } from "../../../types";
 import stateManager from "../../../components/state";
-import { C_API, C_Event } from "@dogma-project/constants-meta";
+import { C_API, C_Event } from "../../../types/constants";
 import WorkerApi from "../index";
 import logger from "../../logger";
 

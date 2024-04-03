@@ -1,5 +1,5 @@
 import DogmaSocket from "../modules/socket";
-import { C_Streams } from "@dogma-project/constants-meta";
+import { C_Streams } from "./constants";
 
 export namespace Streams {
   export type DemuxedResult = {

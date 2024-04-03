@@ -1,4 +1,4 @@
-import { C_Connection, C_Event } from "@dogma-project/constants-meta";
+import { C_Connection, C_Event } from "../../types/constants";
 import ConnectionClass from "../connections";
 import { workerData } from "node:worker_threads";
 

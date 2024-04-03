@@ -3,7 +3,7 @@ import logger from "../logger";
 import * as Types from "../../types";
 import ConnectionClass from "../connections";
 import DogmaSocket from "../socket";
-import { C_Connection, C_Event } from "@dogma-project/constants-meta";
+import { C_Connection, C_Event } from "../../types/constants";
 
 export default function onConnect(
   this: ConnectionClass,

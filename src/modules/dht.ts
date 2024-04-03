@@ -6,7 +6,7 @@ import DogmaSocket from "./socket";
 import StateManager from "./state";
 import Connections from "./connections";
 import { DHTModel } from "./model";
-import { C_Connection, C_Streams, C_DHT } from "@dogma-project/constants-meta";
+import { C_Connection, C_Streams, C_DHT } from "../types/constants";
 type DHTParams = {
   connections: Connections;
   state: StateManager;

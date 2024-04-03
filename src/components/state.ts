@@ -1,6 +1,6 @@
 import logger from "../modules/logger";
 import StateManager from "../modules/state";
-import { C_Event, C_System } from "@dogma-project/constants-meta";
+import { C_Event, C_System } from "../types/constants";
 
 const stateManager = new StateManager([
   C_Event.Type.server,

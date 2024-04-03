@@ -1,4 +1,4 @@
-import { C_API, C_Event } from "@dogma-project/constants-meta";
+import { C_API, C_Event } from "../types/constants";
 import { User } from "./user";
 import { Node } from "./node";
 

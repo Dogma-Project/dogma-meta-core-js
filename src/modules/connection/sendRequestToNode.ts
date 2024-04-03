@@ -2,7 +2,7 @@ import logger from "../logger";
 import * as Types from "../../types";
 import Connections from "../connections";
 import response from "./response";
-import { C_Streams, C_Constants } from "@dogma-project/constants-meta";
+import { C_Streams, C_Constants } from "../../types/constants";
 
 export default function send(
   this: Connections,

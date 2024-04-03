@@ -1,4 +1,4 @@
-import { C_Streams, C_Sync } from "@dogma-project/constants-meta";
+import { C_Streams, C_Sync } from "./constants";
 
 export namespace Sync {
   export type Id = string;

@@ -1,7 +1,7 @@
 import { parentPort } from "node:worker_threads";
 import { Event, Config, API } from "../types";
 import logger from "./logger";
-import { C_API, C_Event, C_System } from "@dogma-project/constants-meta";
+import { C_API, C_Event, C_System } from "../types/constants";
 
 type MapPredicate<T> = T extends C_Event.Type.Service
   ? C_System.States

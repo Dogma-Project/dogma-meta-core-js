@@ -6,7 +6,7 @@ import {
   C_Streams,
   C_Keys,
   C_Constants,
-} from "@dogma-project/constants-meta";
+} from "../types/constants";
 import * as Types from "../types";
 import generateSyncId from "./generateSyncId";
 import logger from "./logger";

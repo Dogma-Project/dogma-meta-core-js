@@ -4,12 +4,7 @@ import * as Types from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
 import Connections from "./connections";
-import {
-  C_Connection,
-  C_Event,
-  C_Sync,
-  C_System,
-} from "@dogma-project/constants-meta";
+import { C_Connection, C_Event, C_Sync, C_System } from "../types/constants";
 
 export default class Client {
   connectionsBridge: Connections;

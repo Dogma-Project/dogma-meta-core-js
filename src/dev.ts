@@ -1,4 +1,4 @@
-import { C_System } from "@dogma-project/constants-meta";
+import { C_System } from "./types/constants";
 import RunWorker from "./run";
 
 import logger from "./modules/logger";

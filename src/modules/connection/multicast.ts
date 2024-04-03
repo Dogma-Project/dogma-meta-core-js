@@ -1,7 +1,7 @@
 import * as Types from "../../types";
 import Connections from "../connections";
 import logger from "../logger";
-import { C_Connection, C_Streams } from "@dogma-project/constants-meta";
+import { C_Connection, C_Streams } from "../../types/constants";
 
 export default function multicast(
   this: Connections,

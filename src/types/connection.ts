@@ -1,7 +1,7 @@
 import DogmaSocket from "../modules/socket";
 import { User } from "./user";
 import { Node } from "./node";
-import { C_Connection } from "@dogma-project/constants-meta";
+import { C_Connection } from "./constants";
 
 export namespace Connection {
   export type Id = string;

@@ -1,7 +1,7 @@
 import stateManager from "./state";
 import checkHomeDir from "../modules/checkHomeDir";
 import logger from "../modules/logger";
-import { C_Event, C_System } from "@dogma-project/constants-meta";
+import { C_Event, C_System } from "../types/constants";
 
 stateManager.subscribe([C_Event.Type.start], () => {
   stateManager.emit(C_Event.Type.dirStatus, C_System.States.ready);

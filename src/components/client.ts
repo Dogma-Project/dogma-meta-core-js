@@ -7,7 +7,7 @@ import dht from "./dht";
 import * as Types from "../types";
 import storage from "./storage";
 import state from "./state";
-import { C_Event, C_Sync, C_System } from "@dogma-project/constants-meta";
+import { C_Event, C_Sync, C_System } from "../types/constants";
 import { userModel, nodeModel } from "./model";
 
 const models: Types.Model.All = {};

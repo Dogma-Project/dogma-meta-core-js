@@ -1,8 +1,4 @@
-import {
-  C_Streams,
-  C_Connection,
-  C_Message,
-} from "@dogma-project/constants-meta";
+import { C_Streams, C_Connection, C_Message } from "./constants";
 
 export namespace Message {
   export type Model = {

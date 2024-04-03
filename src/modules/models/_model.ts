@@ -1,6 +1,6 @@
 import Datastore from "@seald-io/nedb";
 import StateManager from "../state";
-import { C_Sync } from "@dogma-project/constants-meta";
+import { C_Sync } from "../../types/constants";
 
 export default interface Model {
   db: Datastore;

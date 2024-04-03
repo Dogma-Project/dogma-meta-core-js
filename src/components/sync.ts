@@ -1,4 +1,4 @@
-import { C_Event, C_Sync, C_System } from "@dogma-project/constants-meta";
+import { C_Event, C_Sync, C_System } from "../types/constants";
 import stateManager from "./state";
 import storage from "./storage";
 import logger from "../modules/logger";

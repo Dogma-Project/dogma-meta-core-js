@@ -1,4 +1,4 @@
-import { C_API, C_System } from "@dogma-project/constants-meta";
+import { C_API, C_System } from "./types/constants";
 import { Worker } from "node:worker_threads";
 import { EventEmitter } from "node:stream";
 import generateSyncId from "./modules/generateSyncId";

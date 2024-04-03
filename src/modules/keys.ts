@@ -3,7 +3,7 @@ import { Keys } from "../types";
 import logger from "./logger";
 import fs from "node:fs";
 import { getDatadir } from "./datadir";
-import { C_Keys } from "@dogma-project/constants-meta";
+import { C_Keys } from "../types/constants";
 import generateCryptoKey from "./models/dbEncryption/generateCryptoKey";
 
 type result = {

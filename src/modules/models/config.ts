@@ -9,7 +9,7 @@ import {
   C_Defaults,
   C_Event,
   C_System,
-} from "@dogma-project/constants-meta";
+} from "../../types/constants";
 import { workerData } from "node:worker_threads";
 class ConfigModel implements Model {
   stateBridge: StateManager;

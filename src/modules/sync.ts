@@ -5,7 +5,7 @@ import Storage from "./storage";
 import DogmaSocket from "./socket";
 import StateManager from "./state";
 import Connections from "./connections";
-import { C_Connection, C_Streams, C_Sync } from "@dogma-project/constants-meta";
+import { C_Connection, C_Streams, C_Sync } from "../types/constants";
 import Model from "./models/_model";
 import { NodeModel } from "./model";
 

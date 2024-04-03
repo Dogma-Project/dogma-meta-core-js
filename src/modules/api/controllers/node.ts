@@ -1,4 +1,4 @@
-import { C_API } from "@dogma-project/constants-meta";
+import { C_API } from "../../../types/constants";
 import { API } from "../../../types";
 import logger from "../../logger";
 import WorkerApi from "../index";

@@ -1,5 +1,5 @@
 import * as Types from "../types";
-import { C_Defaults } from "@dogma-project/constants-meta";
+import { C_Defaults } from "../types/constants";
 
 class Storage {
   node: Types.Node.Storage = {

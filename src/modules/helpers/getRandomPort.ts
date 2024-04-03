@@ -1,4 +1,4 @@
-import { C_Defaults } from "@dogma-project/constants-meta";
+import { C_Defaults } from "../../types/constants";
 
 export default function getRandomPort() {
   const port =

@@ -2,7 +2,7 @@ import { EventEmitter } from "node:stream";
 import crypto from "node:crypto";
 import { Streams } from "../../types";
 import logger from "../logger";
-import { C_Streams } from "@dogma-project/constants-meta";
+import { C_Streams } from "../../types/constants";
 
 class Decoder extends EventEmitter {
   private privateKey: crypto.KeyLike;

@@ -1,6 +1,5 @@
 import ConnectionClass from "../connections";
-import * as Types from "../../types";
-import { C_Event, C_Sync } from "@dogma-project/constants-meta";
+import { C_Sync } from "../../types/constants";
 import logger from "../logger";
 
 export default async function isUserAuthorized(

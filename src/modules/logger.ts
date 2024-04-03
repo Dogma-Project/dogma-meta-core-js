@@ -1,5 +1,5 @@
 import { workerData } from "node:worker_threads";
-import { C_System, C_Defaults } from "@dogma-project/constants-meta";
+import { C_System, C_Defaults } from "../types/constants";
 
 /** @module Logger */
 

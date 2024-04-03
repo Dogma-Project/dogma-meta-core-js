@@ -3,7 +3,7 @@ import { Worker } from "node:worker_threads";
 import { EventEmitter } from "node:stream";
 import generateSyncId from "./modules/generateSyncId";
 import { API } from "./types";
-// import logger from "./modules/logger";
+import * as Types from "./types";
 
 interface WorkerData {
   prefix: string;
@@ -25,7 +25,7 @@ interface WorkerData {
   loglevel?: C_System.LogLevel;
 }
 
-export default class RunWorker extends EventEmitter {
+class RunWorker extends EventEmitter {
   private worker: Worker;
   public id: string = generateSyncId(8);
   public name: string;
@@ -138,4 +138,5 @@ export default class RunWorker extends EventEmitter {
   }
 }
 
-module.exports = RunWorker;
+export { RunWorker, Types };
+module.exports = { RunWorker, Types };

@@ -1,4 +1,4 @@
-import { C_Event, C_Sync, C_System } from "../types/constants";
+import { C_Event, C_Sync, C_System } from "../constants";
 import stateManager from "./state";
 import storage from "./storage";
 import logger from "../modules/logger";

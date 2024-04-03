@@ -1,7 +1,8 @@
 import DogmaSocket from "../modules/socket";
 import { User } from "./user";
 import { Node } from "./node";
-import { C_Connection } from "./constants";
+import { C_Connection } from "../constants";
+import { ValuesOf } from "./_main";
 
 export namespace Connection {
   export type Id = string;
@@ -27,7 +28,7 @@ export namespace Connection {
   };
   export namespace Handshake {
     export type StageInitRequest = {
-      stage: C_Connection.Stage.init;
+      stage: typeof C_Connection.Stage.init;
       protocol: 2;
       session: string;
       user_id: User.Id;
@@ -36,11 +37,14 @@ export namespace Connection {
       node_name: string;
     };
     export type StageVerificationRequest = {
-      stage: C_Connection.Stage.verification;
+      stage: typeof C_Connection.Stage.verification;
       userKey: string;
       userSign: string;
       nodeKey: string;
       nodeSign: string;
     };
   }
+  export type Direction = ValuesOf<typeof C_Connection.Direction>;
+  export type Status = ValuesOf<typeof C_Connection.Status>;
+  export type Group = ValuesOf<typeof C_Connection.Group>;
 }

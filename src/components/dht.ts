@@ -4,7 +4,8 @@ import stateManager from "./state";
 import storage from "./storage";
 import * as Types from "../types";
 import { dhtModel } from "./model";
-import { C_Event, C_DHT, C_Connection, C_System } from "../types/constants";
+import { C_Event, C_DHT, C_Connection, C_System } from "../constants";
+import { Connection } from "../types";
 
 const dht = new DHT({
   state: stateManager,
@@ -14,19 +15,25 @@ const dht = new DHT({
 });
 
 stateManager.subscribe([C_Event.Type.configDhtLookup], ([configDhtLookup]) => {
-  dht.setPermission(C_DHT.Type.dhtLookup, configDhtLookup as number);
+  dht.setPermission(C_DHT.Type.dhtLookup, configDhtLookup as Connection.Group);
 });
 stateManager.subscribe(
   [C_Event.Type.configDhtAnnounce],
   ([configDhtAnnounce]) => {
-    dht.setPermission(C_DHT.Type.dhtAnnounce, configDhtAnnounce as number);
+    dht.setPermission(
+      C_DHT.Type.dhtAnnounce,
+      configDhtAnnounce as Connection.Group
+    );
   }
 );
 
 stateManager.subscribe(
   [C_Event.Type.configDhtBootstrap],
   ([configDhtBootstrap]) => {
-    dht.setPermission(C_DHT.Type.dhtBootstrap, configDhtBootstrap as number);
+    dht.setPermission(
+      C_DHT.Type.dhtBootstrap,
+      configDhtBootstrap as Connection.Group
+    );
     switch (configDhtBootstrap) {
       case C_Connection.Group.all:
         stateManager.emit(C_Event.Type.dhtService, C_System.States.full);

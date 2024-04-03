@@ -2,7 +2,7 @@ import logger from "../logger";
 import * as Types from "../../types";
 import Connections from "../connections";
 import response from "./response";
-import { C_Streams, C_Constants } from "../../types/constants";
+import { C_Streams, C_Constants } from "../../constants";
 
 export default function send(
   this: Connections,

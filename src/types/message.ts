@@ -1,19 +1,21 @@
-import { C_Streams, C_Connection, C_Message } from "./constants";
+import { C_Streams, C_Connection, C_Message } from "../constants";
+
+type ValuesOf<T> = T[keyof T];
 
 export namespace Message {
   export type Model = {
     id: string;
     sync_id: string;
     text: string;
-    direction: C_Connection.Direction;
+    direction: ValuesOf<typeof C_Connection.Direction>;
     format: number; // edit
-    type: C_Message.Type;
+    type: ValuesOf<typeof C_Message.Type>;
   };
 
   export namespace Send {
     export interface Request {
-      type: C_Message.Type;
-      action: C_Message.Action.send;
+      type: ValuesOf<typeof C_Message.Type>;
+      action: typeof C_Message.Action.send;
       data: Request.Data;
     }
     export namespace Request {
@@ -23,8 +25,8 @@ export namespace Message {
 
   export namespace Delete {
     export interface Request {
-      type: C_Message.Type;
-      action: C_Message.Action.delete;
+      type: ValuesOf<typeof C_Message.Type>;
+      action: typeof C_Message.Action.delete;
       data: Request.Data;
     }
     export namespace Request {
@@ -34,7 +36,7 @@ export namespace Message {
 
   export type Requests = Send.Request | Delete.Request;
   export type Abstract = {
-    class: C_Streams.MX.messages;
+    class: typeof C_Streams.MX.messages;
     body: Requests;
   };
 }

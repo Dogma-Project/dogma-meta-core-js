@@ -1,4 +1,4 @@
-import { C_Event, C_System, C_Defaults } from "../types/constants";
+import { C_Event, C_System, C_Defaults } from "../constants";
 import LocalDiscovery from "../modules/localDiscovery";
 import logger from "../modules/logger";
 import stateManager from "./state";

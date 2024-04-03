@@ -1,6 +1,6 @@
 import { workerData } from "node:worker_threads";
 import process from "node:process";
-import { C_Event } from "./types/constants";
+import { C_Event } from "./constants";
 import stateManager from "./components/state";
 import "./modules/prototypes";
 import "./components/server";

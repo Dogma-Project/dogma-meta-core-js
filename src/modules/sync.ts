@@ -5,9 +5,10 @@ import Storage from "./storage";
 import DogmaSocket from "./socket";
 import StateManager from "./state";
 import Connections from "./connections";
-import { C_Connection, C_Streams, C_Sync } from "../types/constants";
+import { C_Connection, C_Streams, C_Sync } from "../constants";
 import Model from "./models/_model";
 import { NodeModel } from "./model";
+import { Sync } from "../types";
 
 type SyncParams = {
   connections: Connections;
@@ -110,7 +111,7 @@ class Sync extends EventEmitter {
           try {
             if (request.payload) {
               for (const key in request.payload) {
-                const syncType = Number(key) as C_Sync.Type;
+                const syncType = Number(key) as Sync.Type; // ckeck security, add validation
                 const model = this.models.find((m) => m.syncType === syncType);
                 if (model && model.pushSync) {
                   let data = request.payload[syncType] || [];

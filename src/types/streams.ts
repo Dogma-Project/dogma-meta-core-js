@@ -1,9 +1,12 @@
 import DogmaSocket from "../modules/socket";
-import { C_Streams } from "./constants";
+import { C_Streams } from "../constants";
+import { ValuesOf } from "./_main";
 
 export namespace Streams {
+  export type MX = ValuesOf<typeof C_Streams.MX>;
+
   export type DemuxedResult = {
-    mx: C_Streams.MX;
+    mx: MX;
     data: Buffer;
     descriptor?: string; // edit
   };

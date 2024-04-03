@@ -4,7 +4,7 @@ import { getDatadir } from "../datadir";
 import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 import * as Types from "../../types";
-import { C_Event, C_System, C_Message } from "../../types/constants";
+import { C_Event, C_System, C_Message } from "../../constants";
 
 class MessageModel implements Model {
   stateBridge: StateManager;

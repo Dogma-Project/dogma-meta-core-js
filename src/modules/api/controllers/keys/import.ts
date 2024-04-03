@@ -2,7 +2,7 @@ import crypto, { PrivateKeyInput } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
-import { C_Event, C_Keys, C_System } from "../../../../types/constants";
+import { C_Event, C_Keys, C_System } from "../../../../constants";
 import stateManager from "../../../../components/state";
 import { Keys } from "../../../../types";
 import logger from "../../../logger";

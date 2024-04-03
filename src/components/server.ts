@@ -7,7 +7,7 @@ import * as Types from "../types";
 import logger from "../modules/logger";
 import client from "./client";
 import dht from "./dht";
-import { C_Defaults, C_Event, C_System } from "../types/constants";
+import { C_Defaults, C_Event, C_System } from "../constants";
 const server = new Server({ connections, storage, state: stateManager });
 
 stateManager.subscribe(

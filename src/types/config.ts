@@ -1,4 +1,4 @@
-import { C_Event } from "./constants";
+import { C_Event } from "../constants";
 
 export namespace Config {
   export type Value<T extends C_Event.Type.Config> =

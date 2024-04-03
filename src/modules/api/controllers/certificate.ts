@@ -1,10 +1,9 @@
-import { API, Constants } from "../../../types";
+import { API } from "../../../types";
 import WorkerApi from "../index";
 import logger from "../../logger";
 import getCertificate from "./certificate/get";
 import pushCertificate from "./certificate/push";
-
-const { C_API } = Constants;
+import { C_API } from "../../../constants";
 
 export default function CertificateController(
   this: WorkerApi,

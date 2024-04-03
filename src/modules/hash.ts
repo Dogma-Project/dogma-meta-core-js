@@ -1,4 +1,4 @@
-import { C_Keys } from "../types/constants";
+import { C_Keys } from "../constants";
 import crypto from "node:crypto";
 
 export const createSha1Hash = (data: crypto.BinaryLike | string) => {

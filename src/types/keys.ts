@@ -1,10 +1,16 @@
 import { Node } from "../types";
 import { User } from "./user";
+import { C_Keys } from "../constants";
+import { ValuesOf } from "./_main";
 
 export namespace Keys {
+  export type Length = 1024 | 2048 | 4096;
+
+  export type Types = ValuesOf<typeof C_Keys.Type>;
+
   export type InitialParams = {
-    name: string; // check
-    keylength: 1024 | 2048 | 4096;
+    name: string;
+    keylength: Length;
     seed?: string;
   };
 

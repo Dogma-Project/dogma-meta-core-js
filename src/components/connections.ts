@@ -3,7 +3,7 @@ import storage from "./storage";
 import state from "./state";
 import * as Types from "../types";
 import { userModel, nodeModel } from "./model";
-import { C_Sync } from "../types/constants";
+import { C_Sync } from "../constants";
 
 const models: Types.Model.All = {};
 models[C_Sync.Type.users] = userModel;

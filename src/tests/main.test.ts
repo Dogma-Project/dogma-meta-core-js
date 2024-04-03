@@ -2,8 +2,8 @@ import { describe } from "node:test";
 import assert, { strictEqual } from "node:assert";
 
 import logger from "../modules/logger";
-import { RunWorker, Types } from "../run";
-const { C_API, C_Event, C_Keys, C_System } = Types.Constants;
+import { RunWorker } from "../run";
+import { C_API, C_Event, C_Keys, C_System } from "../constants";
 
 const workerAuto = new RunWorker({
   prefix: "test-1",

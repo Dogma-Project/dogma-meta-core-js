@@ -1,7 +1,8 @@
 import { Connection } from "./connection";
 import { Node } from "./node";
 import { User } from "./user";
-import { C_DHT, C_Streams } from "./constants";
+import { C_DHT, C_Streams } from "../constants";
+import { ValuesOf } from "./_main";
 
 export namespace DHT {
   export type Model = {
@@ -13,8 +14,8 @@ export namespace DHT {
 
   export namespace LookUp {
     export interface Request {
-      type: C_DHT.Request.lookup;
-      action: C_DHT.Action.get;
+      type: typeof C_DHT.Request.lookup;
+      action: typeof C_DHT.Action.get;
       data: Request.Data;
     }
     export namespace Request {
@@ -24,8 +25,8 @@ export namespace DHT {
       };
     }
     export interface Answer {
-      type: C_DHT.Request.lookup;
-      action: C_DHT.Action.set;
+      type: typeof C_DHT.Request.lookup;
+      action: typeof C_DHT.Action.set;
       data: Answer.Data[];
     }
     export namespace Answer {
@@ -40,8 +41,8 @@ export namespace DHT {
 
   export namespace Announce {
     export interface Request {
-      type: C_DHT.Request.announce;
-      action: C_DHT.Action.push;
+      type: typeof C_DHT.Request.announce;
+      action: typeof C_DHT.Action.push;
       data: Request.Data;
     }
     export namespace Request {
@@ -53,8 +54,8 @@ export namespace DHT {
 
   export namespace Revoke {
     export interface Request {
-      type: C_DHT.Request.revoke;
-      action: C_DHT.Action.push;
+      type: typeof C_DHT.Request.revoke;
+      action: typeof C_DHT.Action.push;
       data: Request.Data;
     }
     export namespace Request {
@@ -78,7 +79,9 @@ export namespace DHT {
   };
   export type Card = CardQuery<Requests> | CardAnswer;
   export type Abstract = {
-    class: C_Streams.MX.dht;
+    class: typeof C_Streams.MX.dht;
     body: DHT.Requests;
   };
+
+  export type Type = ValuesOf<typeof C_DHT.Type>;
 }

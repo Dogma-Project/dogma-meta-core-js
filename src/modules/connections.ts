@@ -17,7 +17,6 @@ import {
 import * as Types from "../types";
 import StateManager from "./state";
 import Storage from "./storage";
-import { C_Streams } from "../types/constants";
 
 /** @module Connections */
 
@@ -27,7 +26,7 @@ class Connections {
   protected modelsBridge: Types.Model.All;
 
   protected handlers: {
-    [key in C_Streams.MX]?: Types.Streams.DataHandler;
+    [key in Types.Streams.MX]?: Types.Streams.DataHandler;
   } = {};
 
   constructor({

@@ -3,7 +3,7 @@ import { Keys } from "../types";
 import logger from "./logger";
 import fs from "node:fs";
 import { getDatadir } from "./datadir";
-import { C_Keys } from "../types/constants";
+import { C_Keys } from "../constants";
 import generateCryptoKey from "./models/dbEncryption/generateCryptoKey";
 
 type result = {
@@ -33,13 +33,13 @@ function _generateKeyPair(
 }
 
 export async function createKeyPair(
-  type: C_Keys.Type,
-  length: Keys.InitialParams["keylength"] = 2048
+  type: Keys.Types,
+  length: Keys.Length = 2048
 ) {
   try {
     const dir = getDatadir();
     const { publicKey, privateKey } = await _generateKeyPair(length);
-    const opts: crypto.KeyExportOptions<C_Keys.FORMATS.FORMAT> = {
+    const opts: crypto.KeyExportOptions<typeof C_Keys.FORMATS.FORMAT> = {
       // move to constants
       type: C_Keys.FORMATS.TYPE,
       format: C_Keys.FORMATS.FORMAT,

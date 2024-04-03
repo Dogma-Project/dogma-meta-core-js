@@ -1,10 +1,11 @@
-import { C_Connection, C_Event } from "../../types/constants";
+import { C_Connection, C_Event } from "../../constants";
 import ConnectionClass from "../connections";
 import { workerData } from "node:worker_threads";
+import { Connection } from "../../types";
 
 export default function allowDiscoveryRequests(
   this: ConnectionClass,
-  direction: C_Connection.Direction
+  direction: Connection.Direction
 ) {
   if (direction === C_Connection.Direction.incoming) {
     if (workerData.discovery) return true;

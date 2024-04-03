@@ -1,14 +1,17 @@
-import { C_Streams, C_Sync } from "./constants";
+import { C_Streams, C_Sync } from "../constants";
+import { ValuesOf } from "./_main";
 
 export namespace Sync {
   export type Id = string;
 
+  export type Type = ValuesOf<typeof C_Sync.Type>;
+
   export type Result = {
-    [index in C_Sync.Type]?: object[]; // edit
+    [index in Type]?: object[];
   };
 
   export interface RequestFull {
-    action: C_Sync.Action.get;
+    action: typeof C_Sync.Action.get;
     /**
      * Get all data from timestamp
      */
@@ -16,12 +19,12 @@ export namespace Sync {
     time: number;
   }
   export interface RequestPartial extends RequestFull {
-    type: C_Sync.Type;
+    type: Type;
   }
   export type Request = RequestFull | RequestPartial;
 
   export interface ResponseFull {
-    action: C_Sync.Action.push;
+    action: typeof C_Sync.Action.push;
     /**
      * Array of db records
      */
@@ -29,20 +32,20 @@ export namespace Sync {
     time: number;
   }
   export interface ResponsePartial extends ResponseFull {
-    type: C_Sync.Type;
+    type: Type;
   }
   export type Response = ResponseFull | ResponsePartial;
 
   export interface Notify {
-    action: C_Sync.Action.notify;
-    type: C_Sync.Type;
+    action: typeof C_Sync.Action.notify;
+    type: Type;
     time: number;
   }
 
   export type Data = Request | Response | Notify;
 
   export type Abstract = {
-    class: C_Streams.MX.sync;
+    class: typeof C_Streams.MX.sync;
     body: Data;
   };
 }

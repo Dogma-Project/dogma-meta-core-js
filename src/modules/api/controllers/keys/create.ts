@@ -1,7 +1,8 @@
-import { C_Event, C_Keys, C_System } from "../../../../types/constants";
+import { C_Event, C_Keys, C_System } from "../../../../constants";
 import storage from "../../../../components/storage";
 import stateManager from "../../../../components/state";
 import { createKeyPair } from "../../../keys";
+import { Keys } from "../../../../types";
 
 export default async function createKey({
   name,
@@ -9,8 +10,8 @@ export default async function createKey({
   type,
 }: {
   name: string;
-  length: 1024 | 2048 | 4096;
-  type: C_Keys.Type;
+  length: Keys.Length;
+  type: Keys.Types;
 }) {
   // add validation
 

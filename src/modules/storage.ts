@@ -1,5 +1,5 @@
 import * as Types from "../types";
-import { C_Defaults } from "../types/constants";
+import { C_Defaults } from "../constants";
 
 class Storage {
   node: Types.Node.Storage = {

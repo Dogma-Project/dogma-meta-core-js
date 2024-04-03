@@ -1,7 +1,7 @@
 import internal, { Transform, TransformCallback } from "node:stream";
 import crypto from "node:crypto";
 import logger from "../logger";
-import { C_Streams } from "../../types/constants";
+import { C_Streams } from "../../constants";
 
 type StreamEncoderParams = {
   id: number;

@@ -4,7 +4,7 @@ import * as Types from "../types";
 import Connections from "./connections";
 import StateManager from "./state";
 import Storage from "./storage";
-import { C_Connection, C_Event, C_System } from "../types/constants";
+import { C_Connection, C_Event, C_System } from "../constants";
 /** @module Server */
 
 export default class Server {

@@ -1,6 +1,7 @@
 import logger from "../logger";
 import { parentPort, MessagePort } from "node:worker_threads";
-import { API, Constants } from "../../types";
+import { API } from "../../types";
+import { C_API } from "../../constants";
 
 import {
   KeysController,
@@ -12,8 +13,6 @@ import {
   UserController,
   CertificateController,
 } from "./controllers";
-
-const { C_API } = Constants;
 
 export default class WorkerApi {
   parentPort: MessagePort | null;

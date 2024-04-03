@@ -1,5 +1,5 @@
 import { workerData } from "node:worker_threads";
-import { C_System, C_Defaults } from "../types/constants";
+import { C_System, C_Defaults } from "../constants";
 
 /** @module Logger */
 

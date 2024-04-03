@@ -1,15 +1,14 @@
 import stateManager from "./state";
 import checkHomeDir from "../modules/checkHomeDir";
 import logger from "../modules/logger";
-import { C_Event, C_System } from "../types/constants";
+import { C_Event, C_System } from "../constants";
 
 stateManager.subscribe([C_Event.Type.start], () => {
   stateManager.emit(C_Event.Type.dirStatus, C_System.States.ready);
 });
 
 stateManager.subscribe([C_Event.Type.dirStatus], ([dirStatus]) => {
-  const state = dirStatus as C_System.States;
-  switch (state) {
+  switch (dirStatus) {
     case C_System.States.ready:
     case C_System.States.reload:
       checkHomeDir()

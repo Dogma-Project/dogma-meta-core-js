@@ -6,7 +6,9 @@ import DogmaSocket from "./socket";
 import StateManager from "./state";
 import Connections from "./connections";
 import { DHTModel } from "./model";
-import { C_Connection, C_Streams, C_DHT } from "../types/constants";
+import { C_Connection, C_Streams, C_DHT } from "../constants";
+import { Connection, DHT } from "../types";
+
 type DHTParams = {
   connections: Connections;
   state: StateManager;
@@ -21,7 +23,7 @@ class DHT extends EventEmitter {
   modelBridge: DHTModel;
 
   permissions: {
-    [key in C_DHT.Type]: C_Connection.Group;
+    [key in DHT.Type]: Connection.Group;
   };
   peers: DogmaSocket[];
 
@@ -74,7 +76,7 @@ class DHT extends EventEmitter {
     this.peers = peers;
   }
 
-  public setPermission(type: C_DHT.Type, level: C_Connection.Group) {
+  public setPermission(type: DHT.Type, level: Connection.Group) {
     this.permissions[type] = level;
     logger.log("DHT", "setPermission", "set permission level", type, level);
   }

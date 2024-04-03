@@ -1,5 +1,5 @@
 import ConnectionClass from "../connections";
-import { C_Sync } from "../../types/constants";
+import { C_Sync } from "../../constants";
 import logger from "../logger";
 
 export default async function isUserAuthorized(

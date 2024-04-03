@@ -1,6 +1,7 @@
-import { C_API, C_System } from "./types/constants";
 import { Worker } from "node:worker_threads";
 import { EventEmitter } from "node:stream";
+
+import { C_API } from "./constants";
 import generateSyncId from "./modules/generateSyncId";
 import { API } from "./types";
 import * as Types from "./types";
@@ -22,7 +23,7 @@ interface WorkerData {
   /**
    * sets log level. default: C_System.LogLevel.info
    */
-  loglevel?: C_System.LogLevel;
+  loglevel?: Types.System.LogLevel;
 }
 
 class RunWorker extends EventEmitter {
@@ -138,5 +139,5 @@ class RunWorker extends EventEmitter {
   }
 }
 
-export { RunWorker, Types };
-module.exports = { RunWorker, Types };
+export { RunWorker };
+module.exports = { RunWorker };

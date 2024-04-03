@@ -16,4 +16,4 @@ export const Defaults = {
   friendshipRequests: true,
   userName: "Dogma User",
   nodeName: "Dogma Node",
-};
+} as const;

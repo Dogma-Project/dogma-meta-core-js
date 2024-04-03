@@ -1,6 +1,6 @@
 import WorkerApi from "../modules/api";
 import stateManager from "./state";
-import { C_API, C_Event } from "../types/constants";
+import { C_API, C_Event } from "../constants";
 
 const wsApi = new WorkerApi();
 

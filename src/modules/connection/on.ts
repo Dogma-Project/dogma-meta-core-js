@@ -1,5 +1,4 @@
 import ConnectionClass from "../connections";
-import { C_Streams } from "../../types/constants";
 import { Streams } from "../../types";
 
 /**
@@ -10,7 +9,7 @@ import { Streams } from "../../types";
  */
 export default function on(
   this: ConnectionClass,
-  event: C_Streams.MX,
+  event: Streams.MX,
   handler: Streams.DataHandler
 ) {
   this.handlers[event] = handler;

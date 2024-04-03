@@ -1,10 +1,10 @@
 import { parentPort } from "node:worker_threads";
 import { Event, Config, API } from "../types";
 import logger from "./logger";
-import { C_API, C_Event, C_System } from "../types/constants";
+import { C_API, C_Event, C_System } from "../constants";
 
 type MapPredicate<T> = T extends C_Event.Type.Service
-  ? C_System.States
+  ? Event.ServiceState
   : T extends C_Event.Type.Config
   ? Config.Value<T>
   : T extends C_Event.Type.Services
@@ -62,7 +62,7 @@ class StateManager {
     type: C_Event.Type.Config,
     payload: number | string | boolean
   ): void;
-  public emit(type: C_Event.Type.Service, payload: C_System.States): void;
+  public emit(type: C_Event.Type.Service, payload: Event.ServiceState): void;
   public emit(type: C_Event.Type.Services, payload: Event.ServicesList): void;
   public emit(type: C_Event.Type.Storage, payload: any): void;
   public emit(type: C_Event.Type.Action, payload: any): void;
@@ -98,7 +98,8 @@ class StateManager {
           return {
             service: type,
             state:
-              (this.state[type] as C_System.States) || C_System.States.disabled,
+              (this.state[type] as Event.ServiceState) ||
+              C_System.States.disabled,
           };
         });
         this.emit(C_Event.Type.services, services);
@@ -128,7 +129,7 @@ class StateManager {
   public get(type: C_Event.Type.ConfigBool): boolean | undefined;
   public get(type: C_Event.Type.ConfigStr): string | undefined;
   public get(type: C_Event.Type.ConfigNum): number | undefined;
-  public get(type: C_Event.Type.Service): C_System.States | undefined;
+  public get(type: C_Event.Type.Service): Event.ServiceState | undefined;
   public get(type: C_Event.Type.Services): Event.ServicesList | undefined;
   public get<T>(type: C_Event.Type.Storage): T | undefined;
   public get<T>(type: C_Event.Type.Action): T | undefined;

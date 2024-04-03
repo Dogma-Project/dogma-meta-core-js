@@ -1,12 +1,7 @@
 import net from "node:net";
 import crypto from "node:crypto";
 import EventEmitter from "node:events";
-import {
-  C_Connection,
-  C_Streams,
-  C_Keys,
-  C_Constants,
-} from "../types/constants";
+import { C_Connection, C_Streams, C_Keys, C_Constants } from "../constants";
 import * as Types from "../types";
 import generateSyncId from "./generateSyncId";
 import logger from "./logger";
@@ -39,9 +34,9 @@ class DogmaSocket extends EventEmitter {
 
   private decoder?: Decoder;
 
-  public readonly direction: C_Connection.Direction;
-  status: C_Connection.Status = C_Connection.Status.notConnected;
-  group: C_Connection.Group = C_Connection.Group.unknown;
+  public readonly direction: Types.Connection.Direction;
+  status: Types.Connection.Status = C_Connection.Status.notConnected;
+  group: Types.Connection.Group = C_Connection.Group.unknown;
 
   private readonly outSession: string;
   private inSession?: string;
@@ -83,7 +78,7 @@ class DogmaSocket extends EventEmitter {
 
   constructor(
     socket: net.Socket,
-    direction: C_Connection.Direction,
+    direction: Types.Connection.Direction,
     connections: ConnectionClass,
     storage: Storage
   ) {
@@ -277,7 +272,7 @@ class DogmaSocket extends EventEmitter {
     logger.error("connection", this.id, err.name, err.message);
   };
 
-  private sendHandshake(stage: C_Connection.Stage) {
+  private sendHandshake(stage: 0 | 1) {
     if (!this.input) return logger.warn("Socket", "Input is not defined"); // edit
     if (!this.storageBridge.user.privateKey) return;
     if (!this.storageBridge.node.privateKey) return;

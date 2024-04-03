@@ -1,5 +1,5 @@
 import { workerData } from "node:worker_threads";
-import { C_Event, C_Connection, C_System } from "../types/constants";
+import { C_Event, C_Connection, C_System } from "../constants";
 
 import stateManager from "./state";
 import storage from "./storage";

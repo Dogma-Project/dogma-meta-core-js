@@ -14,7 +14,7 @@ import { Sync } from "./types/sync";
 import { User } from "./types/user";
 import { API } from "./types/api";
 import { Model } from "./types/model";
-import * as Constants from "./types/constants";
+import { System } from "./types/system";
 
 declare global {
   interface String {
@@ -44,5 +44,5 @@ export {
   User,
   API,
   Model,
-  Constants,
+  System,
 };

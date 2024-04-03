@@ -1,4 +1,4 @@
-import { C_Defaults } from "../../types/constants";
+import { C_Defaults } from "../../constants";
 
 export default function getRandomPort() {
   const port =

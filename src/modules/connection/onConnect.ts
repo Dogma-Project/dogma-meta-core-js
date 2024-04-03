@@ -3,13 +3,14 @@ import logger from "../logger";
 import * as Types from "../../types";
 import ConnectionClass from "../connections";
 import DogmaSocket from "../socket";
-import { C_Connection, C_Event } from "../../types/constants";
+import { C_Event } from "../../constants";
+import { Connection } from "../../types";
 
 export default function onConnect(
   this: ConnectionClass,
   socket: net.Socket,
   peer: Types.Connection.Peer,
-  direction: C_Connection.Direction
+  direction: Connection.Direction
 ) {
   const dogmaSocket = new DogmaSocket(
     socket,

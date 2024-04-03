@@ -2,7 +2,7 @@ import { EventEmitter } from "node:stream";
 import crypto from "node:crypto";
 import { Streams } from "../../types";
 import logger from "../logger";
-import { C_Streams } from "../../types/constants";
+import { C_Streams } from "../../constants";
 
 class Decoder extends EventEmitter {
   private privateKey: crypto.KeyLike;
@@ -58,6 +58,7 @@ class Decoder extends EventEmitter {
         // plain
         data = packet;
       } else {
+        if (Object.values(C_Streams.MX).indexOf(mx as any) === -1) return;
         if (!this.symmetricKey) {
           this.decoding = false;
           return logger.warn("Decrypt", "Symmetric key not ready");
@@ -83,7 +84,7 @@ class Decoder extends EventEmitter {
       this.decode();
 
       const result: Streams.DemuxedResult = {
-        mx,
+        mx: mx as any,
         data,
       };
 

@@ -1,12 +1,13 @@
 import * as Types from "../../types";
 import Connections from "../connections";
 import logger from "../logger";
-import { C_Connection, C_Streams } from "../../types/constants";
+import { C_Connection, C_Streams } from "../../constants";
+import { Connection } from "../../types";
 
 export default function multicast(
   this: Connections,
   request: Types.Request,
-  destination: C_Connection.Group
+  destination: Connection.Group
 ) {
   if (destination === C_Connection.Group.unknown) return;
   if (destination > C_Connection.Group.selfNode) return;

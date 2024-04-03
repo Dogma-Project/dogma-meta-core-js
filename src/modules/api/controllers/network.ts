@@ -2,7 +2,7 @@ import connections from "../../../components/connections";
 import { API } from "../../../types";
 import storage from "../../../components/storage";
 import { nodeModel, userModel } from "../../../components/model";
-import { C_API } from "../../../types/constants";
+import { C_API } from "../../../constants";
 import WorkerApi from "../index";
 
 export async function getNetwork() {

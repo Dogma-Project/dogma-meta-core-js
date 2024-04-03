@@ -1,4 +1,4 @@
-import { C_Sync } from "./constants";
+import { C_Sync } from "../constants";
 import {
   ConfigModel,
   NodeModel,

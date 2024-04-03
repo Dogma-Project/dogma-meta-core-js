@@ -7,7 +7,7 @@ import { getDatadir } from "../modules/datadir";
 import logger from "../modules/logger";
 import { createKeyPair, readOrCreateEncryptionKey } from "../modules/keys";
 import { createSha256Hash } from "../modules/hash";
-import { C_Event, C_System, C_Keys } from "../types/constants";
+import { C_Event, C_System, C_Keys } from "../constants";
 
 stateManager.subscribe([C_Event.Type.userKey], ([payload]) => {
   const dir = getDatadir();

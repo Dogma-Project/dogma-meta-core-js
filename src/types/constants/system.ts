@@ -1,5 +1,5 @@
 export namespace System {
-  export enum LogLevel {
+  export const enum LogLevel {
     nothing = 0,
     errors = 1,
     warnings = 2,
@@ -7,7 +7,7 @@ export namespace System {
     logs = 4,
     debug = 5,
   }
-  export enum States {
+  export const enum States {
     error = -1,
     disabled = 0,
     ready = 1,

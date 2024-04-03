@@ -1,5 +1,5 @@
 export namespace Streams {
-  export enum MX {
+  export const enum MX {
     /**
      * Not encrypted MX used for handshake
      */
@@ -46,7 +46,7 @@ export namespace Streams {
     sync = 10,
   }
 
-  export enum SIZES {
+  export const enum SIZES {
     /**
      * MX descriptor size in bytes
      */

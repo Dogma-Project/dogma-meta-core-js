@@ -1,20 +1,20 @@
 export namespace DHT {
-  export enum Type {
+  export const enum Type {
     dhtAnnounce = 0,
     dhtLookup = 1,
     dhtBootstrap = 2,
   }
-  export enum Action {
+  export const enum Action {
     get = 0,
     set = 1,
     push = 2,
   }
-  export enum Request {
+  export const enum Request {
     announce = 0,
     lookup = 1,
     revoke = 2,
   }
-  export enum Response {
+  export const enum Response {
     error = -1,
     alreadyPresent = 0,
     ok = 1,

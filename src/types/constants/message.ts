@@ -1,10 +1,10 @@
 export namespace Message {
-  export enum Type {
+  export const enum Type {
     direct = 0,
     user = 1,
     chat = 2,
   }
-  export enum Action {
+  export const enum Action {
     send = 0,
     sync = 1,
     edit = 2,

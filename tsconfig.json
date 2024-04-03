@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "declaration": true,
-    "declarationDir": "./types"
+    "declarationDir": "./types",
+    "preserveConstEnums": true
   }
 }

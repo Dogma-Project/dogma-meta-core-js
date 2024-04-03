@@ -1,8 +1,8 @@
 export namespace Constants {
-  export enum Messages {
+  export const enum Messages {
     test = "hello",
   }
-  export enum MessageCode {
+  export const enum MessageCode {
     error = -1,
     unknown = 0,
     success = 1,

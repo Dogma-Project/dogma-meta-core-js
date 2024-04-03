@@ -1,9 +1,9 @@
 export namespace Sync {
-  export enum SIZES {
+  export const enum SIZES {
     USER_ID = 5,
     NODE_ID = 5,
   }
-  export enum Type {
+  export const enum Type {
     users = 0,
     nodes = 1,
     storage = 2,
@@ -11,7 +11,7 @@ export namespace Sync {
     messages = 4,
     dht = 5,
   }
-  export enum Action {
+  export const enum Action {
     get = 0,
     push = 1,
     notify = 2,

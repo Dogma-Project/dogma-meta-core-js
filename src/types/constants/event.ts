@@ -1,10 +1,10 @@
 export namespace Event {
-  export enum Action {
+  export const enum Action {
     update = 0,
     set = 1,
   }
 
-  export enum Type {
+  export const enum Type {
     start = "START", // action
     ready = "READY", // action
 

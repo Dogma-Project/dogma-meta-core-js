@@ -1,5 +1,5 @@
 export namespace Connection {
-  export enum Status {
+  export const enum Status {
     error = -1,
     notConnected = 0,
     connected = 1,
@@ -12,7 +12,7 @@ export namespace Connection {
      */
     authorized = 3,
   }
-  export enum Group {
+  export const enum Group {
     unknown = 0,
     all = 1,
     friends = 2,
@@ -20,11 +20,11 @@ export namespace Connection {
     selfNode = 4,
     nobody = 5,
   }
-  export enum Direction {
+  export const enum Direction {
     outcoming = 0,
     incoming = 1,
   }
-  export enum Stage {
+  export const enum Stage {
     /**
      * Send StageInitRequest with out session code and own credentials
      */

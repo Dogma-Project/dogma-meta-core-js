@@ -1,5 +1,5 @@
 export namespace API {
-  export enum ApiRequestType {
+  export const enum ApiRequestType {
     services = 0,
     settings = 1,
     keys = 2,
@@ -14,7 +14,7 @@ export namespace API {
     certificate = 11,
   }
 
-  export enum ApiRequestAction {
+  export const enum ApiRequestAction {
     /**
      * Get a value or a state
      */

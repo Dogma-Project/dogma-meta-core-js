@@ -5,6 +5,7 @@ import NetworkController from "./network";
 import SystemController from "./system";
 import NodeController from "./node";
 import UserController from "./user";
+import CertificateController from "./certificate";
 
 export {
   ServicesController,
@@ -14,4 +15,5 @@ export {
   SystemController,
   NodeController,
   UserController,
+  CertificateController,
 };

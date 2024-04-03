@@ -160,6 +160,29 @@ workerAuto.on("state", async (data) => {
             assert.strictEqual(err.action, C_API.ApiRequestAction.error);
           });
 
+        /** CERTIFICATE */
+        const exportCertificate = await workerAuto.request({
+          type: C_API.ApiRequestType.certificate,
+          action: C_API.ApiRequestAction.get,
+          payload: {},
+        });
+        assert.deepStrictEqual(exportCertificate, {
+          type: C_API.ApiRequestType.certificate,
+          action: C_API.ApiRequestAction.result,
+          payload: "null",
+        });
+        const importCertificate = await workerSecondOwn.request({
+          type: C_API.ApiRequestType.certificate,
+          action: C_API.ApiRequestAction.push,
+          payload: exportCertificate.payload,
+        });
+        assert.deepStrictEqual(importCertificate, {
+          type: C_API.ApiRequestType.certificate,
+          action: C_API.ApiRequestAction.result,
+          payload: true,
+        });
+        /** CERTIFICATE */
+
         const getNetwork = await workerAuto.request({
           type: C_API.ApiRequestType.network,
           action: C_API.ApiRequestAction.get,

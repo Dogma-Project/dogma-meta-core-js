@@ -10,6 +10,7 @@ import {
   SystemController,
   NodeController,
   UserController,
+  CertificateController,
 } from "./controllers";
 
 export default class WorkerApi {
@@ -33,6 +34,7 @@ export default class WorkerApi {
   private systemController = SystemController;
   private nodeController = NodeController;
   private userController = UserController;
+  private certController = CertificateController;
 
   private handle(data: API.Request) {
     try {
@@ -57,6 +59,9 @@ export default class WorkerApi {
           break;
         case C_API.ApiRequestType.node:
           this.nodeController(data);
+          break;
+        case C_API.ApiRequestType.certificate:
+          this.certController(data);
           break;
         default:
           // 404

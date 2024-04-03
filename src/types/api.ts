@@ -5,10 +5,11 @@ import { Event } from "./event";
 import { ValuesOf } from "./_main";
 
 export namespace API {
-  export type Type = ValuesOf<typeof C_API.ApiRequestType>;
+  export type RequestType = ValuesOf<typeof C_API.ApiRequestType>;
+  export type RequestAction = ValuesOf<typeof C_API.ApiRequestAction>;
 
   export type Request = {
-    type: Type;
+    type: RequestType;
     action:
       | typeof C_API.ApiRequestAction.get
       | typeof C_API.ApiRequestAction.push
@@ -18,7 +19,7 @@ export namespace API {
     payload?: any;
   };
   export type ResponseRequest = {
-    type: Type;
+    type: RequestType;
     action:
       | typeof C_API.ApiRequestAction.set
       | typeof C_API.ApiRequestAction.result;
@@ -26,7 +27,7 @@ export namespace API {
     payload?: any;
   };
   export type ResponseEvent = {
-    type: Type;
+    type: RequestType;
     action:
       | typeof C_API.ApiRequestAction.set
       | typeof C_API.ApiRequestAction.result;
@@ -34,7 +35,7 @@ export namespace API {
     event: Event.Types;
   };
   export type ResponseError = {
-    type: Type;
+    type: RequestType;
     action: typeof C_API.ApiRequestAction.error;
     id?: number;
     payload?: any;

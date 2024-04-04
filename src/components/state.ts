@@ -27,8 +27,10 @@ stateManager.subscribe(
   ],
   (states) => {
     const result = states.every((s) => s >= C_System.States.ok);
-    logger.debug("STATE", "APP READY");
-    stateManager.emit(C_Event.Type.ready, true);
+    if (result) {
+      logger.info("APP", "is ready");
+      stateManager.emit(C_Event.Type.ready, true);
+    }
   }
 );
 

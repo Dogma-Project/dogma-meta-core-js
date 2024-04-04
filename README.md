@@ -4,7 +4,7 @@
 
 ## About package
 
-This package is a part of **Dogma Meta** Application, which is currently in active development. "Core" is a main dependency of NodeJS-based versions of **Meta** app, like [Dogma Meta (Headless)](https://www.npmjs.com/package/@dogma-project/headless-meta) or a desktop Electron-based app.
+This package is a part of **Dogma Meta** Application, which is currently in active development. "Core" is a main dependency of NodeJS-based versions of **Dogma Meta** app, like a desktop [Electron-based app](https://github.com/Dogma-Project/dogma-meta-desktop-js) or [Dogma Meta (Headless)](https://www.npmjs.com/package/@dogma-project/headless-meta).
 
 ## You can use **Dogma Meta** platform to:
 

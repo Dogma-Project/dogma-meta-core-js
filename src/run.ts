@@ -28,15 +28,18 @@ interface WorkerData {
 
 class RunWorker extends EventEmitter {
   private worker: Worker;
-  public id: string = generateSyncId(8);
-  public name: string;
+  private id: string = generateSyncId(8);
+  private name: string;
   private stack = new Map<number, [Function, Function]>();
 
+  /**
+   * 
+   * @param data Initial worker options
+   */
   constructor(data: WorkerData) {
     super();
     this.name = data.prefix;
     const filename = require.resolve("./worker");
-    // logger.info("Worker resolved", filename);
     this.worker = new Worker(require.resolve(filename), {
       workerData: data,
       env: {},
@@ -67,6 +70,22 @@ class RunWorker extends EventEmitter {
         }
       }
     });
+  }
+
+  /**
+   * get worker id
+   * @returns unique worker ID
+   */
+  public getId() {
+    return this.id;
+  }
+
+  /**
+   * 
+   * @returns worker name
+   */
+  public getName() {
+    return this.name;
   }
 
   public emit(eventName: "state", payload: API.ResponseEvent): boolean;
@@ -134,6 +153,10 @@ class RunWorker extends EventEmitter {
     this.worker.postMessage(data);
   }
 
+  /**
+   * Terminates worker thread
+   * @returns Returns exit code when worker stopped
+   */
   public stop() {
     return this.worker.terminate();
   }

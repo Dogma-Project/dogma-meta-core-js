@@ -36,12 +36,11 @@
     "email": "rotegott@dogma-project.org"
   },
   "dependencies": {
-    "@seald-io/nedb": "^4.0.3",
-    "ext-ip": "^0.3.9"
+    "@seald-io/nedb": "^4.0.3"
   },
   "devDependencies": {
-    "@types/node": "^18.17.1",
+    "@types/node": "^20.11.1",
     "tsc-watch": "^6.0.4",
-    "typescript": "^5.4.3"
+    "typescript": "^5.4.4"
   }
 }

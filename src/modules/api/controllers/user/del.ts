@@ -4,7 +4,7 @@ import { User } from "../../../../types";
 import logger from "../../../logger";
 
 /**
- *
+ * @todo delete all user's nodes
  * @param params
  */
 export default async function DeleteNode(params: { user_id: User.Id }) {

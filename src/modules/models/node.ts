@@ -112,11 +112,7 @@ class NodeModel implements Model {
     node_id: string,
     onlyExport?: false | undefined
   ): Promise<Node.Model>;
-  public async get(
-    user_id: string,
-    node_id: string,
-    onlyExport?: boolean | undefined
-  ) {
+  public async get(user_id: string, node_id: string, onlyExport?: boolean) {
     const project = onlyExport ? this.exportProjection : this.projection;
     return this.db
       .findOneAsync<Node.Model | Node.ExportModel>({ user_id, node_id })

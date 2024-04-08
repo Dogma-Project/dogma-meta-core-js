@@ -33,8 +33,8 @@ dht.on("peers", (data: Types.DHT.LookUp.Answer.Data[]) => {
   });
 });
 
-let connectFriendsInterval: NodeJS.Timer | undefined;
-let searchFriendsInterval: NodeJS.Timer | undefined;
+let connectFriendsInterval: NodeJS.Timeout | undefined;
+let searchFriendsInterval: NodeJS.Timeout | undefined;
 
 if (!workerData.discovery) {
   /**

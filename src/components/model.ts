@@ -61,22 +61,27 @@ stateManager.subscribe(
   }
 );
 
-stateManager.subscribe([C_Event.Type.online], ([online]) => {
+/**
+ * @todo change to user-defined name and node name
+ */
+stateManager.subscribe([C_Event.Type.online], async ([online]) => {
   if (online.node_id === storage.node.id) return; // skip self
   const authorized = online.status === C_Connection.Status.authorized;
   if (authorized) {
-    nodeModel
-      .persistNode({
+    try {
+      await userModel.persistUser({
+        user_id: online.user_id as string,
+        name: online.user_name as string,
+      });
+      await nodeModel.persistNode({
         user_id: online.user_id as string,
         node_id: online.node_id as string,
         name: online.node_name as string,
-      })
-      .then(() => {
-        stateManager.emit(C_Event.Type.sync, online);
-      })
-      .catch((err) => {
-        logger.warn("Model", "online", err);
       });
+      stateManager.emit(C_Event.Type.sync, online);
+    } catch (err) {
+      logger.warn("Model", "online", err);
+    }
   }
 });
 

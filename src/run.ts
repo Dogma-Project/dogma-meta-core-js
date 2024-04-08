@@ -1,6 +1,6 @@
 import { Worker } from "node:worker_threads";
 import { EventEmitter } from "node:stream";
-import { C_API } from "./constants";
+import * as Constants from "./constants";
 import generateSyncId from "./modules/generateSyncId";
 import { API } from "./types";
 import * as Types from "./types";
@@ -28,7 +28,7 @@ class RunWorker extends EventEmitter {
         this.emit("state", message);
       } else {
         if (message.id === undefined) {
-          if (message.action === C_API.ApiRequestAction.error) {
+          if (message.action === Constants.C_API.ApiRequestAction.error) {
             this.emit("error", message);
           } else {
             this.emit("notify", message);
@@ -36,7 +36,7 @@ class RunWorker extends EventEmitter {
         } else {
           const handlers = this.stack.get(message.id);
           if (handlers) {
-            if (message.action === C_API.ApiRequestAction.error) {
+            if (message.action === Constants.C_API.ApiRequestAction.error) {
               handlers[1](message);
             } else {
               handlers[0](message);
@@ -137,5 +137,5 @@ class RunWorker extends EventEmitter {
   }
 }
 
-export { RunWorker };
-module.exports = { RunWorker };
+export { RunWorker, Constants };
+module.exports = { RunWorker, Constants };

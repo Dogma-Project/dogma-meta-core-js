@@ -15,6 +15,7 @@ import { User } from "./types/user";
 import { API } from "./types/api";
 import { Model } from "./types/model";
 import { System } from "./types/system";
+import { Worker } from "./types/worker";
 
 declare global {
   interface String {
@@ -45,4 +46,5 @@ export {
   API,
   Model,
   System,
+  Worker
 };

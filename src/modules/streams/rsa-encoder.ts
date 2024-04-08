@@ -1,20 +1,15 @@
-import internal, { Transform, TransformCallback } from "node:stream";
+import { Transform, TransformCallback } from "node:stream";
 import crypto from "node:crypto";
 import logger from "../logger";
 import { C_Streams } from "../../constants";
-
-type StreamEncoderParams = {
-  id: number;
-  publicKey: crypto.KeyLike;
-  opts?: internal.TransformOptions | undefined;
-};
+import { Streams } from "../../types";
 
 class RsaEncoder extends Transform {
   ss: Buffer;
   id: number;
   publicKey: crypto.KeyLike;
 
-  constructor(params: StreamEncoderParams) {
+  constructor(params: Streams.Encode.RSAParams) {
     // add out of range exception
     super(params.opts);
     this.ss = Buffer.alloc(C_Streams.SIZES.MX, params.id);

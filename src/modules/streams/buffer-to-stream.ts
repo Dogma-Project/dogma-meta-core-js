@@ -1,18 +1,14 @@
-import internal, { Readable } from "node:stream";
+import { Readable } from "node:stream";
 import logger from "../logger";
+import { Streams } from "../../types";
 
-type BufferToStreamParams = {
-  buffer: Buffer;
-  chunkSize: number;
-  opts?: internal.ReadableOptions | undefined;
-};
 
 class BufferToStream extends Readable {
   byte: number = 0;
   buffer: Buffer;
   chunkSize: number;
 
-  constructor(params: BufferToStreamParams) {
+  constructor(params: Streams.BufferToStreamParams) {
     // add out of range exception
     super(params.opts);
     this.buffer = params.buffer;

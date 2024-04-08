@@ -1,6 +1,6 @@
 {
   "name": "@dogma-project/core-meta",
-  "version": "0.9.12",
+  "version": "0.9.13",
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
   "main": "./dist/run.js",
   "types": "./declarations/run.d.ts",
@@ -11,6 +11,7 @@
     "empty2": "prefix=empty-2 tsc-watch --onSuccess 'node ./dist/dev.js'",
     "test": "tsc && loglevel=5 node --test dist/",
     "build": "tsc --build",
+    "docs": "typedoc --options ./typedoc.json",
     "c:build": "rm -rf ./dist/* && rm -rf ./declarations/* && npm run build"
   },
   "author": {

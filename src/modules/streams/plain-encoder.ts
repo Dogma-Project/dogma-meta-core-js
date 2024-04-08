@@ -1,17 +1,13 @@
-import internal, { Transform, TransformCallback } from "node:stream";
+import { Transform, TransformCallback } from "node:stream";
 import logger from "../logger";
 import { C_Streams } from "../../constants";
-
-type StreamEncoderParams = {
-  id: number;
-  opts?: internal.TransformOptions | undefined;
-};
+import { Streams } from "../../types";
 
 class PlainEncoder extends Transform {
   ss: Buffer;
   id: number;
 
-  constructor(params: StreamEncoderParams) {
+  constructor(params: Streams.Encode.PlainParams) {
     // add out of range exception
     super(params.opts);
     this.ss = Buffer.alloc(C_Streams.SIZES.MX, params.id);

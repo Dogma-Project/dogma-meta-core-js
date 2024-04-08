@@ -1,30 +1,9 @@
 import { Worker } from "node:worker_threads";
 import { EventEmitter } from "node:stream";
-
 import { C_API } from "./constants";
 import generateSyncId from "./modules/generateSyncId";
 import { API } from "./types";
 import * as Types from "./types";
-
-interface WorkerData {
-  prefix: string;
-  /**
-   * enforces router port ignoring settings
-   */
-  routerPort?: number;
-  /**
-   * auto generate node. default: false
-   */
-  auto?: boolean;
-  /**
-   * force node to run as passive discovery server. default: false
-   */
-  discovery?: boolean;
-  /**
-   * sets log level. default: C_System.LogLevel.info
-   */
-  loglevel?: Types.System.LogLevel;
-}
 
 class RunWorker extends EventEmitter {
   private worker: Worker;
@@ -32,11 +11,7 @@ class RunWorker extends EventEmitter {
   private name: string;
   private stack = new Map<number, [Function, Function]>();
 
-  /**
-   * 
-   * @param data Initial worker options
-   */
-  constructor(data: WorkerData) {
+  constructor(data: Types.Worker.Options) {
     super();
     this.name = data.prefix;
     const filename = require.resolve("./worker");

@@ -1,6 +1,5 @@
 import { C_Streams, C_Connection, C_Message } from "../constants";
-
-type ValuesOf<T> = T[keyof T];
+import { ValuesOf } from "./_main";
 
 export namespace Message {
   export type Model = {

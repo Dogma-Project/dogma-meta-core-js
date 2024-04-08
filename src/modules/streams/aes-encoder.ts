@@ -1,20 +1,17 @@
-import internal, { Transform, TransformCallback } from "node:stream";
+import { Transform, TransformCallback } from "node:stream";
 import crypto from "node:crypto";
 import logger from "../logger";
 import { C_Streams } from "../../constants";
+import { Streams } from "../../types";
 
-type StreamEncoderParams = {
-  id: number;
-  symmetricKey: Buffer;
-  opts?: internal.TransformOptions | undefined;
-};
+
 
 class AesEncoder extends Transform {
   ss: Buffer;
   id: number;
   symmetricKey: Buffer;
 
-  constructor(params: StreamEncoderParams) {
+  constructor(params: Streams.Encode.AESParams) {
     // add out of range exception
     super(params.opts);
     this.ss = Buffer.alloc(C_Streams.SIZES.MX, params.id);

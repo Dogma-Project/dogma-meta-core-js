@@ -122,6 +122,9 @@ class UserModel implements Model {
   public async persistUser(row: User.Model) {
     try {
       const { user_id } = row;
+      if (!user_id || !user_id.length) {
+        return Promise.reject("Empty user_id. Can't persist.");
+      }
       const result = await this.db.updateAsync<User.Model>(
         { user_id },
         { $set: { ...row, updated: Date.now() } },

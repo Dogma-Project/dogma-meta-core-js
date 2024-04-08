@@ -120,7 +120,7 @@ stateManager.subscribe(
         if (storageUser === C_System.States.full) {
           logger.log("USER MODEL", "insert own user into database");
           await userModel.persistUser({
-            user_id: storage.user.id || "",
+            user_id: storage.user.id || "", // remove empty value
             name: storage.user.name,
           });
         }

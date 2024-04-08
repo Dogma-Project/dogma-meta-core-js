@@ -12,7 +12,7 @@ export default async function pushCertificate(cert: string): Promise<true> {
       const str = Buffer.from(cert, "base64").toString();
       const parsed = JSON.parse(str) as any;
       if ("user_id" in parsed) {
-        const user_id = parsed.used_id as string;
+        const user_id = parsed.user_id as string;
         // validate user_id
         await userModel.persistUser({ user_id });
         if ("node" in parsed) {

@@ -151,6 +151,12 @@ class NodeModel implements Model {
   async persistNode(row: Node.Model) {
     try {
       const { node_id, user_id } = row;
+      if (!user_id || !user_id.length) {
+        return Promise.reject("Empty user_id. Can't persist node.");
+      }
+      if (!node_id || !node_id.length) {
+        return Promise.reject("Empty node_id. Can't persist node.");
+      }
       const result = await this.db.updateAsync<Node.Model>(
         { node_id, user_id },
         { $set: { ...row, updated: Date.now() } },

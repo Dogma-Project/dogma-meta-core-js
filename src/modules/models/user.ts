@@ -123,7 +123,7 @@ class UserModel implements Model {
     try {
       const { user_id } = row;
       if (!user_id || !user_id.length) {
-        return Promise.reject("Empty user_id. Can't persist.");
+        return Promise.reject("Empty user_id. Can't persist user.");
       }
       const result = await this.db.updateAsync<User.Model>(
         { user_id },

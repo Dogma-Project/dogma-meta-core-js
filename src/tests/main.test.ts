@@ -161,11 +161,10 @@ workerAuto.on("state", async (data) => {
           action: C_API.ApiRequestAction.get,
           payload: {},
         });
-        assert.deepStrictEqual(exportCertificate, {
-          type: C_API.ApiRequestType.certificate,
-          action: C_API.ApiRequestAction.result,
-          payload: "null",
-        });
+        strictEqual(exportCertificate.type, C_API.ApiRequestType.certificate);
+        strictEqual(exportCertificate.action, C_API.ApiRequestAction.result);
+        assert(typeof exportCertificate.payload === "string");
+
         const importCertificate = await workerSecondOwn.request({
           type: C_API.ApiRequestType.certificate,
           action: C_API.ApiRequestAction.push,

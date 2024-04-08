@@ -64,10 +64,12 @@ class DogmaSocket extends EventEmitter {
   public unverified_node_id?: Types.Node.Id;
   /**
    * [Peer] User name
+   * @todo validate name
    */
   public user_name: Types.User.Name = "Unknown Dogma User";
   /**
    * [Peer] Node name
+   * @todo validate name
    */
   public node_name: Types.User.Name = "Unknown Dogma Node";
   public readonly peer: Types.Connection.Peer;

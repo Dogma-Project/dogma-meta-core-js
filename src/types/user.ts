@@ -4,12 +4,7 @@ export namespace User {
   export type Id = string;
   export type Name = string;
 
-  export interface ExportModel {
-    name: string;
-    avatar?: string;
-  }
-
-  export interface Model extends ExportModel {
+  export interface Model {
     [index: string | symbol]:
       | Id
       | string
@@ -18,6 +13,8 @@ export namespace User {
       | undefined
       | number;
     user_id: Id;
+    name?: string;
+    avatar?: string;
     requested?: true;
   }
 

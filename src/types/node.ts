@@ -7,7 +7,7 @@ export namespace Node {
   export type Name = string;
 
   export interface ExportModel {
-    name: string;
+    node_id: Node.Id;
     public_ipv4?: Connection.IPv4;
     public_ipv6?: Connection.IPv4;
     tor_addr?: string; // edit
@@ -21,8 +21,8 @@ export namespace Node {
       | boolean
       | undefined
       | number;
-    node_id: Node.Id;
     user_id: User.Id;
+    name?: string;
     local_ipv4?: Connection.IPv6;
     local_ipv6?: Connection.IPv6;
     /**

@@ -18,7 +18,7 @@ export async function getNetwork() {
     users.forEach((user) => {
       result.push({
         id: user.user_id,
-        name: user.name,
+        name: user.name || "[User not synced]",
         current: (own_user_id && own_user_id === user.user_id) || false,
         requested: !!user.requested || undefined,
         nodes: [],

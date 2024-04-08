@@ -15,6 +15,13 @@ class NodeModel implements Model {
 
   encrypt = true;
   private projection = { _id: 0 };
+  private exportProjection = {
+    _id: 0,
+    node_id: 1,
+    public_ipv4: 1,
+    public_ipv6: 1,
+    tor_addr: 1,
+  };
   public syncType = C_Sync.Type.nodes;
 
   constructor({ state }: { state: StateManager }) {
@@ -95,10 +102,25 @@ class NodeModel implements Model {
     }
   }
 
-  public async get(user_id: string, node_id: string) {
+  public async get(
+    user_id: string,
+    node_id: string,
+    onlyExport: true
+  ): Promise<Node.ExportModel>;
+  public async get(
+    user_id: string,
+    node_id: string,
+    onlyExport?: false | undefined
+  ): Promise<Node.Model>;
+  public async get(
+    user_id: string,
+    node_id: string,
+    onlyExport?: boolean | undefined
+  ) {
+    const project = onlyExport ? this.exportProjection : this.projection;
     return this.db
-      .findOneAsync<Node.Model>({ user_id, node_id })
-      .projection(this.projection);
+      .findOneAsync<Node.Model | Node.ExportModel>({ user_id, node_id })
+      .projection(project);
   }
 
   public async loadNodesTable() {

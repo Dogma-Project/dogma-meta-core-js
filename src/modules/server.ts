@@ -51,6 +51,7 @@ export default class Server {
     const host = "0.0.0.0"; // temp
     this.ss.listen(port, host, () => {
       logger.info("server", `TCP socket is listening on ${host}:${port}`);
+      this.storageBridge.node.router_port = port;
       this.stateBridge.emit(C_Event.Type.server, C_System.States.limited);
     });
 

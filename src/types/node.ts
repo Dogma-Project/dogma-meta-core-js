@@ -40,6 +40,7 @@ export namespace Node {
     name: Name;
     privateKey: Buffer | null;
     publicKey: Buffer | null;
+    router_port: number | null;
     public_ipv4?: Connection.IPv4;
     local_ipv4?: Connection.IPv4;
   };

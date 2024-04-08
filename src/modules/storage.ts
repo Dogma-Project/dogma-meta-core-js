@@ -7,6 +7,7 @@ class Storage {
     name: C_Defaults.nodeName,
     privateKey: null,
     publicKey: null,
+    router_port: null,
   };
   user: Types.User.Storage = {
     id: null,

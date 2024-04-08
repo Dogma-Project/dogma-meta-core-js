@@ -35,6 +35,7 @@ export namespace Connection {
       user_name: string;
       node_id: Node.Id;
       node_name: string;
+      router_port?: number;
     };
     export type StageVerificationRequest = {
       stage: typeof C_Connection.Stage.verification;

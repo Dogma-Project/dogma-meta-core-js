@@ -13,6 +13,7 @@ import {
   FileModel,
 } from "../modules/model";
 import logger from "../modules/logger";
+import { Connection, Node } from "../types";
 
 const configModel = new ConfigModel({ state: stateManager });
 const nodeModel = new NodeModel({ state: stateManager });
@@ -47,17 +48,40 @@ stateManager.subscribe(
 
 stateManager.subscribe(
   [C_Event.Type.friendshipRequest],
-  ([friendshipRequest]) => {
+  async ([friendshipRequest]) => {
     logger.log(
       "MODEL",
       "Handled friendship request from",
       friendshipRequest.user_id
     );
-    userModel.persistUser({
-      user_id: friendshipRequest.user_id as string,
-      name: friendshipRequest.user_name as string,
-      requested: true,
-    });
+    try {
+      await userModel.persistUser({
+        user_id: friendshipRequest.user_id as string,
+        name: friendshipRequest.user_name as string,
+        requested: true,
+      });
+      const options: Node.Model = {
+        user_id: friendshipRequest.user_id as string,
+        node_id: friendshipRequest.node_id as string,
+        name: friendshipRequest.user_name as string,
+      };
+      /**
+       * @todo test this part
+       */
+      const peer = friendshipRequest.peer as Connection.Peer;
+      if (peer) {
+        if (!peer.version || peer.version === 4) {
+          if (peer.public) {
+            options.public_ipv4 = peer.address;
+          } else {
+            options.local_ipv4 = peer.address;
+          }
+        }
+      }
+      await nodeModel.persistNode(options);
+    } catch (err) {
+      logger.error("MODEL", err);
+    }
   }
 );
 

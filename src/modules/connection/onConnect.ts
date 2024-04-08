@@ -58,11 +58,22 @@ export default function onConnect(
     }
   });
 
-  dogmaSocket.on("friendship", () => {
-    const { user_id, user_name } = dogmaSocket; // add name
+  /**
+   * @todo add type
+   */
+  dogmaSocket.on("friendship", (data: any) => {
+    let { user_id, user_name, node_id, node_name, peer, router_port } = data;
+    if (router_port) {
+      const addr = peer.address.split(":");
+      addr[1] = router_port;
+      peer = this.peerFromIP(addr.join(":"));
+    }
     this.stateBridge.emit(C_Event.Type.friendshipRequest, {
       user_id,
       user_name,
+      node_id,
+      node_name,
+      peer,
     });
   });
 

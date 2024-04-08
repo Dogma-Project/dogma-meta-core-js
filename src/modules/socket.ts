@@ -74,6 +74,8 @@ class DogmaSocket extends EventEmitter {
   public node_name: Types.User.Name = "Unknown Dogma Node";
   public readonly peer: Types.Connection.Peer;
 
+  public router_port: number | null = null;
+
   onDisconnect?: Function; // edit
 
   public tested: boolean = false;
@@ -233,12 +235,25 @@ class DogmaSocket extends EventEmitter {
       if (this.connectionsBridge.allowDiscoveryRequests(this.direction)) {
         // ok
       } else if (this.connectionsBridge.allowFriendshipRequests()) {
+        /**
+         * @todo check logic of this part
+         */
+        this.emit("friendship", {
+          user_id: this.user_id,
+          user_name: this.user_name,
+          node_id: this.node_id,
+          node_name: this.node_name,
+          peer: this.peer,
+          router_port: this.router_port,
+        });
+        this.destroy("friendship request handled");
+        /*
         if (this.direction == C_Connection.Direction.incoming) {
-          this.emit("friendship", true);
-          this.destroy("friendship request handled");
+          // edit
         } else {
           // edit
         }
+        */
       } else {
         this.destroy("not allowed!");
       }
@@ -284,6 +299,10 @@ class DogmaSocket extends EventEmitter {
     if (!this.storageBridge.node.id) return;
 
     if (stage === C_Connection.Stage.init) {
+      let router_port;
+      if (this.storageBridge.node.router_port) {
+        router_port = this.storageBridge.node.router_port;
+      }
       const request: Types.Connection.Handshake.StageInitRequest = {
         stage,
         protocol: 2,
@@ -292,6 +311,7 @@ class DogmaSocket extends EventEmitter {
         user_name: this.storageBridge.user.name,
         node_id: this.storageBridge.node.id,
         node_name: this.storageBridge.node.name || "",
+        router_port,
       };
       this.input.handshake.write(JSON.stringify(request));
     } else if (stage === C_Connection.Stage.verification) {
@@ -342,6 +362,7 @@ class DogmaSocket extends EventEmitter {
         this.user_name = parsed.user_name;
         this.unverified_node_id = parsed.node_id;
         this.node_name = parsed.node_name;
+        this.router_port = parsed.router_port || null;
         this.sendHandshake(C_Connection.Stage.verification);
       } else if (parsed.stage === C_Connection.Stage.verification) {
         try {

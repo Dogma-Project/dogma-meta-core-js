@@ -2,7 +2,7 @@ import { describe } from "node:test";
 import assert, { strictEqual } from "node:assert";
 
 import logger from "../modules/logger";
-import { RunWorker } from "../run";
+import RunWorker from "../run";
 import { C_API, C_Event, C_Keys, C_System } from "../constants";
 
 const workerAuto = new RunWorker({

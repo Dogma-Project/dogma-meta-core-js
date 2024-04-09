@@ -5,7 +5,7 @@ import generateSyncId from "./modules/generateSyncId";
 import { API } from "./types";
 import * as Types from "./types";
 
-class RunWorker extends EventEmitter {
+export default class RunWorker extends EventEmitter {
   private worker: Worker;
   private id: string = generateSyncId(8);
   private name: string;
@@ -56,7 +56,7 @@ class RunWorker extends EventEmitter {
   }
 
   /**
-   * 
+   *
    * @returns worker name
    */
   public getName() {
@@ -136,6 +136,3 @@ class RunWorker extends EventEmitter {
     return this.worker.terminate();
   }
 }
-
-export { RunWorker, Constants };
-module.exports = { RunWorker, Constants };

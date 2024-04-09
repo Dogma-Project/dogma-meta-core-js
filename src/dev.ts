@@ -1,4 +1,4 @@
-import { RunWorker } from "./run";
+import RunWorker from "./run";
 import logger from "./modules/logger";
 import { C_System } from "./constants";
 

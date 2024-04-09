@@ -43,7 +43,6 @@ export default function CertificateController(
           });
         })
         .catch((err) => {
-          logger.error("API CERTIFICATE", err);
           this.error({
             type: C_API.ApiRequestType.certificate,
             action: C_API.ApiRequestAction.error,

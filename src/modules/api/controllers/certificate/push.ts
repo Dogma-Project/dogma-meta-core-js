@@ -1,5 +1,6 @@
 import { userModel, nodeModel } from "../../../../components/model";
 import { Node } from "../../../../types";
+import logger from "../../../logger";
 
 /**
  * @todo add validations
@@ -25,6 +26,7 @@ export default async function pushCertificate(cert: string): Promise<true> {
     }
     return Promise.reject(null); // edit
   } catch (err) {
-    return Promise.reject(err);
+    logger.error("pushCertificate", err);
+    return Promise.reject("Can't handle user's certificate");
   }
 }

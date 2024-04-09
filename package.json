@@ -1,6 +1,6 @@
 {
   "name": "@dogma-project/core-meta",
-  "version": "0.9.15",
+  "version": "0.9.16",
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
   "main": "./dist/run.js",
   "types": "./declarations/run.d.ts",
@@ -22,8 +22,8 @@
   "homepage": "https://meta.dogma-project.org/",
   "keywords": [
     "dogma",
-    "dogma-core",
-    "dogma-meta",
+    "dogma core",
+    "dogma meta",
     "decentralization",
     "p2p"
   ],

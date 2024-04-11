@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import { workerData } from "node:worker_threads";
-
 import stateManager from "./state";
 import storage from "./storage";
 import { getDatadir } from "../modules/datadir";

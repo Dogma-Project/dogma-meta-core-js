@@ -1,10 +1,8 @@
 import os from "node:os";
 
-const ifaces = os.networkInterfaces();
-
 /**
  *
- * @param {String} ip "192.168.0.2"
+ * @param ip "192.168.0.2"
  */
 export const convertToBroadcast = (ip: string) => {
   if (ip === "0.0.0.0") return "255.255.255.0"; // fallback
@@ -15,7 +13,7 @@ export const convertToBroadcast = (ip: string) => {
 
 /**
  *
- * @param {String} ip "192.168.0.2"
+ * @param ip "192.168.0.2"
  */
 export const getLocalAddress = (ip: string = "") => {
   const ifaces = os.networkInterfaces();

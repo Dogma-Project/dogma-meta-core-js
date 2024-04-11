@@ -1,10 +1,10 @@
 import { randomBytes } from "node:crypto";
-import * as Types from "../types";
+import { Sync } from "../types";
 
 /**
  * @param size *2
  */
-const generateSyncId = (size: number = 6): Types.Sync.Id => {
+const generateSyncId = (size: number = 6): Sync.Id => {
   size = Number(size) || 6;
   const time = new Date().getTime();
   return randomBytes(size).toString("hex") + time.toString().slice(-size);

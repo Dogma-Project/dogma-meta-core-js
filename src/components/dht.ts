@@ -2,7 +2,6 @@ import DHT from "../modules/dht";
 import connections from "./connections";
 import stateManager from "./state";
 import storage from "./storage";
-import * as Types from "../types";
 import { dhtModel } from "./model";
 import { C_Event, C_DHT, C_Connection, C_System } from "../constants";
 import { Connection } from "../types";

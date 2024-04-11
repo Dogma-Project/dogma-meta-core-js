@@ -7,11 +7,11 @@ import logger from "./logger";
 /** @module LocalDiscovery */
 
 class LocalDiscovery extends EventEmitter {
-  ip: string;
-  port: number;
-  broadcast: string;
-  server?: dgram.Socket;
-  ready: boolean = false;
+  private ip: string;
+  private port: number;
+  private broadcast: string;
+  private server?: dgram.Socket;
+  private ready: boolean = false;
 
   constructor({ port = 45432, ip = "0.0.0.0" }: { port: number; ip: string }) {
     super();
@@ -74,6 +74,11 @@ class LocalDiscovery extends EventEmitter {
     this.server?.close();
   }
 
+  /**
+   * Announces current node in local network
+   * @param card
+   * @returns
+   */
   public announce(card: Types.Discovery.Card) {
     const message = JSON.stringify(card);
     if (!this.ready) {

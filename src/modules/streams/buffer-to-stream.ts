@@ -2,7 +2,6 @@ import { Readable } from "node:stream";
 import logger from "../logger";
 import { Streams } from "../../types";
 
-
 class BufferToStream extends Readable {
   byte: number = 0;
   buffer: Buffer;

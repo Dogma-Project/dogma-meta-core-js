@@ -1,3 +1,4 @@
+import { workerData } from "node:worker_threads";
 import * as Types from "../../types";
 import { getDatadir } from "../datadir";
 import Datastore from "@seald-io/nedb";
@@ -5,7 +6,7 @@ import logger from "../logger";
 import Model from "./_model";
 import StateManager from "../state";
 import { C_Connection, C_Defaults, C_Event, C_System } from "../../constants";
-import { workerData } from "node:worker_threads";
+
 class ConfigModel implements Model {
   stateBridge: StateManager;
   db!: Datastore;

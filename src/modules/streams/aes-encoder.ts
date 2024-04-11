@@ -4,8 +4,6 @@ import logger from "../logger";
 import { C_Streams } from "../../constants";
 import { Streams } from "../../types";
 
-
-
 class AesEncoder extends Transform {
   ss: Buffer;
   id: number;

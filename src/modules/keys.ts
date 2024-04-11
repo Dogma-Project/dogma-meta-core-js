@@ -1,7 +1,7 @@
 import crypto, { RSAKeyPairKeyObjectOptions } from "node:crypto";
+import fs from "node:fs";
 import { Keys } from "../types";
 import logger from "./logger";
-import fs from "node:fs";
 import { getDatadir } from "./datadir";
 import { C_Keys } from "../constants";
 import generateCryptoKey from "./models/dbEncryption/generateCryptoKey";

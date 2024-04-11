@@ -1,6 +1,6 @@
+import { workerData } from "node:worker_threads";
 import { C_Connection, C_Event } from "../../constants";
 import ConnectionClass from "../connections";
-import { workerData } from "node:worker_threads";
 import { Connection } from "../../types";
 
 export default function allowDiscoveryRequests(

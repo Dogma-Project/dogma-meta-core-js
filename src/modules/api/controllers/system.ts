@@ -1,6 +1,6 @@
+import process from "node:process";
 import { API } from "../../../types";
 import { C_API } from "../../../constants";
-import process from "node:process";
 import WorkerApi from "../index";
 
 function getSystemInfo() {

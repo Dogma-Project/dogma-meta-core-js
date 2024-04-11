@@ -11,6 +11,10 @@ export default class RunWorker extends EventEmitter {
   private name: string;
   private stack = new Map<number, [Function, Function]>();
 
+  /**
+   * Run Worker thread with specific prefix
+   * @param data
+   */
   constructor(data: Types.Worker.Options) {
     super();
     this.name = data.prefix;

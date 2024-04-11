@@ -1,5 +1,5 @@
-import logger from "../logger";
 import { parentPort, MessagePort } from "node:worker_threads";
+import logger from "../logger";
 import { API } from "../../types";
 import { C_API } from "../../constants";
 

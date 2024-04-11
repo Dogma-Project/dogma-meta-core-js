@@ -1,3 +1,4 @@
+import path from "node:path";
 import { User } from "../../types";
 import logger from "../logger";
 import { getDatadir } from "../datadir";
@@ -7,7 +8,6 @@ import StateManager from "../state";
 import { C_Event, C_System, C_Sync } from "../../constants";
 import EncryptDb from "./dbEncryption/afterSerialization";
 import DecryptDb from "./dbEncryption/beforeDeserialization";
-import path from "node:path";
 
 class UserModel implements Model {
   stateBridge: StateManager;

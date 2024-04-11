@@ -1,6 +1,6 @@
 import StateManager from "../state";
 import Model from "./_model";
-import { getDatadir } from "../datadir";
+import dataDir from "../datadir";
 import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 import * as Types from "../../types";
@@ -19,7 +19,7 @@ class MessageModel implements Model {
     try {
       logger.log("nedb", "load database", "messages");
       this.db = new Datastore({
-        filename: getDatadir().nedb + "/messages.db",
+        filename: dataDir.nedb + "/messages.db",
       });
       await this.db.loadDatabaseAsync();
       await this.db.ensureIndexAsync({

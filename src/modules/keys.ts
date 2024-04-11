@@ -2,7 +2,7 @@ import crypto, { RSAKeyPairKeyObjectOptions } from "node:crypto";
 import fs from "node:fs";
 import { Keys } from "../types";
 import logger from "./logger";
-import { getDatadir } from "./datadir";
+import dir from "./datadir";
 import { C_Keys } from "../constants";
 import generateCryptoKey from "./models/dbEncryption/generateCryptoKey";
 
@@ -37,7 +37,6 @@ export async function createKeyPair(
   length: Keys.Length = 2048
 ) {
   try {
-    const dir = getDatadir();
     const { publicKey, privateKey } = await _generateKeyPair(length);
     const opts: crypto.KeyExportOptions<typeof C_Keys.FORMATS.FORMAT> = {
       // move to constants
@@ -71,7 +70,6 @@ export async function readOrCreateEncryptionKey(
   publicKey: Buffer,
   privateKey: Buffer
 ) {
-  const dir = getDatadir();
   try {
     const privateMasterKey = crypto.createPrivateKey({
       key: privateKey,

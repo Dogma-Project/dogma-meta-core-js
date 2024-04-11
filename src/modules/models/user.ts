@@ -1,7 +1,7 @@
 import path from "node:path";
 import { User } from "../../types";
 import logger from "../logger";
-import { getDatadir } from "../datadir";
+import dataDir from "../datadir";
 import Datastore from "@seald-io/nedb";
 import Model from "./_model";
 import StateManager from "../state";
@@ -25,7 +25,7 @@ class UserModel implements Model {
     try {
       logger.log("nedb", "load database", "users");
       this.db = new Datastore({
-        filename: path.join(getDatadir().nedb, "/users.db"),
+        filename: path.join(dataDir.nedb, "/users.db"),
         afterSerialization: (str) => {
           if (encryptionKey && this.encrypt) {
             return EncryptDb(str, encryptionKey);

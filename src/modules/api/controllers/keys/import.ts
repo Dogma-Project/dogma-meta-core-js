@@ -6,7 +6,7 @@ import { C_Event, C_Keys, C_System } from "../../../../constants";
 import stateManager from "../../../../components/state";
 import { Keys } from "../../../../types";
 import logger from "../../../logger";
-import { getDatadir } from "../../../datadir";
+import dir from "../../../datadir";
 
 export default function importUserKey(cert: Keys.Import) {
   try {
@@ -37,7 +37,6 @@ export default function importUserKey(cert: Keys.Import) {
         ? Buffer.from(publicKeyExport)
         : publicKeyExport;
     if (privateKeyBuffer && publicKeyBuffer) {
-      const dir = getDatadir();
       fs.writeFileSync(
         path.join(dir.keys, "/master-public.pem"),
         publicKeyBuffer

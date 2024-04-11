@@ -1,9 +1,12 @@
 import fs from "node:fs";
-import { getDatadir } from "./datadir";
+import dir from "./datadir";
 
+/**
+ * @todo check!!!
+ * @returns
+ */
 export default function checkHomeDir() {
   try {
-    const dir = getDatadir();
     if (
       global.prefix.indexOf("empty-") > -1 ||
       global.prefix.indexOf("test-") > -1

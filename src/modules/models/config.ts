@@ -1,6 +1,6 @@
 import { workerData } from "node:worker_threads";
 import * as Types from "../../types";
-import { getDatadir } from "../datadir";
+import dataDir from "../datadir";
 import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 import Model from "./_model";
@@ -22,7 +22,7 @@ class ConfigModel implements Model {
     try {
       logger.log("nedb", "load database", "config");
       this.db = new Datastore({
-        filename: getDatadir().nedb + "/config.db",
+        filename: dataDir.nedb + "/config.db",
       });
       await this.db.loadDatabaseAsync();
       await this.db.ensureIndexAsync({

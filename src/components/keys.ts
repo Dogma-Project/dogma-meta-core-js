@@ -2,14 +2,13 @@ import fs from "node:fs";
 import { workerData } from "node:worker_threads";
 import stateManager from "./state";
 import storage from "./storage";
-import { getDatadir } from "../modules/datadir";
+import dataDir from "../modules/datadir";
 import logger from "../modules/logger";
 import { createKeyPair, readOrCreateEncryptionKey } from "../modules/keys";
 import { createSha256Hash } from "../modules/hash";
 import { C_Event, C_System, C_Keys } from "../constants";
 
 stateManager.subscribe([C_Event.Type.userKey], ([payload]) => {
-  const dir = getDatadir();
   if (payload === C_System.States.empty) {
     logger.info("store", "Master key not found");
     if (workerData.auto) {
@@ -26,9 +25,11 @@ stateManager.subscribe([C_Event.Type.userKey], ([payload]) => {
     logger.log("KEYS", "Reading master key");
     try {
       storage.user.privateKey = fs.readFileSync(
-        dir.keys + "/master-private.pem"
+        dataDir.keys + "/master-private.pem"
       );
-      storage.user.publicKey = fs.readFileSync(dir.keys + "/master-public.pem");
+      storage.user.publicKey = fs.readFileSync(
+        dataDir.keys + "/master-public.pem"
+      );
       stateManager.emit(C_Event.Type.userKey, C_System.States.full);
     } catch (e) {
       // edit
@@ -53,7 +54,6 @@ stateManager.subscribe([C_Event.Type.userKey], ([payload]) => {
 });
 
 stateManager.subscribe([C_Event.Type.nodeKey], ([payload]) => {
-  const dir = getDatadir();
   if (payload === C_System.States.empty) {
     logger.info("KEYS", "Node key not found");
     if (workerData.auto) {
@@ -69,8 +69,12 @@ stateManager.subscribe([C_Event.Type.nodeKey], ([payload]) => {
   } else if (payload === C_System.States.ready) {
     logger.log("KEYS", "Reading node key");
     try {
-      storage.node.privateKey = fs.readFileSync(dir.keys + "/node-private.pem");
-      storage.node.publicKey = fs.readFileSync(dir.keys + "/node-public.pem");
+      storage.node.privateKey = fs.readFileSync(
+        dataDir.keys + "/node-private.pem"
+      );
+      storage.node.publicKey = fs.readFileSync(
+        dataDir.keys + "/node-public.pem"
+      );
       stateManager.emit(C_Event.Type.nodeKey, C_System.States.full);
     } catch (e) {
       // edit

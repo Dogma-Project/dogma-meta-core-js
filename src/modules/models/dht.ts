@@ -2,7 +2,7 @@ import StateManager from "../state";
 import Datastore from "@seald-io/nedb";
 import * as Types from "../../types";
 import Model from "./_model";
-import { getDatadir } from "../datadir";
+import dataDir from "../datadir";
 import logger from "../logger";
 import { C_Event, C_System, C_DHT } from "../../constants";
 
@@ -19,7 +19,7 @@ class DHTModel implements Model {
     try {
       logger.log("nedb", "load database", "DHT");
       this.db = new Datastore({
-        filename: getDatadir().nedb + "/dht.db",
+        filename: dataDir.nedb + "/dht.db",
       });
       await this.db.loadDatabaseAsync();
       // await this.db.ensureIndexAsync({

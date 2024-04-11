@@ -1,5 +1,4 @@
-import * as Types from "../../types";
-import { getDatadir } from "../datadir";
+import dataDir from "../datadir";
 import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 import Model from "./_model";
@@ -19,7 +18,7 @@ class ProtocolModel implements Model {
     try {
       logger.log("nedb", "load database", "protocol");
       this.db = new Datastore({
-        filename: getDatadir().nedb + "/protocol.db",
+        filename: dataDir.nedb + "/protocol.db",
       });
       await this.db.loadDatabaseAsync();
       // await this.db.ensureIndexAsync({

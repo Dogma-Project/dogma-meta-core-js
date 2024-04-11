@@ -1,5 +1,5 @@
 import * as Types from "../../types";
-import { getDatadir } from "../datadir";
+import dataDir from "../datadir";
 import Datastore from "@seald-io/nedb";
 import logger from "../logger";
 import Model from "./_model";
@@ -19,7 +19,7 @@ class FileModel implements Model {
     try {
       logger.log("nedb", "load database", "files");
       this.db = new Datastore({
-        filename: getDatadir().nedb + "/files.db",
+        filename: dataDir.nedb + "/files.db",
       });
       await this.db.loadDatabaseAsync();
       this.stateBridge.emit(C_Event.Type.filesDb, C_System.States.ready);

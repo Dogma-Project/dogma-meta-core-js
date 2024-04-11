@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { workerData } from "node:worker_threads";
 import dir from "./datadir";
 
 /**
@@ -8,8 +9,8 @@ import dir from "./datadir";
 export default function checkHomeDir() {
   try {
     if (
-      global.prefix.indexOf("empty-") > -1 ||
-      global.prefix.indexOf("test-") > -1
+      workerData.prefix.indexOf("empty-") > -1 ||
+      workerData.prefix.indexOf("test-") > -1
     ) {
       fs.rmSync(dir.data, { recursive: true, force: true });
     }

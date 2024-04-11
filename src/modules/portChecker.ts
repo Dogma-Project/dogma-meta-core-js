@@ -1,6 +1,6 @@
 import net from "node:net";
 
-export default async function CheckPort(port: number): Promise<boolean> {
+export default async function CheckPort(port: number) {
   return new Promise((resolve, reject) => {
     const s = net.createServer();
     s.once("error", (err: any) => {

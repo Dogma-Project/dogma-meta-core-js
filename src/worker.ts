@@ -11,6 +11,5 @@ import "./components/homedir";
 import "./components/api";
 import "./components/sync";
 
-process.title = `Dogma Meta ${global.prefix}`;
-global.prefix = workerData.prefix;
+process.title = `Dogma Meta ${workerData.prefix}`;
 stateManager.enforce(C_Event.Type.start);

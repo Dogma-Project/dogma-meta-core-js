@@ -9,7 +9,7 @@ import { DHTModel } from "./model";
 import { C_Connection, C_Streams, C_DHT } from "../constants";
 import { Connection, DHT } from "../types";
 
-type DHTParams = {
+export type DHTParams = {
   connections: Connections;
   state: StateManager;
   storage: Storage;

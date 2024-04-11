@@ -38,7 +38,7 @@ const logLevel = () => {
 };
 
 const prefix = () => {
-  return global.prefix ? `${global.prefix}> ` : "";
+  return workerData && workerData.prefix ? `${workerData.prefix}> ` : "";
 };
 
 /**

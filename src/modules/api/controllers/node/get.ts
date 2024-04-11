@@ -5,13 +5,13 @@ import logger from "../../../logger";
 
 /**
  * If user_id and node_id not defined, returns own node
+ * @todo check return
  * @param params
  */
 export default async function GetNode(params: {
   user_id?: User.Id;
   node_id?: Node.Id;
 }) {
-  logger.debug("GET NODE!!", params);
   if (!params || !params.user_id || !params.node_id) {
     if (!storage.user.id || !storage.node.id) return Promise.reject(null);
     params = {
@@ -21,7 +21,12 @@ export default async function GetNode(params: {
   }
   if (params.user_id && params.node_id) {
     const result = await nodeModel.get(params.user_id, params.node_id);
-    if (result) return result;
+    if (result) {
+      return {
+        ...result,
+        self: result.node_id === storage.node.id,
+      };
+    }
   } else {
     logger.warn("API NODE", "Can't get node");
     // warn

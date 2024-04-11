@@ -7,7 +7,6 @@ import DeleteUser from "./user/del";
 import EditUser from "./user/edit";
 
 export default function UserController(this: WorkerApi, data: API.Request) {
-  logger.debug("API", "[USER]", data);
   switch (data.action) {
     case C_API.ApiRequestAction.get:
       // get user by user_id or own

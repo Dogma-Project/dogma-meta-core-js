@@ -7,7 +7,6 @@ import DeleteNode from "./node/del";
 import EditNode from "./node/edit";
 
 export default function NodeController(this: WorkerApi, data: API.Request) {
-  logger.debug("API", "[NODE]", data);
   switch (data.action) {
     case C_API.ApiRequestAction.get:
       // get node by node_id or own

@@ -126,8 +126,6 @@ async function setConfig(body: {} = {}) {
 }
 
 export default function SettingsController(this: WorkerApi, data: API.Request) {
-  logger.debug("API", "[SETTINGS]", data);
-
   switch (data.action) {
     case C_API.ApiRequestAction.get:
       this.response({

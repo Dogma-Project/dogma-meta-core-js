@@ -1,4 +1,8 @@
-import { events as EventEmitter, crypto } from "@dogma-project/core-host-api";
+import {
+  events as EventEmitter,
+  crypto,
+  Buffer,
+} from "@dogma-project/core-host-api";
 import { Streams } from "../../types";
 import logger from "../logger";
 import { C_Streams } from "../../constants";

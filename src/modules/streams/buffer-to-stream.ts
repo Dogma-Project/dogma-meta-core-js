@@ -1,4 +1,4 @@
-import { stream } from "@dogma-project/core-host-api";
+import { stream, Buffer } from "@dogma-project/core-host-api";
 import logger from "../logger";
 import { Streams } from "../../types";
 

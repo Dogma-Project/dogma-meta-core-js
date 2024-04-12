@@ -1,4 +1,4 @@
-import { parentPort, MessagePort } from "node:worker_threads";
+import { worker } from "@dogma-project/core-host-api";
 import logger from "../logger";
 import { API } from "../../types";
 import { C_API } from "../../constants";
@@ -15,10 +15,10 @@ import {
 } from "./controllers";
 
 export default class WorkerApi {
-  parentPort: MessagePort | null;
+  parentPort: worker.MessagePort | null;
 
   constructor() {
-    this.parentPort = parentPort;
+    this.parentPort = worker.parentPort;
     if (this.parentPort) {
       this.parentPort.on("message", (data) => {
         this.handle(data);

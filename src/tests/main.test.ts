@@ -1,5 +1,4 @@
-import { describe } from "node:test";
-import assert, { strictEqual } from "node:assert";
+import { test, assert } from "@dogma-project/core-host-api";
 
 import logger from "../modules/logger";
 import RunWorker from "../run";
@@ -28,7 +27,7 @@ workerAuto.on("state", async (data) => {
       if (testingImport === true) return;
       testingImport = true;
 
-      describe("Main test", async () => {
+      test.describe("Main test", async () => {
         const cert = await workerAuto.request({
           type: C_API.ApiRequestType.keys,
           action: C_API.ApiRequestAction.get,
@@ -161,8 +160,14 @@ workerAuto.on("state", async (data) => {
           action: C_API.ApiRequestAction.get,
           payload: {},
         });
-        strictEqual(exportCertificate.type, C_API.ApiRequestType.certificate);
-        strictEqual(exportCertificate.action, C_API.ApiRequestAction.result);
+        assert.strictEqual(
+          exportCertificate.type,
+          C_API.ApiRequestType.certificate
+        );
+        assert.strictEqual(
+          exportCertificate.action,
+          C_API.ApiRequestAction.result
+        );
         assert(typeof exportCertificate.payload === "string");
 
         const importCertificate = await workerSecondOwn.request({

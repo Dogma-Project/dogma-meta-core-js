@@ -1,5 +1,8 @@
-import net from "node:net";
-import { events as EventEmitter, crypto } from "@dogma-project/core-host-api";
+import {
+  events as EventEmitter,
+  crypto,
+  net,
+} from "@dogma-project/core-host-api";
 import { C_Connection, C_Streams, C_Keys, C_Constants } from "../constants";
 import * as Types from "../types";
 import generateSyncId from "./generateSyncId";

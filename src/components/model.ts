@@ -1,4 +1,4 @@
-import { workerData } from "node:worker_threads";
+import { worker } from "@dogma-project/core-host-api";
 import { C_Event, C_Connection, C_System } from "../constants";
 
 import stateManager from "./state";
@@ -118,7 +118,7 @@ stateManager.subscribe([C_Event.Type.configDb], async ([configDb]) => {
         break;
       case C_System.States.empty:
         logger.info("CONFIG MODEL", "DB is empty");
-        if (workerData.auto) {
+        if (worker.workerData.auto) {
           await configModel.insertDefaults();
         }
         break;

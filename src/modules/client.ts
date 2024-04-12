@@ -1,4 +1,4 @@
-import net from "node:net";
+import { net } from "@dogma-project/core-host-api";
 import logger from "./logger";
 import * as Types from "../types";
 import StateManager from "./state";

@@ -1,4 +1,4 @@
-import { workerData } from "node:worker_threads";
+import { worker } from "@dogma-project/core-host-api";
 import { C_System, C_Defaults } from "../constants";
 
 /** @module Logger */
@@ -31,14 +31,16 @@ import { C_System, C_Defaults } from "../constants";
 
 const logLevel = () => {
   return (
-    (workerData && workerData.loglevel) ||
+    (worker.workerData && worker.workerData.loglevel) ||
     Number(process.env.loglevel) ||
     C_Defaults.logLevel
   );
 };
 
 const prefix = () => {
-  return workerData && workerData.prefix ? `${workerData.prefix}> ` : "";
+  return worker.workerData && worker.workerData.prefix
+    ? `${worker.workerData.prefix}> `
+    : "";
 };
 
 /**

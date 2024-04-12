@@ -1,4 +1,4 @@
-import { parentPort } from "node:worker_threads";
+import { worker } from "@dogma-project/core-host-api";
 import { Event, Config, API } from "../types";
 import logger from "./logger";
 import { C_API, C_Event, C_System } from "../constants";
@@ -83,7 +83,7 @@ class StateManager {
           event: type,
           payload,
         };
-        parentPort?.postMessage(event);
+        worker.parentPort?.postMessage(event);
       } else {
         if (this.state[type] === undefined) {
           this.state[type] = this.trigger;

@@ -1,4 +1,4 @@
-import { workerData } from "node:worker_threads";
+import { worker } from "@dogma-project/core-host-api";
 import * as Types from "../../types";
 import dataDir from "../datadir";
 import Datastore from "@seald-io/nedb";
@@ -40,7 +40,7 @@ class ConfigModel implements Model {
     return this.persistConfig([
       {
         param: C_Event.Type.configRouter,
-        value: workerData.routerPort || C_Defaults.router,
+        value: worker.workerData.routerPort || C_Defaults.router,
       },
       {
         param: C_Event.Type.configAutoDefine,

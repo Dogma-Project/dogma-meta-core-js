@@ -1,5 +1,4 @@
-import { fs } from "@dogma-project/core-host-api";
-import { workerData } from "node:worker_threads";
+import { fs, worker } from "@dogma-project/core-host-api";
 import stateManager from "./state";
 import storage from "./storage";
 import dataDir from "../modules/datadir";
@@ -11,7 +10,7 @@ import { C_Event, C_System, C_Keys } from "../constants";
 stateManager.subscribe([C_Event.Type.userKey], async ([payload]) => {
   if (payload === C_System.States.empty) {
     logger.info("store", "Master key not found");
-    if (workerData.auto) {
+    if (worker.workerData.auto) {
       createKeyPair(C_Keys.Type.userKey, 4096)
         .then(() => {
           stateManager.emit(C_Event.Type.userKey, C_System.States.ready);
@@ -56,7 +55,7 @@ stateManager.subscribe([C_Event.Type.userKey], async ([payload]) => {
 stateManager.subscribe([C_Event.Type.nodeKey], async ([payload]) => {
   if (payload === C_System.States.empty) {
     logger.info("KEYS", "Node key not found");
-    if (workerData.auto) {
+    if (worker.workerData.auto) {
       createKeyPair(C_Keys.Type.nodeKey, 2048)
         .then(() => {
           stateManager.emit(C_Event.Type.nodeKey, C_System.States.ready);

@@ -1,12 +1,11 @@
-import { Worker } from "node:worker_threads";
-import { events as EventEmitter } from "@dogma-project/core-host-api";
+import { events as EventEmitter, worker } from "@dogma-project/core-host-api";
 import * as Constants from "./constants";
 import generateSyncId from "./modules/generateSyncId";
 import { API } from "./types";
 import * as Types from "./types";
 
 export default class RunWorker extends EventEmitter {
-  private worker: Worker;
+  private worker: worker.Worker;
   private id: string = generateSyncId(8);
   private name: string;
   private stack = new Map<number, [Function, Function]>();
@@ -19,7 +18,7 @@ export default class RunWorker extends EventEmitter {
     super();
     this.name = data.prefix;
     const filename = require.resolve("./worker");
-    this.worker = new Worker(require.resolve(filename), {
+    this.worker = new worker.Worker(require.resolve(filename), {
       workerData: data,
       env: {},
       name: this.name,

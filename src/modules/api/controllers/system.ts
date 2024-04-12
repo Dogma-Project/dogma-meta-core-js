@@ -1,4 +1,4 @@
-import process from "node:process";
+import { process } from "@dogma-project/core-host-api";
 import { API } from "../../../types";
 import { C_API } from "../../../constants";
 import WorkerApi from "../index";

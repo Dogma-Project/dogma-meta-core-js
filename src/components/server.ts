@@ -1,4 +1,4 @@
-import { workerData } from "node:worker_threads";
+import { worker } from "@dogma-project/core-host-api";
 import Server from "../modules/server";
 import connections from "./connections";
 import stateManager from "./state";
@@ -67,7 +67,7 @@ stateManager.subscribe(
       storageNode === C_System.States.full
     ) {
       logger.log("DEBUG", "Server start");
-      const forced = workerData.routerPort;
+      const forced = worker.workerData.routerPort;
       if (forced) logger.log("SERVER", "forced to port", forced);
       server.start(forced || configRouter);
     }
@@ -82,7 +82,7 @@ stateManager.subscribe(
   ],
   ([server, configRouter]) => {
     if (server === C_System.States.ok || server === C_System.States.full) {
-      dht.announce(workerData.routerPort || configRouter);
+      dht.announce(worker.workerData.routerPort || configRouter);
     }
   }
 );

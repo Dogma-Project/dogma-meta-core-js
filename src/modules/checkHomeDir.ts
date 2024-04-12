@@ -1,12 +1,11 @@
-import { fs } from "@dogma-project/core-host-api";
-import { workerData } from "node:worker_threads";
+import { fs, worker } from "@dogma-project/core-host-api";
 import dir from "./datadir";
 
 export default async function checkHomeDir() {
   try {
     if (
-      workerData.prefix.indexOf("empty-") > -1 ||
-      workerData.prefix.indexOf("test-") > -1
+      worker.workerData.prefix.indexOf("empty-") > -1 ||
+      worker.workerData.prefix.indexOf("test-") > -1
     ) {
       await fs.rm(dir.data, { recursive: true, force: true });
     }

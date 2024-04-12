@@ -1,4 +1,4 @@
-import { workerData } from "node:worker_threads";
+import { worker } from "@dogma-project/core-host-api";
 import Client from "../modules/client";
 import connections from "./connections";
 import localDiscovery from "./localDiscovery";
@@ -36,7 +36,7 @@ dht.on("peers", (data: Types.DHT.LookUp.Answer.Data[]) => {
 let connectFriendsInterval: NodeJS.Timeout | undefined;
 let searchFriendsInterval: NodeJS.Timeout | undefined;
 
-if (!workerData.discovery) {
+if (!worker.workerData.discovery) {
   /**
    * Try to connect friends
    */

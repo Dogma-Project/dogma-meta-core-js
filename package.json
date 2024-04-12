@@ -1,6 +1,6 @@
 {
   "name": "@dogma-project/core-meta",
-  "version": "0.9.22",
+  "version": "0.10.1",
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
   "main": "./dist/export.js",
   "types": "./declarations/export.d.ts",
@@ -9,7 +9,7 @@
     "dev2": "prefix=dev2 tsc-watch --onSuccess 'node ./dist/dev.js'",
     "empty": "prefix=empty-1 tsc-watch --onSuccess 'node ./dist/dev.js'",
     "empty2": "prefix=empty-2 tsc-watch --onSuccess 'node ./dist/dev.js'",
-    "test": "tsc && loglevel=5 node --test dist/",
+    "test": "npm run build && loglevel=5 node --test dist/",
     "build": "tsc --build && npm run docs",
     "docs": "typedoc --options ./typedoc.json",
     "c:build": "rm -rf ./dist/* && rm -rf ./declarations/* && rm -rf ./docs/* && npm run build"
@@ -28,6 +28,9 @@
     "p2p"
   ],
   "license": "MIT",
+  "workspaces": [
+    "packages/host-api"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/Dogma-Project/dogma-meta-core-js"

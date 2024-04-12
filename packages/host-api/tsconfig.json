@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "module": "nodenext",
+    "composite": true,
     "lib": ["es6"],
     "allowJs": true,
     "outDir": "dist",
@@ -15,10 +16,5 @@
     "declarationDir": "./declarations",
     "preserveConstEnums": true
   },
-  "include": ["src"],
-  "references": [
-    {
-      "path": "./packages/host-api"
-    }
-  ]
+  "include": ["src"]
 }

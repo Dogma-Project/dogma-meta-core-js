@@ -1,0 +1,34 @@
+{
+  "name": "@dogma-project/core-host-api",
+  "version": "0.1.1",
+  "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
+  "main": "./dist/index.js",
+  "types": "./declarations/index.d.ts",
+  "private": true,
+  "scripts": {},
+  "author": {
+    "name": "Rotegott",
+    "email": "rotegott@dogma-project.org",
+    "url": "https://dogma-project.org/"
+  },
+  "homepage": "https://meta.dogma-project.org/",
+  "keywords": [
+    "dogma",
+    "dogma core",
+    "dogma meta",
+    "decentralization",
+    "p2p"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dogma-Project/dogma-meta-core-js"
+  },
+  "bugs": {
+    "url": "https://github.com/Dogma-Project/dogma-meta-core-js/issues",
+    "email": "rotegott@dogma-project.org"
+  },
+  "dependencies": {
+    "@types/node": "^20.11.1"
+  }
+}

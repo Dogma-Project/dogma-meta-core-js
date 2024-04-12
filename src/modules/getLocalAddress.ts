@@ -1,4 +1,4 @@
-import os from "node:os";
+import { os } from "@dogma-project/core-host-api";
 
 /**
  *

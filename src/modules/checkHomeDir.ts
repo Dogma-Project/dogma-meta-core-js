@@ -1,4 +1,4 @@
-import fs from "node:fs/promises";
+import { fs } from "@dogma-project/core-host-api";
 import { workerData } from "node:worker_threads";
 import dir from "./datadir";
 

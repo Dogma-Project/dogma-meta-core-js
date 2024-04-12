@@ -1,6 +1,5 @@
-import crypto, { PrivateKeyInput } from "node:crypto";
-import fs from "node:fs";
-import path from "node:path";
+import crypto from "node:crypto";
+import { fs, path, Buffer } from "@dogma-project/core-host-api";
 
 import { C_Event, C_Keys, C_System } from "../../../../constants";
 import stateManager from "../../../../components/state";
@@ -8,11 +7,11 @@ import { Keys } from "../../../../types";
 import logger from "../../../logger";
 import dir from "../../../datadir";
 
-export default function importUserKey(cert: Keys.Import) {
+export default async function importUserKey(cert: Keys.Import) {
   try {
     let str: string;
     if ("path" in cert) {
-      str = fs.readFileSync(cert.path).toString();
+      str = await fs.readFile(cert.path).toString();
     } else {
       str = cert.b64;
     }
@@ -21,7 +20,7 @@ export default function importUserKey(cert: Keys.Import) {
     ) as Keys.ExportFormat;
     // logger.info("import", parsed);
     const privateKeyBuffer = Buffer.from(parsed.key, "hex");
-    const input: PrivateKeyInput = {
+    const input = {
       key: privateKeyBuffer,
       type: C_Keys.FORMATS.TYPE,
       format: C_Keys.FORMATS.FORMAT,
@@ -37,11 +36,11 @@ export default function importUserKey(cert: Keys.Import) {
         ? Buffer.from(publicKeyExport)
         : publicKeyExport;
     if (privateKeyBuffer && publicKeyBuffer) {
-      fs.writeFileSync(
+      await fs.writeFile(
         path.join(dir.keys, "/master-public.pem"),
         publicKeyBuffer
       );
-      fs.writeFileSync(
+      await fs.writeFile(
         path.join(dir.keys, "/master-private.pem"),
         privateKeyBuffer
       );

@@ -1,6 +1,6 @@
 import net from "node:net";
 import crypto from "node:crypto";
-import EventEmitter from "node:events";
+import { events as EventEmitter } from "@dogma-project/core-host-api";
 import { C_Connection, C_Streams, C_Keys, C_Constants } from "../constants";
 import * as Types from "../types";
 import generateSyncId from "./generateSyncId";

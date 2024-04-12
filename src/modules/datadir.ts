@@ -1,5 +1,4 @@
-import os from "node:os";
-import path from "node:path";
+import { os, path } from "@dogma-project/core-host-api";
 import { workerData } from "node:worker_threads";
 
 const main = path.join(os.homedir(), "/.dogma-node");

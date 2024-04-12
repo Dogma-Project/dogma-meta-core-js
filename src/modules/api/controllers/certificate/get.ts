@@ -1,6 +1,7 @@
 import storage from "../../../../components/storage";
 import { nodeModel } from "../../../../components/model";
 import { Certificate } from "../../../../types";
+import { Buffer } from "@dogma-project/core-host-api";
 
 export default async function getCertificate() {
   try {

@@ -1,4 +1,4 @@
-import path from "node:path";
+import { path } from "@dogma-project/core-host-api";
 import logger from "../logger";
 import { Node, User } from "../../types";
 import dataDir from "../datadir";

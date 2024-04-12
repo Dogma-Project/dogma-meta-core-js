@@ -1,5 +1,5 @@
 import crypto, { RSAKeyPairKeyObjectOptions } from "node:crypto";
-import fs from "node:fs";
+import { fs, Buffer } from "@dogma-project/core-host-api";
 import { Keys } from "../types";
 import logger from "./logger";
 import dir from "./datadir";
@@ -57,8 +57,8 @@ export async function createKeyPair(
     } else {
       return Promise.reject("unknown key type");
     }
-    fs.writeFileSync(public_str, publicKeyBuffer);
-    fs.writeFileSync(private_str, privateKeyBuffer);
+    await fs.writeFile(public_str, publicKeyBuffer);
+    await fs.writeFile(private_str, privateKeyBuffer);
     return Promise.resolve(true);
   } catch (err) {
     logger.error("keys", err);
@@ -76,7 +76,7 @@ export async function readOrCreateEncryptionKey(
       type: C_Keys.FORMATS.TYPE,
       format: C_Keys.FORMATS.FORMAT,
     });
-    const key = await fs.promises.readFile(dir.keys + "/encryption.key");
+    const key = await fs.readFile(dir.keys + "/encryption.key");
     if (!key || !key.length) throw { code: "ENOENT" };
     const result = crypto.privateDecrypt(privateMasterKey, key);
     return result.toString();
@@ -91,7 +91,7 @@ export async function readOrCreateEncryptionKey(
         const unencryped = generateCryptoKey(32); // edit;
         const buffer = Buffer.from(unencryped, "utf-8");
         const encrypted = crypto.publicEncrypt(publicMasterKey, buffer);
-        await fs.promises.writeFile(dir.keys + "/encryption.key", encrypted);
+        await fs.writeFile(dir.keys + "/encryption.key", encrypted);
         return unencryped;
       } catch (err2: any) {
         logger.error("KEYS 1", err);

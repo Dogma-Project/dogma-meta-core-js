@@ -2,6 +2,7 @@ import storage from "../../../../components/storage";
 import { nodeModel, userModel } from "../../../../components/model";
 import { Keys } from "../../../../types";
 import logger from "../../../logger";
+import { Buffer } from "@dogma-project/core-host-api";
 
 /**
  *

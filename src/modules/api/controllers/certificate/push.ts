@@ -1,6 +1,7 @@
 import { userModel, nodeModel } from "../../../../components/model";
 import { Node } from "../../../../types";
 import logger from "../../../logger";
+import { Buffer } from "@dogma-project/core-host-api";
 
 /**
  * @todo add validations

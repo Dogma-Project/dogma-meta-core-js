@@ -1,4 +1,4 @@
-import fs from "node:fs";
+import { fs } from "@dogma-project/core-host-api";
 import { workerData } from "node:worker_threads";
 import stateManager from "./state";
 import storage from "./storage";
@@ -8,7 +8,7 @@ import { createKeyPair, readOrCreateEncryptionKey } from "../modules/keys";
 import { createSha256Hash } from "../modules/hash";
 import { C_Event, C_System, C_Keys } from "../constants";
 
-stateManager.subscribe([C_Event.Type.userKey], ([payload]) => {
+stateManager.subscribe([C_Event.Type.userKey], async ([payload]) => {
   if (payload === C_System.States.empty) {
     logger.info("store", "Master key not found");
     if (workerData.auto) {
@@ -24,10 +24,10 @@ stateManager.subscribe([C_Event.Type.userKey], ([payload]) => {
   } else if (payload === C_System.States.ready) {
     logger.log("KEYS", "Reading master key");
     try {
-      storage.user.privateKey = fs.readFileSync(
+      storage.user.privateKey = await fs.readFile(
         dataDir.keys + "/master-private.pem"
       );
-      storage.user.publicKey = fs.readFileSync(
+      storage.user.publicKey = await fs.readFile(
         dataDir.keys + "/master-public.pem"
       );
       stateManager.emit(C_Event.Type.userKey, C_System.States.full);
@@ -53,7 +53,7 @@ stateManager.subscribe([C_Event.Type.userKey], ([payload]) => {
   }
 });
 
-stateManager.subscribe([C_Event.Type.nodeKey], ([payload]) => {
+stateManager.subscribe([C_Event.Type.nodeKey], async ([payload]) => {
   if (payload === C_System.States.empty) {
     logger.info("KEYS", "Node key not found");
     if (workerData.auto) {
@@ -69,10 +69,10 @@ stateManager.subscribe([C_Event.Type.nodeKey], ([payload]) => {
   } else if (payload === C_System.States.ready) {
     logger.log("KEYS", "Reading node key");
     try {
-      storage.node.privateKey = fs.readFileSync(
+      storage.node.privateKey = await fs.readFile(
         dataDir.keys + "/node-private.pem"
       );
-      storage.node.publicKey = fs.readFileSync(
+      storage.node.publicKey = await fs.readFile(
         dataDir.keys + "/node-public.pem"
       );
       stateManager.emit(C_Event.Type.nodeKey, C_System.States.full);

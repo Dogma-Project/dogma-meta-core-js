@@ -1,5 +1,4 @@
-import dgram from "node:dgram";
-import EventEmitter from "node:events";
+import { events as EventEmitter, dgram } from "@dogma-project/core-host-api";
 import * as Types from "../types";
 import { getLocalAddress } from "./getLocalAddress";
 import logger from "./logger";

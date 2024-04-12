@@ -1,10 +1,9 @@
-import { Transform, TransformCallback } from "node:stream";
-import crypto from "node:crypto";
+import { stream, crypto } from "@dogma-project/core-host-api";
 import logger from "../logger";
 import { C_Streams } from "../../constants";
 import { Streams } from "../../types";
 
-class AesEncoder extends Transform {
+class AesEncoder extends stream.Transform {
   ss: Buffer;
   id: number;
   symmetricKey: Buffer;
@@ -20,7 +19,7 @@ class AesEncoder extends Transform {
   _transform(
     chunk: Buffer,
     encoding: BufferEncoding,
-    callback: TransformCallback
+    callback: stream.TransformCallback
   ) {
     try {
       const iv = crypto.randomBytes(12); // move to constants

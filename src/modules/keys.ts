@@ -1,5 +1,4 @@
-import crypto, { RSAKeyPairKeyObjectOptions } from "node:crypto";
-import { fs, Buffer } from "@dogma-project/core-host-api";
+import { fs, Buffer, crypto } from "@dogma-project/core-host-api";
 import { Keys } from "../types";
 import logger from "./logger";
 import dir from "./datadir";
@@ -13,7 +12,7 @@ type result = {
 function _generateKeyPair(
   length: Keys.InitialParams["keylength"]
 ): Promise<result> {
-  const options: RSAKeyPairKeyObjectOptions = {
+  const options = {
     modulusLength: length,
   };
   return new Promise((resolve, reject) => {

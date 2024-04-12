@@ -1,9 +1,9 @@
-import { Transform, TransformCallback } from "node:stream";
+import { stream } from "@dogma-project/core-host-api";
 import logger from "../logger";
 import { C_Streams } from "../../constants";
 import { Streams } from "../../types";
 
-class PlainEncoder extends Transform {
+class PlainEncoder extends stream.Transform {
   ss: Buffer;
   id: number;
 
@@ -17,7 +17,7 @@ class PlainEncoder extends Transform {
   _transform(
     chunk: Buffer,
     encoding: BufferEncoding,
-    callback: TransformCallback
+    callback: stream.TransformCallback
   ) {
     try {
       const len = Buffer.alloc(C_Streams.SIZES.LEN, 0);

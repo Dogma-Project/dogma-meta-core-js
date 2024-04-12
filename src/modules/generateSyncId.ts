@@ -1,4 +1,4 @@
-import { randomBytes } from "node:crypto";
+import { crypto } from "@dogma-project/core-host-api";
 import { Sync } from "../types";
 
 /**
@@ -7,7 +7,9 @@ import { Sync } from "../types";
 const generateSyncId = (size: number = 6): Sync.Id => {
   size = Number(size) || 6;
   const time = new Date().getTime();
-  return randomBytes(size).toString("hex") + time.toString().slice(-size);
+  return (
+    crypto.randomBytes(size).toString("hex") + time.toString().slice(-size)
+  );
 };
 
 export default generateSyncId;

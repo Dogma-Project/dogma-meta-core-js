@@ -1,5 +1,5 @@
 import { Worker } from "node:worker_threads";
-import { EventEmitter } from "node:stream";
+import { events as EventEmitter } from "@dogma-project/core-host-api";
 import * as Constants from "./constants";
 import generateSyncId from "./modules/generateSyncId";
 import { API } from "./types";

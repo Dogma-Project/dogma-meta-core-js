@@ -1,5 +1,4 @@
-import crypto from "node:crypto";
-import { Buffer } from "@dogma-project/core-host-api";
+import { Buffer, crypto } from "@dogma-project/core-host-api";
 
 export default function DecryptDb(ciphertext: string, key: string) {
   try {

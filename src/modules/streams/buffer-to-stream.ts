@@ -1,8 +1,8 @@
-import { Readable } from "node:stream";
+import { stream } from "@dogma-project/core-host-api";
 import logger from "../logger";
 import { Streams } from "../../types";
 
-class BufferToStream extends Readable {
+class BufferToStream extends stream.Readable {
   byte: number = 0;
   buffer: Buffer;
   chunkSize: number;

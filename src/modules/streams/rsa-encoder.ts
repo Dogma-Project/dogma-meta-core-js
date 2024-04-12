@@ -1,10 +1,9 @@
-import { Transform, TransformCallback } from "node:stream";
-import crypto from "node:crypto";
+import { stream, crypto } from "@dogma-project/core-host-api";
 import logger from "../logger";
 import { C_Streams } from "../../constants";
 import { Streams } from "../../types";
 
-class RsaEncoder extends Transform {
+class RsaEncoder extends stream.Transform {
   ss: Buffer;
   id: number;
   publicKey: crypto.KeyLike;
@@ -20,7 +19,7 @@ class RsaEncoder extends Transform {
   _transform(
     chunk: Buffer,
     encoding: BufferEncoding,
-    callback: TransformCallback
+    callback: stream.TransformCallback
   ) {
     try {
       chunk = crypto.publicEncrypt(this.publicKey, chunk);

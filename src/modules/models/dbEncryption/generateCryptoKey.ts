@@ -1,4 +1,4 @@
-import crypto from "node:crypto";
+import { crypto } from "@dogma-project/core-host-api";
 
 /**
  * @todo check sizes, move to constants

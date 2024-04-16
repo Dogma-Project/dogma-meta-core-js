@@ -1,4 +1,4 @@
-import { test, assert } from "@dogma-project/core-host-api";
+import { test, assert } from "@dogma-project/core-meta-be-node";
 
 import logger from "../modules/logger";
 import RunWorker from "../run";

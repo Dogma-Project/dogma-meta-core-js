@@ -1,4 +1,4 @@
-import { net } from "@dogma-project/core-host-api";
+import { net } from "@dogma-project/core-meta-be-node";
 
 export default async function CheckPort(port: number) {
   return new Promise((resolve, reject) => {

@@ -1,4 +1,4 @@
-import { events as EventEmitter } from "@dogma-project/core-host-api";
+import { events as EventEmitter } from "@dogma-project/core-meta-be-node";
 import logger from "./logger";
 import * as Types from "../types";
 import Storage from "./storage";

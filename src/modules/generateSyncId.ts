@@ -1,4 +1,4 @@
-import { crypto } from "@dogma-project/core-host-api";
+import { crypto } from "@dogma-project/core-meta-be-node";
 import { Sync } from "../types";
 
 /**

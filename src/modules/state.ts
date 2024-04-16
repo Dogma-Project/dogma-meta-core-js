@@ -1,4 +1,4 @@
-import { worker } from "@dogma-project/core-host-api";
+import { worker } from "@dogma-project/core-meta-be-node";
 import { Event, Config, API } from "../types";
 import logger from "./logger";
 import { C_API, C_Event, C_System } from "../constants";

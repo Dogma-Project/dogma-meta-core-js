@@ -1,4 +1,4 @@
-import { worker } from "@dogma-project/core-host-api";
+import { worker } from "@dogma-project/core-meta-be-node";
 import { C_System, C_Defaults } from "../constants";
 
 /** @module Logger */

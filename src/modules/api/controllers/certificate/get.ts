@@ -1,7 +1,7 @@
 import storage from "../../../../components/storage";
 import { nodeModel } from "../../../../components/model";
 import { Certificate } from "../../../../types";
-import { Buffer } from "@dogma-project/core-host-api";
+import { Buffer } from "@dogma-project/core-meta-be-node";
 
 export default async function getCertificate() {
   try {

@@ -1,4 +1,4 @@
-import { worker } from "@dogma-project/core-host-api";
+import { worker } from "@dogma-project/core-meta-be-node";
 import { C_Connection, C_Event } from "../../constants";
 import ConnectionClass from "../connections";
 import { Connection } from "../../types";

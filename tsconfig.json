@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "module": "nodenext",
     "lib": ["es6"],
+    "module": "NodeNext",
     "allowJs": true,
     "outDir": "dist",
     "rootDir": "src",
@@ -15,10 +15,5 @@
     "declarationDir": "./declarations",
     "preserveConstEnums": true
   },
-  "include": ["src"],
-  "references": [
-    {
-      "path": "./packages/host-api"
-    }
-  ]
+  "include": ["src"]
 }

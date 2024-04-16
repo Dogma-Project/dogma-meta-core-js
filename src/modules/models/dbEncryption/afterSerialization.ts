@@ -1,4 +1,4 @@
-import { crypto, Buffer } from "@dogma-project/core-host-api";
+import { crypto, Buffer } from "@dogma-project/core-meta-be-node";
 
 export default function EncryptDb(plaintext: string, key: string) {
   const iv = crypto.randomBytes(16); // move to constants

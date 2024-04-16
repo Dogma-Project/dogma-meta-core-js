@@ -1,4 +1,4 @@
-import { Buffer, crypto } from "@dogma-project/core-host-api";
+import { Buffer, crypto } from "@dogma-project/core-meta-be-node";
 
 export default function DecryptDb(ciphertext: string, key: string) {
   try {

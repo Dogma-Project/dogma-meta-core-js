@@ -1,4 +1,4 @@
-import { fs, worker } from "@dogma-project/core-host-api";
+import { fs, worker } from "@dogma-project/core-meta-be-node";
 import stateManager from "./state";
 import storage from "./storage";
 import dataDir from "../modules/datadir";

@@ -1,4 +1,4 @@
-import { worker } from "@dogma-project/core-host-api";
+import { worker } from "@dogma-project/core-meta-be-node";
 import Client from "../modules/client";
 import connections from "./connections";
 import localDiscovery from "./localDiscovery";

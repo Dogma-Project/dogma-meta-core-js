@@ -2,7 +2,7 @@ import {
   events as EventEmitter,
   crypto,
   net,
-} from "@dogma-project/core-host-api";
+} from "@dogma-project/core-meta-be-node";
 import { C_Connection, C_Streams, C_Keys, C_Constants } from "../constants";
 import * as Types from "../types";
 import generateSyncId from "./generateSyncId";

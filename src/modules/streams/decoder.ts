@@ -2,7 +2,7 @@ import {
   events as EventEmitter,
   crypto,
   Buffer,
-} from "@dogma-project/core-host-api";
+} from "@dogma-project/core-meta-be-node";
 import { Streams } from "../../types";
 import logger from "../logger";
 import { C_Streams } from "../../constants";

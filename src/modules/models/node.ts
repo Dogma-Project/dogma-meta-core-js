@@ -1,4 +1,4 @@
-import { path } from "@dogma-project/core-host-api";
+import { path } from "@dogma-project/core-meta-be-node";
 import logger from "../logger";
 import { Node, User } from "../../types";
 import dataDir from "../datadir";

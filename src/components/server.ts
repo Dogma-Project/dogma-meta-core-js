@@ -1,4 +1,4 @@
-import { worker } from "@dogma-project/core-host-api";
+import { worker } from "@dogma-project/core-meta-be-node";
 import Server from "../modules/server";
 import connections from "./connections";
 import stateManager from "./state";

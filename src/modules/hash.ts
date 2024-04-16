@@ -1,4 +1,4 @@
-import { crypto } from "@dogma-project/core-host-api";
+import { crypto } from "@dogma-project/core-meta-be-node";
 import { C_Keys } from "../constants";
 
 export const createSha1Hash = (data: crypto.BinaryLike | string) => {

@@ -1,4 +1,4 @@
-import { fs, worker } from "@dogma-project/core-host-api";
+import { fs, worker } from "@dogma-project/core-meta-be-node";
 import dir from "./datadir";
 
 export default async function checkHomeDir() {

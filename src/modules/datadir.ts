@@ -1,4 +1,4 @@
-import { os, path, worker } from "@dogma-project/core-host-api";
+import { os, path, worker } from "@dogma-project/core-meta-be-node";
 
 const main = path.join(os.homedir(), "/.dogma-node");
 const data = path.join(main, `/${worker.workerData.prefix}`);

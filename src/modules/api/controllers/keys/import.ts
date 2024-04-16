@@ -1,4 +1,4 @@
-import { fs, path, Buffer, crypto } from "@dogma-project/core-host-api";
+import { fs, path, Buffer, crypto } from "@dogma-project/core-meta-be-node";
 import { C_Event, C_Keys, C_System } from "../../../../constants";
 import stateManager from "../../../../components/state";
 import { Keys } from "../../../../types";

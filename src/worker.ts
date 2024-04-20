@@ -1,4 +1,5 @@
-import { worker, process } from "@dogma-project/core-meta-be-node";
+import worker from "node:worker_threads";
+import process from "node:process";
 import { C_Event } from "./constants";
 import stateManager from "./components/state";
 import "./modules/prototypes";

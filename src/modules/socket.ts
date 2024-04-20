@@ -1,8 +1,6 @@
-import {
-  events as EventEmitter,
-  crypto,
-  net,
-} from "@dogma-project/core-meta-be-node";
+import EventEmitter from "node:events";
+import crypto from "node:crypto";
+import WebSocket from "websocket";
 import { C_Connection, C_Streams, C_Keys, C_Constants } from "../constants";
 import * as Types from "../types";
 import generateSyncId from "./generateSyncId";
@@ -18,7 +16,7 @@ class DogmaSocket extends EventEmitter {
   protected connectionsBridge: ConnectionClass;
 
   public readonly id: Types.Connection.Id;
-  private readonly socket: net.Socket;
+  private readonly connection: WebSocket.connection;
 
   public input: {
     handshake: PlainEncoder;
@@ -83,7 +81,7 @@ class DogmaSocket extends EventEmitter {
   public tested: boolean = false;
 
   constructor(
-    socket: net.Socket,
+    connection: WebSocket.connection,
     direction: Types.Connection.Direction,
     connections: ConnectionClass,
     storage: Storage
@@ -97,29 +95,21 @@ class DogmaSocket extends EventEmitter {
     this.connectionsBridge = connections;
     this.storageBridge = storage;
 
-    this.socket = socket;
-    this.socket.on("close", this.onClose);
-    this.socket.on("error", this.onError);
+    this.connection = connection;
+    this.connection.on("close", this.onClose);
+    this.connection.on("error", this.onError);
     this.input = {
       handshake: new PlainEncoder({
         id: C_Streams.MX.handshake,
       }),
     };
-    this.input.handshake.pipe(this.socket); // unencrypted
+    this.input.handshake.pipe(this.connection.socket); // unencrypted
     this.status = C_Connection.Status.connected;
     this.setDecoder();
     this.sendHandshake(C_Connection.Stage.init);
-    const host = socket.remoteAddress;
-    const port = socket.remotePort;
-    const family = socket.remoteFamily;
-    if (host && port && family) {
-      this.peer = {
-        host,
-        port,
-        address: `${host}:${port}`,
-        version: family === "IPv4" ? 4 : 6,
-        public: host.indexOf("192.168.") === -1, // edit for ipv6
-      };
+    const address = connection.remoteAddress; // check
+    if (address) {
+      this.peer = connections.peerFromIP(address);
     } else {
       throw "Unknown address";
     }
@@ -135,8 +125,11 @@ class DogmaSocket extends EventEmitter {
     this.decoder = new Decoder(privateNodeKey);
     this.decoder.symmetricKey = this.inSymmetricKey;
     this.decoder.on("data", (data) => this.onData(data));
-    this.socket.on("data", (data) => {
-      this.decoder && this.decoder.input(data);
+    this.connection.on("message", (data) => {
+      this.decoder &&
+        this.decoder.input(
+          data.type === "binary" ? data.binaryData : Buffer.from(data.utf8Data)
+        );
     });
   }
 
@@ -148,7 +141,7 @@ class DogmaSocket extends EventEmitter {
       id: C_Streams.MX.key,
       publicKey: this.publicNodeKey,
     });
-    this.input.key.pipe(this.socket);
+    this.input.key.pipe(this.connection.socket);
   }
 
   private setAesEncoders() {
@@ -160,37 +153,37 @@ class DogmaSocket extends EventEmitter {
       id: C_Streams.MX.test,
       symmetricKey: this.outSymmetricKey,
     });
-    this.input.test.pipe(this.socket);
+    this.input.test.pipe(this.connection.socket);
 
     this.input.control = new AesEncoder({
       id: C_Streams.MX.control,
       symmetricKey: this.outSymmetricKey,
     });
-    this.input.control.pipe(this.socket);
+    this.input.control.pipe(this.connection.socket);
 
     this.input.messages = new AesEncoder({
       id: C_Streams.MX.messages,
       symmetricKey: this.outSymmetricKey,
     });
-    this.input.messages.pipe(this.socket);
+    this.input.messages.pipe(this.connection.socket);
 
     this.input.mail = new AesEncoder({
       id: C_Streams.MX.mail,
       symmetricKey: this.outSymmetricKey,
     });
-    this.input.mail.pipe(this.socket);
+    this.input.mail.pipe(this.connection.socket);
 
     this.input.dht = new AesEncoder({
       id: C_Streams.MX.dht,
       symmetricKey: this.outSymmetricKey,
     });
-    this.input.dht.pipe(this.socket);
+    this.input.dht.pipe(this.connection.socket);
 
     this.input.sync = new AesEncoder({
       id: C_Streams.MX.sync,
       symmetricKey: this.outSymmetricKey,
     });
-    this.input.sync.pipe(this.socket);
+    this.input.sync.pipe(this.connection.socket);
   }
 
   /**
@@ -199,7 +192,7 @@ class DogmaSocket extends EventEmitter {
   private async setGroup() {
     try {
       if (!this.user_id || !this.node_id) {
-        this.destroy("Peer user_id or node_id not defined");
+        this.destroy(0, "Peer user_id or node_id not defined");
         return Promise.reject(null);
       }
       if (this.user_id === this.storageBridge.user.id) {
@@ -248,7 +241,7 @@ class DogmaSocket extends EventEmitter {
           peer: this.peer,
           router_port: this.router_port,
         });
-        this.destroy("friendship request handled");
+        this.destroy(1, "friendship request handled");
         /*
         if (this.direction == C_Connection.Direction.incoming) {
           // edit
@@ -257,7 +250,7 @@ class DogmaSocket extends EventEmitter {
         }
         */
       } else {
-        this.destroy("not allowed!");
+        this.destroy(2, "not allowed!");
       }
     } else if (this.status === C_Connection.Status.authorized) {
       // ok
@@ -282,7 +275,7 @@ class DogmaSocket extends EventEmitter {
 
   private onData = onData;
 
-  private onClose = async (hadError: boolean) => {
+  private onClose = async (code: number, desc: string) => {
     this.emit("offline", this.node_id);
     logger.info("connection", "closed", this.id);
   };
@@ -331,7 +324,7 @@ class DogmaSocket extends EventEmitter {
       );
 
       if (!userSign || !nodeSign) {
-        return this.destroy("Can't sign session code");
+        return this.destroy(3, "Can't sign session code");
       }
 
       const request: Types.Connection.Handshake.StageVerificationRequest = {
@@ -451,9 +444,12 @@ class DogmaSocket extends EventEmitter {
    * @param reason
    * @returns
    */
-  public destroy(reason?: string) {
-    if (reason) logger.log("Socket", "closed", reason);
-    return this.socket.destroy();
+  public destroy(
+    reasonCode?: number | undefined,
+    description?: string | undefined
+  ) {
+    if (reasonCode) logger.log("Socket", "closed", reasonCode);
+    return this.connection.close(reasonCode, description);
   }
 }
 

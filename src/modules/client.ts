@@ -1,4 +1,4 @@
-import { net } from "@dogma-project/core-meta-be-node";
+import WebSocket from "websocket";
 import logger from "./logger";
 import * as Types from "../types";
 import StateManager from "./state";
@@ -31,14 +31,16 @@ export default class Client {
 
   private _connect(peer: Types.Connection.Peer) {
     try {
-      const socket = net.connect(peer.port, peer.host, () => {
+      const socket = new WebSocket.client();
+      socket.connect("ws://" + peer.address);
+      socket.on("connect", (connection) => {
         this.connectionsBridge.onConnect(
-          socket,
+          connection,
           peer,
           C_Connection.Direction.outcoming
         );
       });
-      socket.on("error", (err: Error) => {
+      socket.on("connectFailed", (err: Error) => {
         // determine reason
         // logger.warn("CONNECT", err);
       });
@@ -100,34 +102,33 @@ export default class Client {
 
   test(peer: Types.Connection.Peer, cb: (result: boolean) => void) {
     try {
-      logger.log("client", "TEST OWN SERVER", peer.address);
+      logger.debug("client", "TEST OWN SERVER", peer.address);
+      const socket = new WebSocket.client();
+      socket.connect("ws://" + peer.address);
 
-      const socket = net.connect({
-        port: peer.port,
-        host: peer.host,
-        allowHalfOpen: false,
-        noDelay: true,
-        keepAlive: false,
-      });
+      const timeout = setTimeout(() => {
+        return resultError();
+      }, 5000);
 
-      socket.setTimeout(5000);
-      socket.on("timeout", () => {
-        if (socket.connecting) {
-          logger.log("client", "TEST CONNECTION TIMEOUT");
-          socket.destroy();
-          return cb(false);
-        } else {
-          logger.warn("client", "TEST CONNECTION UNKNOWN BEHAVIOUR");
-        }
-      });
-      socket.on("error", (error) => {
-        logger.log("client", "TEST CONNECTION ERROR");
+      const resultOk = () => {
+        logger.debug("client", "TEST CONNECTION SUCCESSFUL");
+        clearTimeout(timeout);
+        socket.abort(); // check api
+        cb(true);
+      };
+
+      const resultError = () => {
+        logger.warn("client", "TEST CONNECTION ERROR");
+        clearTimeout(timeout);
+        socket.abort();
         cb(false);
+      };
+
+      socket.on("connectFailed", (error) => {
+        return resultError();
       });
       socket.on("connect", () => {
-        logger.log("client", "TEST CONNECTION SUCCESSFUL");
-        socket.destroy();
-        cb(true);
+        return resultOk();
       });
     } catch (e) {
       logger.error("client.js", "test", "Can't establish connection", e);

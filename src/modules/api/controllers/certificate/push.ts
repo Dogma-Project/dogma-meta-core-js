@@ -1,7 +1,7 @@
 import { userModel, nodeModel } from "../../../../components/model";
 import { Node } from "../../../../types";
 import logger from "../../../logger";
-import { Buffer } from "@dogma-project/core-meta-be-node";
+import { Buffer } from "node:buffer";
 
 /**
  * @todo add validations

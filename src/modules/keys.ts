@@ -1,4 +1,6 @@
-import { fs, Buffer, crypto } from "@dogma-project/core-meta-be-node";
+import fs from "node:fs/promises";
+import { Buffer } from "node:buffer";
+import crypto from "node:crypto";
 import { Keys } from "../types";
 import logger from "./logger";
 import dir from "./datadir";

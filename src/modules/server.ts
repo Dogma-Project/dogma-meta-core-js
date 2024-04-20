@@ -1,10 +1,11 @@
-import { net } from "@dogma-project/core-meta-be-node";
+import WebSocket from "websocket";
+import http from "node:http";
 import logger from "./logger";
-import * as Types from "../types";
 import Connections from "./connections";
 import StateManager from "./state";
 import Storage from "./storage";
 import { C_Connection, C_Event, C_System } from "../constants";
+
 /** @module Server */
 
 export default class Server {
@@ -12,7 +13,7 @@ export default class Server {
   stateBridge: StateManager;
   storageBridge: Storage;
 
-  ss: net.Server | null = null;
+  ss: WebSocket.server | null = null;
   port: number = 0;
 
   constructor({
@@ -32,42 +33,45 @@ export default class Server {
   private listen(port: number) {
     this.port = port;
 
-    this.ss = net.createServer({}, (socket) => {
-      const host = socket.remoteAddress || "127.0.0.1"; // edit
-      const port = socket.remotePort || 0; // edit
-      const peer: Types.Connection.Peer = {
-        host,
-        port,
-        address: host + ":" + port,
-        version: 4,
-      };
-      this.connectionsBridge.onConnect(
-        socket,
-        peer,
-        C_Connection.Direction.incoming
-      );
+    const httpServer = http.createServer((request, response) => {
+      console.log(new Date() + " Received request for " + request.url);
+      response.writeHead(404);
+      response.end();
     });
-
-    const host = "0.0.0.0"; // temp
-    this.ss.listen(port, host, () => {
-      logger.info("server", `TCP socket is listening on ${host}:${port}`);
+    httpServer.listen(this.port, "0.0.0.0", () => {
+      logger.info("server", `Websocket is listening on port ${port}`);
       this.storageBridge.node.router_port = port;
       this.stateBridge.emit(C_Event.Type.server, C_System.States.limited);
     });
-
-    this.ss.on("error", (error) => {
+    httpServer.on("error", (error) => {
       this.stateBridge.emit(C_Event.Type.server, C_System.States.error);
       logger.error("server", "SERVER ERROR", error);
     });
-
-    this.ss.on("close", () => {
+    httpServer.on("close", () => {
       logger.log("server", "SOCKET SERVER CLOSED");
+    });
+
+    this.ss = new WebSocket.server({
+      httpServer,
+      autoAcceptConnections: true, // check
+    });
+
+    this.ss.on("request", (request) => {
+      const connection = request.accept(); // add protocol
+      const address = connection.remoteAddress || "127.0.0.1"; // edit
+      const peer = this.connectionsBridge.peerFromIP(address);
+      logger.debug("PEER", peer);
+      this.connectionsBridge.onConnect(
+        connection,
+        peer,
+        C_Connection.Direction.incoming
+      );
     });
   }
 
   private refresh(port: number) {
     this.stateBridge.emit(C_Event.Type.server, C_System.States.disabled);
-    this.ss && this.ss.close();
+    this.ss && this.ss.shutDown(); // test
     return this.listen(port);
   }
 

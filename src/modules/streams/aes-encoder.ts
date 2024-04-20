@@ -1,4 +1,7 @@
-import { stream, crypto, Buffer } from "@dogma-project/core-meta-be-node";
+import { Buffer } from "node:buffer";
+import stream from "node:stream";
+import crypto from "node:crypto";
+
 import logger from "../logger";
 import { C_Streams } from "../../constants";
 import { Streams } from "../../types";

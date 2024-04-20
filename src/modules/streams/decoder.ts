@@ -1,8 +1,7 @@
-import {
-  events as EventEmitter,
-  crypto,
-  Buffer,
-} from "@dogma-project/core-meta-be-node";
+import { Buffer } from "node:buffer";
+import EventEmitter from "node:events";
+import crypto from "node:crypto";
+
 import { Streams } from "../../types";
 import logger from "../logger";
 import { C_Streams } from "../../constants";

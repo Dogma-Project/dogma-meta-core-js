@@ -1,4 +1,5 @@
-import { crypto, Buffer } from "@dogma-project/core-meta-be-node";
+import { Buffer } from "node:buffer";
+import crypto from "node:crypto";
 
 export default function EncryptDb(plaintext: string, key: string) {
   const iv = crypto.randomBytes(16); // move to constants

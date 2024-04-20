@@ -1,4 +1,3 @@
-import { events as EventEmitter } from "@dogma-project/core-meta-be-node";
 import logger from "./logger";
 import * as Types from "../types";
 import Storage from "./storage";
@@ -8,6 +7,7 @@ import Connections from "./connections";
 import { DHTModel } from "./model";
 import { C_Connection, C_Streams, C_DHT } from "../constants";
 import { Connection, DHT } from "../types";
+import EventEmitter from "node:events";
 
 export type DHTParams = {
   connections: Connections;

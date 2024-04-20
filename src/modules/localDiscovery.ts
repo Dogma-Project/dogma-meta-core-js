@@ -1,10 +1,8 @@
-import {
-  events as EventEmitter,
-  dgram,
-} from "@dogma-project/core-meta-be-node";
+import dgram from "node:dgram";
 import * as Types from "../types";
 import { getLocalAddress } from "./getLocalAddress";
 import logger from "./logger";
+import EventEmitter from "node:events";
 
 /** @module LocalDiscovery */
 

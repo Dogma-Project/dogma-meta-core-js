@@ -1,4 +1,4 @@
-import { net } from "@dogma-project/core-meta-be-node";
+import WebSocket from "websocket";
 import logger from "../logger";
 import * as Types from "../../types";
 import ConnectionClass from "../connections";
@@ -8,7 +8,7 @@ import { Connection } from "../../types";
 
 export default function onConnect(
   this: ConnectionClass,
-  socket: net.Socket,
+  socket: WebSocket.connection,
   peer: Types.Connection.Peer,
   direction: Connection.Direction
 ) {
@@ -53,7 +53,7 @@ export default function onConnect(
         );
       }
     } else {
-      dogmaSocket.destroy("Unknown user or node id");
+      dogmaSocket.destroy(0, "Unknown user or node id");
       logger.warn("connection", "Unknown user or node id");
     }
   });

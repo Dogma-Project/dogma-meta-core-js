@@ -1,9 +1,10 @@
 {
   "name": "@dogma-project/core-meta",
-  "version": "0.10.7",
+  "version": "0.11.1",
   "description": "Dogma is a cross-platform, non-anonymous, privacy-oriented decentralized communication platform written in JavaScript. Core package",
   "main": "./dist/export.js",
   "types": "./declarations/export.d.ts",
+  "private": true,
   "scripts": {
     "dev": "prefix=dev tsc-watch --onSuccess 'node ./dist/dev.js'",
     "dev2": "prefix=dev2 tsc-watch --onSuccess 'node ./dist/dev.js'",
@@ -37,11 +38,12 @@
     "email": "rotegott@dogma-project.org"
   },
   "dependencies": {
-    "@dogma-project/core-meta-be-node": "github:Dogma-Project/dogma-meta-core-js-be-node",
-    "@seald-io/nedb": "^4.0.3"
+    "@seald-io/nedb": "^4.0.3",
+    "websocket": "^1.0.34"
   },
   "devDependencies": {
     "@types/node": "^20.11.1",
+    "@types/websocket": "^1.0.10",
     "tsc-watch": "^6.2.0",
     "typedoc": "^0.25.13",
     "typescript": "^5.4.5"

@@ -1,4 +1,5 @@
-import { stream, crypto } from "@dogma-project/core-meta-be-node";
+import crypto from "node:crypto";
+import stream from "node:stream";
 import DogmaSocket from "../modules/socket";
 import { C_Streams } from "../constants";
 import { ValuesOf } from "./_main";

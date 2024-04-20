@@ -1,6 +1,11 @@
-import { net } from "@dogma-project/core-meta-be-node";
-
+/**
+ * @todo rewrite to websocket
+ * @param port
+ * @returns
+ */
 export default async function CheckPort(port: number) {
+  return Promise.resolve(true);
+  /*
   return new Promise((resolve, reject) => {
     const s = net.createServer();
     s.once("error", (err: any) => {
@@ -17,4 +22,5 @@ export default async function CheckPort(port: number) {
     });
     s.listen(port);
   });
+  */
 }

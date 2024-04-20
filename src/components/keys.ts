@@ -1,4 +1,5 @@
-import { fs, worker } from "@dogma-project/core-meta-be-node";
+import worker from "node:worker_threads";
+import fs from "node:fs/promises";
 import stateManager from "./state";
 import storage from "./storage";
 import dataDir from "../modules/datadir";

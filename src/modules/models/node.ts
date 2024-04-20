@@ -1,4 +1,4 @@
-import { path } from "@dogma-project/core-meta-be-node";
+import path from "node:path";
 import logger from "../logger";
 import { Node, User } from "../../types";
 import dataDir from "../datadir";

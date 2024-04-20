@@ -1,4 +1,4 @@
-import { process } from "@dogma-project/core-meta-be-node";
+import process from "node:process";
 import { API } from "../../../types";
 import { C_API } from "../../../constants";
 import WorkerApi from "../index";

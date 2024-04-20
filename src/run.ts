@@ -1,7 +1,6 @@
-import {
-  events as EventEmitter,
-  worker,
-} from "@dogma-project/core-meta-be-node";
+import EventEmitter from "node:events";
+import worker from "node:worker_threads";
+
 import * as Constants from "./constants";
 import generateSyncId from "./modules/generateSyncId";
 import { API } from "./types";

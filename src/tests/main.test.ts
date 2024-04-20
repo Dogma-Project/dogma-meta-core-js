@@ -1,4 +1,5 @@
-import { test, assert } from "@dogma-project/core-meta-be-node";
+import test from "node:test";
+import assert from "node:assert";
 
 import logger from "../modules/logger";
 import RunWorker from "../run";
@@ -7,14 +8,14 @@ import { C_API, C_Event, C_Keys, C_System } from "../constants";
 const workerAuto = new RunWorker({
   prefix: "test-1",
   routerPort: 27834,
-  loglevel: C_System.LogLevel.warnings,
+  loglevel: C_System.LogLevel.debug,
   auto: true,
 });
 
 const workerSecondOwn = new RunWorker({
   prefix: "test-2",
   routerPort: 27835,
-  loglevel: C_System.LogLevel.warnings,
+  loglevel: C_System.LogLevel.debug,
 });
 
 let testingImport = false;
@@ -23,6 +24,7 @@ logger.info("TEST", "Running tests");
 
 workerAuto.on("state", async (data) => {
   if (data.event === C_Event.Type.ready) {
+    console.log(data);
     if (data.payload && data.payload === true) {
       if (testingImport === true) return;
       testingImport = true;

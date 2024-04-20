@@ -19,31 +19,37 @@ export const Streams = {
     /**
      * AES symmetric-encrypted MX
      */
-    messages: 4,
+    dht: 4,
     /**
      * AES symmetric-encrypted MX
      */
-    mail: 5,
+    relay: 5,
+
     /**
+     * DATA MX
      * AES symmetric-encrypted MX
      */
-    dht: 6,
+    sync: 100,
     /**
+     * DATA MX
      * AES symmetric-encrypted MX
      */
-    web: 7,
+    messages: 101,
     /**
+     * DATA MX
      * AES symmetric-encrypted MX
      */
-    file: 8,
+    file: 102,
     /**
+     * DATA MX
      * AES symmetric-encrypted MX
      */
-    relay: 9,
+    mail: 103,
     /**
-     * AES symmetric-encrypted MX for sync
+     * DATA MX
+     * AES symmetric-encrypted MX
      */
-    sync: 10,
+    web: 104,
   },
 
   SIZES: {

@@ -16,8 +16,8 @@ import { API } from "./constants/api";
 export const PROTOCOL = {
   DB: 1,
   CERTIFICATE: 0,
-  CONNECTION: 2,
-};
+  CONNECTION: 3,
+} as const;
 
 export {
   Connection as C_Connection,

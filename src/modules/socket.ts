@@ -1,7 +1,13 @@
 import EventEmitter from "node:events";
 import crypto from "node:crypto";
 import WebSocket from "websocket";
-import { C_Connection, C_Streams, C_Keys, C_Constants } from "../constants";
+import {
+  C_Connection,
+  C_Streams,
+  C_Keys,
+  C_Constants,
+  PROTOCOL,
+} from "../constants";
 import * as Types from "../types";
 import generateSyncId from "./generateSyncId";
 import logger from "./logger";
@@ -103,6 +109,9 @@ class DogmaSocket extends EventEmitter {
         id: C_Streams.MX.handshake,
       }),
     };
+    /**
+     * websocket
+     */
     this.input.handshake.pipe(this.connection.socket); // unencrypted
     this.status = C_Connection.Status.connected;
     this.setDecoder();
@@ -126,10 +135,13 @@ class DogmaSocket extends EventEmitter {
     this.decoder.symmetricKey = this.inSymmetricKey;
     this.decoder.on("data", (data) => this.onData(data));
     this.connection.on("message", (data) => {
-      this.decoder &&
-        this.decoder.input(
-          data.type === "binary" ? data.binaryData : Buffer.from(data.utf8Data)
-        );
+      if (this.decoder) {
+        if (data.type === "binary") {
+          this.decoder.input(data.binaryData);
+        } else {
+          logger.warn("WS DATA", "Unexpected UTF-8 data");
+        }
+      }
     });
   }
 
@@ -141,6 +153,9 @@ class DogmaSocket extends EventEmitter {
       id: C_Streams.MX.key,
       publicKey: this.publicNodeKey,
     });
+    /**
+     * websocket
+     */
     this.input.key.pipe(this.connection.socket);
   }
 
@@ -153,37 +168,55 @@ class DogmaSocket extends EventEmitter {
       id: C_Streams.MX.test,
       symmetricKey: this.outSymmetricKey,
     });
+    /**
+     * websocket
+     */
     this.input.test.pipe(this.connection.socket);
 
     this.input.control = new AesEncoder({
       id: C_Streams.MX.control,
       symmetricKey: this.outSymmetricKey,
     });
+    /**
+     * websocket
+     */
     this.input.control.pipe(this.connection.socket);
-
-    this.input.messages = new AesEncoder({
-      id: C_Streams.MX.messages,
-      symmetricKey: this.outSymmetricKey,
-    });
-    this.input.messages.pipe(this.connection.socket);
-
-    this.input.mail = new AesEncoder({
-      id: C_Streams.MX.mail,
-      symmetricKey: this.outSymmetricKey,
-    });
-    this.input.mail.pipe(this.connection.socket);
 
     this.input.dht = new AesEncoder({
       id: C_Streams.MX.dht,
       symmetricKey: this.outSymmetricKey,
     });
+    /**
+     * websocket
+     */
     this.input.dht.pipe(this.connection.socket);
 
     this.input.sync = new AesEncoder({
       id: C_Streams.MX.sync,
       symmetricKey: this.outSymmetricKey,
     });
+    /**
+     * webrtc
+     */
     this.input.sync.pipe(this.connection.socket);
+
+    this.input.messages = new AesEncoder({
+      id: C_Streams.MX.messages,
+      symmetricKey: this.outSymmetricKey,
+    });
+    /**
+     * webrtc
+     */
+    this.input.messages.pipe(this.connection.socket);
+
+    this.input.mail = new AesEncoder({
+      id: C_Streams.MX.mail,
+      symmetricKey: this.outSymmetricKey,
+    });
+    /**
+     * webrtc
+     */
+    this.input.mail.pipe(this.connection.socket);
   }
 
   /**
@@ -300,7 +333,7 @@ class DogmaSocket extends EventEmitter {
       }
       const request: Types.Connection.Handshake.StageInitRequest = {
         stage,
-        protocol: 2,
+        protocol: PROTOCOL.CONNECTION,
         session: this.outSession,
         user_id: this.storageBridge.user.id || "",
         user_name: this.storageBridge.user.name,

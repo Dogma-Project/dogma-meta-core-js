@@ -1,7 +1,7 @@
 import DogmaSocket from "../modules/socket";
 import { User } from "./user";
 import { Node } from "./node";
-import { C_Connection } from "../constants";
+import { C_Connection, PROTOCOL } from "../constants";
 import { ValuesOf } from "./_main";
 
 export namespace Connection {
@@ -29,7 +29,7 @@ export namespace Connection {
   export namespace Handshake {
     export type StageInitRequest = {
       stage: typeof C_Connection.Stage.init;
-      protocol: 2;
+      protocol: typeof PROTOCOL.CONNECTION;
       session: string;
       user_id: User.Id;
       user_name: string;

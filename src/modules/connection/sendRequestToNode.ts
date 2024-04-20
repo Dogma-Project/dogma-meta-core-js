@@ -12,8 +12,9 @@ export default function send(
   try {
     logger.log("Connection", "Sending request to node", node_id);
     const socket = this.getConnectionByNodeId(node_id);
-    if (!socket)
+    if (!socket) {
       return response(1, C_Constants.MessageCode.unknown, "user is offline"); // edit
+    }
     switch (request.class) {
       case C_Streams.MX.dht:
         var str = JSON.stringify(request.body);
